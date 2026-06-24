@@ -31,32 +31,20 @@ jobs:
       - name: Android SDK yolu ayarla
         run: echo "sdk.dir=$ANDROID_HOME" > android/local.properties
 
-      - name: Keystore önbellekten yükle
-        id: cache-keystore
-        uses: actions/cache@v4
-        with:
-          path: ~/.android/debug.keystore
-          key: android-debug-keystore-v1
+      - name: Keystore'u secrets'tan oluştur
+        run: echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > android/app/yokdil.keystore
 
-      - name: Keystore oluştur (sadece ilk çalıştırmada)
-        if: steps.cache-keystore.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p ~/.android
-          keytool -genkeypair -v \
-            -keystore ~/.android/debug.keystore \
-            -alias androiddebugkey \
-            -keyalg RSA -keysize 2048 \
-            -validity 10000 \
-            -storepass android \
-            -keypass android \
-            -dname "CN=Android Debug,O=Android,C=US"
-
-      - name: Build debug APK
-        run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - name: Build release APK
+        run: cd android && chmod +x gradlew && ./gradlew assembleRelease --no-daemon
+        env:
+          KEYSTORE_PATH: app/yokdil.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: yokdil-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: yokdil-release
+          path: android/app/build/outputs/apk/release/app-release.apk
           retention-days: 30
