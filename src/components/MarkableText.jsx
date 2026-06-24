@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useStore } from "../store.js";
 
 export default function MarkableText({ text, className }) {
@@ -6,27 +6,6 @@ export default function MarkableText({ text, className }) {
   const pendingWords = useStore((s) => s.pendingWords);
   const addPendingWord = useStore((s) => s.addPendingWord);
   const [msg, setMsg] = useState(null);
-  const [selPhrase, setSelPhrase] = useState(null);
-  const containerRef = useRef();
-
-  useEffect(() => {
-    const onSelChange = () => {
-      const sel = window.getSelection();
-      const raw = sel?.toString().trim();
-      if (
-        raw && raw.length > 2 &&
-        containerRef.current?.contains(sel.anchorNode)
-      ) {
-        const cleaned = raw.replace(/[^A-Za-z\s'''-]/g, " ").trim().replace(/\s+/g, " ").toLowerCase();
-        if (cleaned.includes(" ")) setSelPhrase(cleaned);
-        else setSelPhrase(null);
-      } else {
-        setSelPhrase(null);
-      }
-    };
-    document.addEventListener("selectionchange", onSelChange);
-    return () => document.removeEventListener("selectionchange", onSelChange);
-  }, []);
 
   if (!text) return null;
 
@@ -34,18 +13,7 @@ export default function MarkableText({ text, className }) {
   const pendingKeys = new Set(pendingWords.map((w) => w.word.toLowerCase()));
   const tokens = text.match(/[A-Za-z'']+|[^A-Za-z'']+/g) || [text];
 
-  const addPhrase = (phrase) => {
-    window.getSelection()?.removeAllRanges();
-    setSelPhrase(null);
-    if (knownKeys.has(phrase)) {
-      flash(`"${phrase}" zaten kelimelerde var.`);
-    } else if (pendingKeys.has(phrase)) {
-      flash(`"${phrase}" zaten bekleme listesinde.`);
-    } else {
-      addPendingWord(phrase, text);
-      flash(`✓ "${phrase}" bekleme listesine eklendi.`);
-    }
-  };
+  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(null), 1800); };
 
   const handleMark = (raw) => {
     const clean = raw.replace(/['']+$/, "").toLowerCase();
@@ -55,10 +23,8 @@ export default function MarkableText({ text, className }) {
     else { addPendingWord(clean, text); flash(`✓ "${clean}" bekleme listesine eklendi.`); }
   };
 
-  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(null), 1800); };
-
   return (
-    <span className={className} ref={containerRef}>
+    <span className={className} style={{ userSelect: "none", WebkitUserSelect: "none" }}>
       {tokens.map((tok, i) => {
         const isWord = /[A-Za-z]/.test(tok);
         if (!isWord) return <span key={i}>{tok}</span>;
@@ -69,21 +35,14 @@ export default function MarkableText({ text, className }) {
           <span
             key={i}
             className={"mw" + (marked ? " mw-known" : "") + (pending ? " mw-pending" : "")}
-            onClick={(e) => { e.stopPropagation(); if (!window.getSelection()?.toString().trim()) handleMark(tok); }}
+            onClick={(e) => { e.stopPropagation(); handleMark(tok); }}
             title="Kelimeyi işaretle"
           >
             {tok}
           </span>
         );
       })}
-      {selPhrase && (
-        <span className="mw-toast mw-phrase-toast">
-          <span>"{selPhrase}"</span>
-          <button className="phrase-add-btn" onClick={() => addPhrase(selPhrase)}>+ Ekle</button>
-          <button className="phrase-cancel-btn" onClick={() => { window.getSelection()?.removeAllRanges(); setSelPhrase(null); }}>✕</button>
-        </span>
-      )}
-      {!selPhrase && msg && <span className="mw-toast">{msg}</span>}
+      {msg && <span className="mw-toast">{msg}</span>}
     </span>
   );
 }

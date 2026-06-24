@@ -16,6 +16,7 @@ export default function Words() {
   const words = useStore((s) => s.words);
   const pendingWords = useStore((s) => s.pendingWords);
   const clearPendingWords = useStore((s) => s.clearPendingWords);
+  const removePendingWord = useStore((s) => s.removePendingWord);
   const addWord = useStore((s) => s.addWord);
   const importWords = useStore((s) => s.importWords);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
@@ -98,7 +99,12 @@ export default function Words() {
         <div className="card pending-card">
           <p className="pending-title">Bekleyen kelimeler: <strong>{pendingWords.length}</strong></p>
           <div className="pending-chips">
-            {pendingWords.map((w) => <span key={w.word} className="pending-chip">{w.word}</span>)}
+            {pendingWords.map((w) => (
+              <span key={w.word} className="pending-chip">
+                {w.word}
+                <button className="pending-chip-x" onClick={() => removePendingWord(w.word)}>✕</button>
+              </span>
+            ))}
           </div>
           {analyzeError && <div className="alert">{analyzeError}</div>}
           <button className="btn btn-primary" onClick={onAnalyze} disabled={analyzing}>

@@ -128,6 +128,8 @@ export const useStore = create(
         return true;
       },
       clearPendingWords: () => set({ pendingWords: [] }),
+      removePendingWord: (word) =>
+        set((s) => ({ pendingWords: s.pendingWords.filter((w) => w.word !== word) })),
       addWord: (wordObj) => {
         const key = wordObj.word.trim().toLowerCase();
         const exists = get().words.find((w) => w.word.toLowerCase() === key);

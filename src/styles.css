@@ -204,7 +204,8 @@ button.opt-letter:disabled { opacity: 0.85; }
 .pending-card { display: flex; flex-direction: column; gap: 10px; border-color: var(--primary); }
 .pending-title { margin: 0; }
 .pending-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.pending-chip { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 13px; }
+.pending-chip { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; }
+.pending-chip-x { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; padding: 0; line-height: 1; }
 .mw-pending { background: rgba(245,158,11,0.25); text-decoration: underline dotted; }
 .mw-phrase-toast { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .phrase-add-btn { background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 3px 8px; font-size: 13px; cursor: pointer; }
