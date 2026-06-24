@@ -1,51 +1,30 @@
 import { useState } from "react";
 import { useStore } from "../store.js";
-import { analyzeWord } from "../lib/ai.js";
 
-// İngilizce kelimeleri tıklanabilir yapar. Tıklanan kelime "bilinmeyen kelimeler"e
-// (Kelimeler oyununa) eklenir.
 export default function MarkableText({ text, className }) {
-  const settings = useStore((s) => s.settings);
-  const addWord = useStore((s) => s.addWord);
   const words = useStore((s) => s.words);
-  const [busy, setBusy] = useState(null);
+  const pendingWords = useStore((s) => s.pendingWords);
+  const addPendingWord = useStore((s) => s.addPendingWord);
   const [msg, setMsg] = useState(null);
 
   if (!text) return null;
 
-  const known = new Set(words.map((w) => w.word.toLowerCase()));
-  // Kelime + aradaki boşluk/noktalama olarak parçala.
-  const tokens = text.match(/[A-Za-z'’]+|[^A-Za-z'’]+/g) || [text];
+  const knownKeys = new Set(words.map((w) => w.word.toLowerCase()));
+  const pendingKeys = new Set(pendingWords.map((w) => w.word.toLowerCase()));
+  const tokens = text.match(/[A-Za-z'']+|[^A-Za-z'']+/g) || [text];
 
-  const handleMark = async (raw) => {
-    const clean = raw.replace(/['’]+$/, "").toLowerCase();
+  const handleMark = (raw) => {
+    const clean = raw.replace(/['']+$/, "").toLowerCase();
     if (clean.length < 2) return;
-    if (known.has(clean)) {
+    if (knownKeys.has(clean)) {
       setMsg(`"${clean}" zaten kelimelerde var.`);
-      setTimeout(() => setMsg(null), 1500);
-      return;
+    } else if (pendingKeys.has(clean)) {
+      setMsg(`"${clean}" zaten bekleme listesinde.`);
+    } else {
+      addPendingWord(clean, text);
+      setMsg(`✓ "${clean}" bekleme listesine eklendi.`);
     }
-    if (!settings.apiKey) {
-      setMsg("Önce Ayarlar'dan API anahtarı ekle.");
-      setTimeout(() => setMsg(null), 2000);
-      return;
-    }
-    setBusy(clean);
-    try {
-      const data = await analyzeWord({
-        apiKey: settings.apiKey,
-        model: settings.model,
-        word: clean,
-        context: text,
-      });
-      addWord(data);
-      setMsg(`✓ "${clean}" kelimelere eklendi.`);
-    } catch (e) {
-      setMsg("Hata: " + (e.message || "kelime eklenemedi"));
-    } finally {
-      setBusy(null);
-      setTimeout(() => setMsg(null), 2000);
-    }
+    setTimeout(() => setMsg(null), 1800);
   };
 
   return (
@@ -53,18 +32,14 @@ export default function MarkableText({ text, className }) {
       {tokens.map((tok, i) => {
         const isWord = /[A-Za-z]/.test(tok);
         if (!isWord) return <span key={i}>{tok}</span>;
-        const clean = tok.replace(/['’]+$/, "").toLowerCase();
-        const marked = known.has(clean);
+        const clean = tok.replace(/['']+$/, "").toLowerCase();
+        const marked = knownKeys.has(clean);
+        const pending = pendingKeys.has(clean);
         return (
           <span
             key={i}
-            className={
-              "mw" + (marked ? " mw-known" : "") + (busy === clean ? " mw-busy" : "")
-            }
-            onClick={(e) => {
-              e.stopPropagation();
-              handleMark(tok);
-            }}
+            className={"mw" + (marked ? " mw-known" : "") + (pending ? " mw-pending" : "")}
+            onClick={(e) => { e.stopPropagation(); handleMark(tok); }}
             title="Kelimeyi işaretle"
           >
             {tok}

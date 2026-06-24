@@ -2,10 +2,20 @@ import { useRef, useState } from "react";
 import { useStore } from "../store.js";
 import { EXTRACT_PROMPT } from "../lib/ai.js";
 
+function exportJSON(data, filename) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function Home({ navigate }) {
   const denemes = useStore((s) => s.denemes);
   const addDeneme = useStore((s) => s.addDeneme);
   const removeDeneme = useStore((s) => s.removeDeneme);
+  const renameDeneme = useStore((s) => s.renameDeneme);
+  const [renamingId, setRenamingId] = useState(null);
+  const [renamingName, setRenamingName] = useState("");
   const fileRef = useRef();
   const [fileName, setFileName] = useState(null);
   const [jsonText, setJsonText] = useState("");
@@ -127,29 +137,55 @@ export default function Home({ navigate }) {
           const correct = d.questions.filter(
             (q) => q.userAnswer && q.userAnswer === q.answer
           ).length;
+          const isRenaming = renamingId === d.id;
           return (
             <div key={d.id} className="card deneme-card">
-              <div className="deneme-info" onClick={() => navigate("solve", d.id)}>
-                <h3>{d.name}</h3>
+              <div className="deneme-info" onClick={() => !isRenaming && navigate("solve", d.id)}>
+                {isRenaming ? (
+                  <div className="rename-row" onClick={(e) => e.stopPropagation()}>
+                    <input
+                      className="input rename-input"
+                      value={renamingName}
+                      autoFocus
+                      onChange={(e) => setRenamingName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && renamingName.trim()) {
+                          renameDeneme(d.id, renamingName.trim());
+                          setRenamingId(null);
+                        } else if (e.key === "Escape") setRenamingId(null);
+                      }}
+                    />
+                    <button className="btn btn-sm btn-primary" onClick={() => {
+                      if (renamingName.trim()) renameDeneme(d.id, renamingName.trim());
+                      setRenamingId(null);
+                    }}>✓</button>
+                    <button className="btn btn-sm btn-ghost" onClick={() => setRenamingId(null)}>✕</button>
+                  </div>
+                ) : (
+                  <h3>{d.name}</h3>
+                )}
                 <p className="muted">
                   {d.questions.length} soru · {answered} cevaplandı · {correct} doğru
                 </p>
                 <div className="progress">
-                  <div
-                    className="progress-bar"
-                    style={{ width: `${(answered / d.questions.length) * 100}%` }}
-                  />
+                  <div className="progress-bar" style={{ width: `${(answered / d.questions.length) * 100}%` }} />
                 </div>
               </div>
-              <button
-                className="icon-btn"
-                title="Denemeyi sil"
-                onClick={() => {
+              <div className="deneme-actions">
+                <button className="icon-btn" title="İsim değiştir" onClick={(e) => {
+                  e.stopPropagation();
+                  setRenamingId(d.id);
+                  setRenamingName(d.name);
+                }}>✏️</button>
+                <button className="icon-btn" title="Dışa aktar" onClick={(e) => {
+                  e.stopPropagation();
+                  exportJSON(d, `${d.name}.json`);
+                }}>⬇️</button>
+                <button className="icon-btn" title="Denemeyi sil" onClick={(e) => {
+                  e.stopPropagation();
                   if (confirm(`"${d.name}" silinsin mi?`)) removeDeneme(d.id);
-                }}
-              >
-                🗑
-              </button>
+                }}>🗑</button>
+              </div>
             </div>
           );
         })}

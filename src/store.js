@@ -38,6 +38,10 @@ export const useStore = create(
           denemes: s.denemes.filter((d) => d.id !== id),
           wrongQuestions: s.wrongQuestions.filter((w) => w.denemeId !== id),
         })),
+      renameDeneme: (id, name) =>
+        set((s) => ({
+          denemes: s.denemes.map((d) => (d.id === id ? { ...d, name } : d)),
+        })),
 
       // Bir soruyu cevapla. Doğru/yanlış döndürür ve yanlışsa yanlışlar paneline ekler.
       answerQuestion: (denemeId, questionId, letter) => {
@@ -114,6 +118,16 @@ export const useStore = create(
 
       // --- Kelimeler ---
       words: [], // { word, meaning_tr, pos, example_en, example_tr, distractors_tr, stats, addedAt }
+      pendingWords: [], // { word, context } — analiz bekleniyor
+      addPendingWord: (word, context) => {
+        const key = word.trim().toLowerCase();
+        const alreadyKnown = get().words.some((w) => w.word.toLowerCase() === key);
+        const alreadyPending = get().pendingWords.some((w) => w.word === key);
+        if (alreadyKnown || alreadyPending) return false;
+        set((s) => ({ pendingWords: [...s.pendingWords, { word: key, context }] }));
+        return true;
+      },
+      clearPendingWords: () => set({ pendingWords: [] }),
       addWord: (wordObj) => {
         const key = wordObj.word.trim().toLowerCase();
         const exists = get().words.find((w) => w.word.toLowerCase() === key);
@@ -139,6 +153,25 @@ export const useStore = create(
         })),
       removeWord: (word) =>
         set((s) => ({ words: s.words.filter((w) => w.word !== word) })),
+      importWords: (incoming) => {
+        const existingKeys = new Set(get().words.map((w) => w.word.toLowerCase()));
+        const toAdd = (incoming || []).filter(
+          (w) => w.word && !existingKeys.has(w.word.toLowerCase())
+        );
+        set((s) => ({
+          words: [
+            ...s.words,
+            ...toAdd.map((w) => ({ ...w, stats: w.stats || emptyStats(), addedAt: w.addedAt || Date.now() })),
+          ],
+        }));
+        return toAdd.length;
+      },
+      importWrongQuestions: (incoming) => {
+        const existingIds = new Set(get().wrongQuestions.map((w) => w.id));
+        const toAdd = (incoming || []).filter((w) => w.id && !existingIds.has(w.id));
+        set((s) => ({ wrongQuestions: [...s.wrongQuestions, ...toAdd] }));
+        return toAdd.length;
+      },
     }),
     {
       name: "yokdil-store-v1",

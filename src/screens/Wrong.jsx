@@ -1,8 +1,16 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useStore } from "../store.js";
 import { explainQuestion } from "../lib/ai.js";
 
 const LETTERS = ["A", "B", "C", "D", "E"];
+
+function exportJSON(data, filename) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
 
 function WrongCard({ w }) {
   const settings = useStore((s) => s.settings);
@@ -14,20 +22,13 @@ function WrongCard({ w }) {
   const q = w.question;
 
   const loadExplanation = async () => {
-    setError(null);
-    setLoading(true);
+    setError(null); setLoading(true);
     try {
-      const text = await explainQuestion({
-        apiKey: settings.apiKey,
-        model: settings.model,
-        question: q,
-      });
+      const text = await explainQuestion({ apiKey: settings.apiKey, model: settings.model, question: q });
       setExplanation(w.id, text);
     } catch (e) {
       setError(e.message || "Açıklama alınamadı.");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
@@ -37,7 +38,6 @@ function WrongCard({ w }) {
         <span>{open ? "▲" : "▼"}</span>
       </div>
       <div className="q-text small">{q.text}</div>
-
       {open && (
         <>
           <div className="options compact">
@@ -53,7 +53,6 @@ function WrongCard({ w }) {
               );
             })}
           </div>
-
           <div className="explain">
             {w.explanation ? (
               <div className="explain-text">{w.explanation}</div>
@@ -64,10 +63,7 @@ function WrongCard({ w }) {
             )}
             {error && <div className="alert">{error}</div>}
           </div>
-
-          <button className="link danger" onClick={() => removeWrong(w.id)}>
-            Bu soruyu listeden kaldır
-          </button>
+          <button className="link danger" onClick={() => removeWrong(w.id)}>Bu soruyu listeden kaldır</button>
         </>
       )}
     </div>
@@ -76,15 +72,42 @@ function WrongCard({ w }) {
 
 export default function Wrong() {
   const wrongQuestions = useStore((s) => s.wrongQuestions);
+  const importWrongQuestions = useStore((s) => s.importWrongQuestions);
+  const importRef = useRef();
+  const [importMsg, setImportMsg] = useState(null);
+
+  const onImport = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        const arr = Array.isArray(data) ? data : data.wrongQuestions;
+        const n = importWrongQuestions(arr);
+        setImportMsg(`${n} yanlış soru eklendi.`);
+        setTimeout(() => setImportMsg(null), 2500);
+      } catch { setImportMsg("Geçersiz JSON."); setTimeout(() => setImportMsg(null), 2500); }
+    };
+    reader.readAsText(file);
+  };
 
   return (
     <div className="screen">
       <header className="screen-head">
         <h1>Yanlışlarım</h1>
-        <p className="muted">
-          Yanlış yaptığın sorular burada. Aç, AI açıklamasını incele.
-        </p>
+        <p className="muted">Yanlış yaptığın sorular burada.</p>
       </header>
+
+      {wrongQuestions.length > 0 && (
+        <div className="io-row">
+          <button className="btn btn-sm" onClick={() => exportJSON(wrongQuestions, "yanlislar.json")}>Dışa Aktar</button>
+          <button className="btn btn-sm" onClick={() => importRef.current?.click()}>İçe Aktar</button>
+          <input ref={importRef} type="file" accept=".json" hidden onChange={onImport} />
+        </div>
+      )}
+      {importMsg && <div className="alert alert-ok">{importMsg}</div>}
 
       {wrongQuestions.length === 0 ? (
         <div className="empty">
@@ -93,9 +116,7 @@ export default function Wrong() {
         </div>
       ) : (
         <div className="list">
-          {wrongQuestions.map((w) => (
-            <WrongCard key={w.id} w={w} />
-          ))}
+          {wrongQuestions.map((w) => <WrongCard key={w.id} w={w} />)}
         </div>
       )}
     </div>

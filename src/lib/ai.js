@@ -74,23 +74,29 @@ const wordSchema = {
   required: ["word", "meaning_tr", "pos", "example_en", "example_tr", "distractors_tr"],
 };
 
-export async function analyzeWord({ apiKey, model, word, context }) {
+export async function analyzeWords({ apiKey, model, words }) {
   const ai = getAI(apiKey);
-  const prompt = `İngilizce kelime: "${word}"
-${context ? `Geçtiği cümle: ${context}` : ""}
+  const list = words
+    .map((w, i) => `${i + 1}. "${w.word}"${w.context ? ` — cümle: ${w.context}` : ""}`)
+    .join("\n");
+  const prompt = `Aşağıdaki İngilizce kelimeler için JSON dizisi üret. Sırayı koru, her kelime bir eleman.
 
-Bu kelime için JSON üret:
+Her eleman için:
+- word: kelimenin kendisi (küçük harf)
 - meaning_tr: bağlamdaki kısa Türkçe anlamı
 - pos: türü (isim/fiil/sıfat/zarf/edat/bağlaç...)
 - example_en: kısa İngilizce örnek cümle
 - example_tr: örnek cümlenin Türkçe çevirisi
-- distractors_tr: kelime oyunu için 3 adet mantıklı ama YANLIŞ Türkçe anlam`;
+- distractors_tr: kelime oyunu için 3 adet mantıklı ama YANLIŞ Türkçe anlam
+
+Kelimeler:
+${list}`;
   const response = await ai.models.generateContent({
     model,
     contents: prompt,
     config: {
       responseMimeType: "application/json",
-      responseSchema: wordSchema,
+      responseSchema: { type: Type.ARRAY, items: wordSchema },
     },
   });
   return JSON.parse(textOf(response));

@@ -200,6 +200,36 @@ button.opt-letter:disabled { opacity: 0.85; }
 .model-opt.selected { border-color: var(--primary); background: rgba(99,102,241,0.1); }
 .model-opt input { margin-top: 3px; }
 
+/* Pending kelimeler */
+.pending-card { display: flex; flex-direction: column; gap: 10px; border-color: var(--primary); }
+.pending-title { margin: 0; }
+.pending-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pending-chip { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 13px; }
+.mw-pending { background: rgba(245,158,11,0.25); text-decoration: underline dotted; }
+
+/* Export/Import satırı */
+.io-row { display: flex; gap: 8px; margin-bottom: 10px; }
+
+/* Import başarı mesajı */
+.alert.alert-ok { background: rgba(34,197,94,0.12); border-color: var(--good); color: #86efac; }
+
+/* Deneme actions */
+.deneme-card { align-items: flex-start; }
+.deneme-actions { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+.rename-row { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
+.rename-input { flex: 1; padding: 6px 10px; font-size: 15px; }
+
+/* Puan ekranı */
+.score-card { text-align: center; padding: 24px 16px; }
+.score-big { font-size: 72px; font-weight: 800; color: var(--primary2); line-height: 1; margin-bottom: 20px; }
+.score-pct { font-size: 36px; }
+.score-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 16px; }
+.score-row:last-child { border-bottom: none; }
+.score-label { color: var(--muted); }
+.score-val { font-weight: 700; }
+.score-val.good { color: var(--good); }
+.score-val.bad { color: var(--bad); }
+
 /* Manuel Claude akışı */
 .claude-card { display: flex; flex-direction: column; gap: 12px; }
 .claude-filename { margin: 0; font-weight: 600; }
