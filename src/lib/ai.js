@@ -11,69 +11,22 @@ function textOf(response) {
   return t;
 }
 
-// ---- 1) PDF'ten soruları + cevap anahtarını çıkar ----
+// ---- 1) PDF → JSON için Claude tarayıcı promptu ----
 
-const denemeSchema = {
-  type: Type.OBJECT,
-  properties: {
-    questions: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          number: { type: Type.INTEGER },
-          passage: { type: Type.STRING, nullable: true },
-          text: { type: Type.STRING },
-          options: {
-            type: Type.OBJECT,
-            properties: {
-              A: { type: Type.STRING },
-              B: { type: Type.STRING },
-              C: { type: Type.STRING },
-              D: { type: Type.STRING },
-              E: { type: Type.STRING, nullable: true },
-            },
-            required: ["A", "B", "C", "D"],
-          },
-          answer: { type: Type.STRING },
-        },
-        required: ["number", "text", "options", "answer"],
-      },
-    },
-  },
-  required: ["questions"],
-};
+export const EXTRACT_PROMPT = `Bu bir YÖKDİL veya YDS İngilizce deneme sınavı PDF'idir.
 
-const EXTRACT_PROMPT = `Bu bir YÖKDİL veya YDS İngilizce deneme sınavı PDF'idir.
-
-Görevin: Tüm soruları SIRAYI BOZMADAN, numaralarıyla birlikte eksiksiz çıkarmak.
+Görevin: Tüm soruları sırayla, numaralarıyla birlikte eksiksiz çıkarmak.
 
 Kurallar:
-- Soru metnini, boşluklu cümleyi ve A-E şıklarını TAM ve ORİJİNAL (İngilizce) haliyle yaz. Hiçbir şeyi çevirme, kısaltma veya düzeltme.
-- Okuma parçası (reading passage) varsa: o parçaya bağlı soru grubunun yalnızca İLK sorusunun "passage" alanına tüm parça metnini koy. Aynı gruptaki diğer soruların "passage" alanını boş (null) bırak.
-- Bir soruda yalnızca 4 şık varsa E alanını boş (null) bırak.
-- Cevap anahtarı genellikle PDF'in SON sayfa(lar)ındadır (ör. "1.C 2.A 3.E ..." veya cevap tablosu). Bu anahtarı bul ve her sorunun "answer" alanına doğru şık harfini (A-E) yaz. Anahtarı bulamadığın soruda en olası cevabı yaz ama mümkün olduğunca anahtara dayan.
-- Soruları PDF'teki numara sırasına göre küçükten büyüğe sırala.
+- Soru metni ve A–E şıklarını TAM, ORİJİNAL İngilizce haliyle yaz. Çevirme, kısaltma veya düzeltme yapma.
+- Okuma parçası (reading passage) varsa: o parçaya ait soru grubunun sadece İLK sorusunun "passage" alanına tüm parçayı koy; diğer soruların "passage" alanını null bırak.
+- 4 şıklı sorularda E alanını null bırak.
+- Cevap anahtarı PDF'in SON sayfasındadır. Her sorunun "answer" alanına doğru şık harfini (A–E) yaz.
+- Soruları numara sırasına göre küçükten büyüğe sırala.
 
-Sadece istenen JSON'u döndür.`;
+SADECE aşağıdaki JSON formatında yanıt ver, başka hiçbir şey yazma:
 
-export async function extractDeneme({ apiKey, model, base64Pdf }) {
-  const ai = getAI(apiKey);
-  const response = await ai.models.generateContent({
-    model,
-    contents: [
-      { inlineData: { mimeType: "application/pdf", data: base64Pdf } },
-      { text: EXTRACT_PROMPT },
-    ],
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: denemeSchema,
-      maxOutputTokens: 65536,
-    },
-  });
-  const data = JSON.parse(textOf(response));
-  return data.questions || [];
-}
+{"questions":[{"number":1,"passage":null,"text":"...","options":{"A":"...","B":"...","C":"...","D":"...","E":null},"answer":"A"},{"number":2,"passage":null,"text":"...","options":{"A":"...","B":"...","C":"...","D":"...","E":null},"answer":"B"}]}`;
 
 // ---- 2) Yanlış yapılan soru için açıklama ----
 

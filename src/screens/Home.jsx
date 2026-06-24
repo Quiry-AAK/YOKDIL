@@ -1,70 +1,64 @@
 import { useRef, useState } from "react";
 import { useStore } from "../store.js";
-import { fileToBase64 } from "../lib/pdf.js";
-import { extractDeneme } from "../lib/ai.js";
+import { EXTRACT_PROMPT } from "../lib/ai.js";
 
 export default function Home({ navigate }) {
   const denemes = useStore((s) => s.denemes);
-  const settings = useStore((s) => s.settings);
   const addDeneme = useStore((s) => s.addDeneme);
   const removeDeneme = useStore((s) => s.removeDeneme);
   const fileRef = useRef();
-  const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [fileName, setFileName] = useState(null);
+  const [jsonText, setJsonText] = useState("");
   const [error, setError] = useState(null);
+  const [copied, setCopied] = useState(false);
 
-  const onPick = async (e) => {
+  const onPick = (e) => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
-    if (!settings.apiKey) {
-      setError("Önce Ayarlar ekranından ücretsiz Gemini API anahtarını ekle.");
-      return;
-    }
+    setFileName(file.name);
+    setJsonText("");
     setError(null);
-    setLoading(true);
-    setProgress(4);
-    // Tek bir API isteği olduğu için ilerleme tahmini olarak ilerletilir,
-    // istek bitince %100'e tamamlanır.
-    const timer = setInterval(() => {
-      setProgress((p) => (p < 92 ? p + Math.max(1, Math.round((92 - p) / 14)) : p));
-    }, 450);
-    try {
-      const base64Pdf = await fileToBase64(file);
-      setProgress((p) => Math.max(p, 20));
-      const questions = await extractDeneme({
-        apiKey: settings.apiKey,
-        model: settings.model,
-        base64Pdf,
-      });
-      if (!questions.length) throw new Error("PDF'ten soru çıkarılamadı.");
-      clearInterval(timer);
-      setProgress(100);
-      const name = file.name.replace(/\.pdf$/i, "");
-      const id = addDeneme(name, questions);
-      setTimeout(() => navigate("solve", id), 350);
-    } catch (err) {
-      clearInterval(timer);
-      setProgress(0);
-      setError(err.message || "PDF işlenemedi.");
-      setLoading(false);
-    }
   };
 
-  const progressLabel =
-    progress < 20
-      ? "PDF okunuyor…"
-      : progress < 65
-      ? "Sorular çıkarılıyor…"
-      : progress < 100
-      ? "Cevap anahtarı eşleştiriliyor…"
-      : "Hazır!";
+  const onCopy = () => {
+    navigator.clipboard.writeText(EXTRACT_PROMPT);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const onSubmit = () => {
+    setError(null);
+    let data;
+    try {
+      data = JSON.parse(jsonText.trim());
+    } catch {
+      setError("Geçersiz JSON. Claude'un çıktısını tam ve değiştirmeden yapıştır.");
+      return;
+    }
+    const questions = Array.isArray(data) ? data : data.questions;
+    if (!Array.isArray(questions) || !questions.length) {
+      setError("Sorular bulunamadı. Claude'un verdiği JSON'un içinde \"questions\" dizisi olmalı.");
+      return;
+    }
+    const name = fileName.replace(/\.pdf$/i, "");
+    const id = addDeneme(name, questions);
+    setFileName(null);
+    setJsonText("");
+    navigate("solve", id);
+  };
+
+  const onCancel = () => {
+    setFileName(null);
+    setJsonText("");
+    setError(null);
+  };
 
   return (
     <div className="screen">
       <header className="screen-head">
         <h1>Denemelerim</h1>
-        <p className="muted">PDF yükle, AI soruları çıkarsın, çöz.</p>
+        <p className="muted">PDF'i Claude.ai'ye yükle, JSON'u yapıştır, çöz.</p>
       </header>
 
       <input
@@ -75,16 +69,38 @@ export default function Home({ navigate }) {
         onChange={onPick}
       />
 
-      {loading ? (
-        <div className="card loading-card">
-          <div className="spinner" />
-          <p className="loading-title">AI denemeyi okuyor…</p>
-          <div className="progress big">
-            <div className="progress-bar" style={{ width: `${progress}%` }} />
+      {fileName ? (
+        <div className="card claude-card">
+          <p className="claude-filename">📄 {fileName}</p>
+          <ol className="claude-steps">
+            <li>Bu PDF'i <strong>claude.ai</strong>'ye yükle</li>
+            <li>Aşağıdaki promptu kopyalayıp yapıştır ve gönder</li>
+            <li>Claude'un verdiği JSON'u altta yapıştır</li>
+          </ol>
+          <div className="prompt-box">
+            <pre className="prompt-text">{EXTRACT_PROMPT}</pre>
+            <button className="btn btn-sm prompt-copy-btn" onClick={onCopy}>
+              {copied ? "✓ Kopyalandı" : "Kopyala"}
+            </button>
           </div>
-          <p className="muted small loading-sub">
-            {progressLabel} · %{progress}
-          </p>
+          <textarea
+            className="input json-paste"
+            placeholder='Claude\'un JSON çıktısını buraya yapıştır…'
+            value={jsonText}
+            onChange={(e) => setJsonText(e.target.value)}
+            rows={6}
+          />
+          {error && <div className="alert">{error}</div>}
+          <div className="claude-actions">
+            <button className="btn btn-ghost" onClick={onCancel}>İptal</button>
+            <button
+              className="btn btn-primary"
+              onClick={onSubmit}
+              disabled={!jsonText.trim()}
+            >
+              Devam Et →
+            </button>
+          </div>
         </div>
       ) : (
         <button
@@ -95,14 +111,12 @@ export default function Home({ navigate }) {
         </button>
       )}
 
-      {error && <div className="alert">{error}</div>}
-
-      {denemes.length === 0 && !loading && (
+      {denemes.length === 0 && !fileName && (
         <div className="empty">
           <p>Henüz deneme yok.</p>
           <p className="muted">
-            Yukarıdan bir YÖKDİL/YDS deneme PDF'i yükle. Cevap anahtarı son
-            sayfada olsun — AI onu okuyup soruları kontrol edecek.
+            Yukarıdan bir YÖKDİL/YDS deneme PDF'i seç. Cevap anahtarı son
+            sayfada olsun — Claude onu okuyup soruları JSON'a çevirecek.
           </p>
         </div>
       )}

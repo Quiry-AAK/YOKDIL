@@ -200,6 +200,28 @@ button.opt-letter:disabled { opacity: 0.85; }
 .model-opt.selected { border-color: var(--primary); background: rgba(99,102,241,0.1); }
 .model-opt input { margin-top: 3px; }
 
+/* Manuel Claude akışı */
+.claude-card { display: flex; flex-direction: column; gap: 12px; }
+.claude-filename { margin: 0; font-weight: 600; }
+.claude-steps { margin: 0; padding-left: 20px; line-height: 1.9; }
+.prompt-box {
+  position: relative; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 12px 44px;
+}
+.prompt-text {
+  margin: 0; font-size: 13px; line-height: 1.6; white-space: pre-wrap;
+  word-break: break-word; color: var(--text); font-family: inherit;
+}
+.prompt-copy-btn {
+  position: absolute; bottom: 10px; right: 10px;
+}
+.json-paste { resize: vertical; display: block; width: 100%; font-family: monospace; font-size: 13px; }
+.claude-actions { display: flex; gap: 10px; }
+.claude-actions .btn { flex: 1; }
+.btn-ghost {
+  background: transparent; border-color: var(--border); color: var(--muted);
+}
+
 /* Loading (PDF işleniyor) */
 .loading-card { text-align: center; padding: 24px 16px; }
 .spinner {
