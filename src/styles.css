@@ -207,9 +207,17 @@ button.opt-letter:disabled { opacity: 0.85; }
 .pending-chip { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; }
 .pending-chip-x { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; padding: 0; line-height: 1; }
 .mw-pending { background: rgba(245,158,11,0.25); text-decoration: underline dotted; }
-.mw-phrase-toast { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.phrase-add-btn { background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 3px 8px; font-size: 13px; cursor: pointer; }
-.phrase-cancel-btn { background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 0 2px; }
+.mw-sel { background: rgba(99,102,241,0.35); border-radius: 2px; }
+.sel-bar {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--card2); border: 1px solid var(--primary);
+  border-radius: 10px; padding: 5px 10px; margin-left: 6px;
+  font-size: 13px; flex-wrap: wrap;
+}
+.sel-phrase { font-weight: 600; color: var(--primary2); }
+.sel-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 2px 8px; cursor: pointer; font-size: 13px; }
+.sel-confirm { background: var(--primary); border: none; color: #fff; border-radius: 6px; padding: 3px 10px; cursor: pointer; font-size: 13px; font-weight: 600; }
+.sel-cancel { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 0; }
 
 /* Export/Import satırı */
 .io-row { display: flex; gap: 8px; margin-bottom: 10px; }
