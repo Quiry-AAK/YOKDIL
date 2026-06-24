@@ -19,7 +19,7 @@ Görevin: Tüm soruları sırayla, numaralarıyla birlikte eksiksiz çıkarmak.
 
 Kurallar:
 - Soru metni ve A–E şıklarını TAM, ORİJİNAL İngilizce haliyle yaz. Çevirme, kısaltma veya düzeltme yapma.
-- Okuma parçası (reading passage) varsa: o parçaya ait soru grubunun sadece İLK sorusunun "passage" alanına tüm parçayı koy; diğer soruların "passage" alanını null bırak.
+- Okuma parçası (reading passage) varsa: o parçaya ait soru grubunun TÜM sorularının "passage" alanına aynı parça metnini koy. Parçasız sorularda "passage" alanını null bırak.
 - 4 şıklı sorularda E alanını null bırak.
 - Cevap anahtarı PDF'in SON sayfasındadır. Her sorunun "answer" alanına doğru şık harfini (A–E) yaz.
 - Soruları numara sırasına göre küçükten büyüğe sırala.

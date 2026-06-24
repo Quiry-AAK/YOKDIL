@@ -27,6 +27,11 @@ export default function Solve({ denemeId, navigate }) {
   const answered = !!q.userAnswer;
   const isCorrect = q.userAnswer === q.answer;
 
+  // Mevcut soruda passage yoksa önceki sorudan devral (aynı grup)
+  const displayPassage = q.passage ??
+    [...deneme.questions].slice(0, idx).reverse().find((x) => x.passage)?.passage ??
+    null;
+
   const choose = (letter) => {
     if (answered) return;
     answerQuestion(deneme.id, q.id, letter);
@@ -84,8 +89,8 @@ export default function Solve({ denemeId, navigate }) {
       </p>
 
       <div className="card question-card">
-        {q.passage && (
-          <div className="passage"><MarkableText text={q.passage} /></div>
+        {displayPassage && (
+          <div className="passage"><MarkableText text={displayPassage} /></div>
         )}
         <div className="q-text">
           <span className="q-num">{q.number}.</span>{" "}
