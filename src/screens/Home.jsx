@@ -85,7 +85,7 @@ export default function Home({ navigate }) {
           </div>
           <textarea
             className="input json-paste"
-            placeholder='Claude\'un JSON çıktısını buraya yapıştır…'
+            placeholder="Claude'un JSON çıktısını buraya yapıştır…"
             value={jsonText}
             onChange={(e) => setJsonText(e.target.value)}
             rows={6}
