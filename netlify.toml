@@ -1,0 +1,10 @@
+# GitHub reposunu Netlify'a bağlarsan otomatik derleyip yayınlar.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA: her yol index.html'e düşsün.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
