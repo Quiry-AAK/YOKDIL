@@ -2,7 +2,7 @@ name: Build APK
 
 on:
   push:
-    branches: [main, claude/ai-json-conversion-prompt-zugrxv]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
