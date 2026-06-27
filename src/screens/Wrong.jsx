@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useStore } from "../store.js";
 import { explainQuestion } from "../lib/ai.js";
+import { getCategory, CAT_ORDER } from "../lib/categories.js";
 
 const LETTERS = ["A", "B", "C", "D", "E"];
 
@@ -10,44 +11,6 @@ function exportJSON(data, filename) {
   const a = document.createElement("a");
   a.href = url; a.download = filename; a.click();
   URL.revokeObjectURL(url);
-}
-
-const YOKDIL_CATS = [
-  { label: "Kelime Bilgisi", min: 1, max: 6 },
-  { label: "Dil Bilgisi", min: 7, max: 20 },
-  { label: "Cloze Test", min: 21, max: 30 },
-  { label: "Cümle Tamamlama", min: 31, max: 41 },
-  { label: "İng→Türkçe Çeviri", min: 42, max: 47 },
-  { label: "Türkçe→İng Çeviri", min: 48, max: 53 },
-  { label: "Paragraf Tamamlama", min: 54, max: 59 },
-  { label: "Anlam Bütünlüğü", min: 60, max: 65 },
-  { label: "Okuduğunu Anlama", min: 66, max: 80 },
-];
-
-const YDS_CATS = [
-  { label: "Kelime Bilgisi", min: 1, max: 6 },
-  { label: "Dil Bilgisi", min: 7, max: 16 },
-  { label: "Cloze Test", min: 17, max: 26 },
-  { label: "Cümle Tamamlama", min: 27, max: 36 },
-  { label: "Çeviri", min: 37, max: 42 },
-  { label: "Okuma Parçaları", min: 43, max: 62 },
-  { label: "Diyalog Tamamlama", min: 63, max: 67 },
-  { label: "Anlamca En Yakın Cümle", min: 68, max: 71 },
-  { label: "Paragraf Tamamlama", min: 72, max: 75 },
-  { label: "Anlam Bütünlüğü", min: 76, max: 80 },
-];
-
-const CAT_ORDER = [
-  "Kelime Bilgisi", "Dil Bilgisi", "Cloze Test", "Cümle Tamamlama",
-  "İng→Türkçe Çeviri", "Türkçe→İng Çeviri", "Çeviri",
-  "Paragraf Tamamlama", "Anlam Bütünlüğü",
-  "Okuduğunu Anlama", "Okuma Parçaları",
-  "Diyalog Tamamlama", "Anlamca En Yakın Cümle", "Diğer",
-];
-
-function getCategory(questionNumber, denemeType) {
-  const cats = denemeType === "yds" ? YDS_CATS : YOKDIL_CATS;
-  return cats.find((c) => questionNumber >= c.min && questionNumber <= c.max)?.label ?? "Diğer";
 }
 
 function WrongCard({ w }) {

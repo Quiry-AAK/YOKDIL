@@ -227,6 +227,19 @@ button.opt-letter:disabled { opacity: 0.85; }
 /* Tür seçici satırı (Home yükleme akışı) */
 .type-row { display: flex; align-items: center; gap: 10px; margin: 4px 0 8px; }
 
+/* Analiz paneli */
+.analysis-box {
+  width: 100%; margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.analysis-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.analysis-row:last-child { border-bottom: none; }
+.analysis-label { color: var(--muted); }
+.analysis-vals { font-weight: 600; display: flex; gap: 10px; }
+
 /* JSON güncelleme kutusu (deneme kartı altında) */
 .update-json-box {
   width: 100%; margin-top: 10px; padding-top: 10px;

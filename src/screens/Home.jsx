@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useStore } from "../store.js";
 import { EXTRACT_PROMPT } from "../lib/ai.js";
+import { getCategory, CAT_ORDER } from "../lib/categories.js";
 
 function exportJSON(data, filename) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -21,6 +22,7 @@ export default function Home({ navigate }) {
   const [updatingId, setUpdatingId] = useState(null);
   const [updateJson, setUpdateJson] = useState("");
   const [updateError, setUpdateError] = useState(null);
+  const [analysisId, setAnalysisId] = useState(null);
   const fileRef = useRef();
   const [fileName, setFileName] = useState(null);
   const [jsonText, setJsonText] = useState("");
@@ -167,9 +169,9 @@ export default function Home({ navigate }) {
       <div className="list">
         {denemes.map((d) => {
           const answered = d.questions.filter((q) => q.userAnswer).length;
-          const correct = d.questions.filter(
-            (q) => q.userAnswer && q.userAnswer === q.answer
-          ).length;
+          const correct = d.questions.filter((q) => q.userAnswer && q.userAnswer === q.answer).length;
+          const wrong = answered - correct;
+          const pct = answered ? Math.round((correct / answered) * 100) : null;
           const isRenaming = renamingId === d.id;
           return (
             <div key={d.id} className="card deneme-card">
@@ -197,8 +199,9 @@ export default function Home({ navigate }) {
                 ) : (
                   <h3>{d.name}</h3>
                 )}
-                <p className="muted">
-                  {d.questions.length} soru · {answered} cevaplandı · {correct} doğru
+                <p className="muted small">
+                  {d.questions.length} soru · {answered} cevaplandı
+                  {answered > 0 && <> · <span style={{ color: "var(--good)" }}>✓{correct}</span> <span style={{ color: "var(--bad)" }}>✗{wrong}</span> · <strong style={{ color: "var(--primary2)" }}>%{pct}</strong></>}
                 </p>
                 <div className="progress">
                   <div className="progress-bar" style={{ width: `${(answered / d.questions.length) * 100}%` }} />
@@ -220,6 +223,10 @@ export default function Home({ navigate }) {
                   setRenamingId(d.id);
                   setRenamingName(d.name);
                 }}>✏️</button>
+                <button className="icon-btn" title="Analiz" onClick={(e) => {
+                  e.stopPropagation();
+                  setAnalysisId(analysisId === d.id ? null : d.id);
+                }}>📊</button>
                 <button className="icon-btn" title="JSON güncelle" onClick={(e) => {
                   e.stopPropagation();
                   setUpdatingId(updatingId === d.id ? null : d.id);
@@ -235,6 +242,33 @@ export default function Home({ navigate }) {
                   if (confirm(`"${d.name}" silinsin mi?`)) removeDeneme(d.id);
                 }}>🗑</button>
               </div>
+              {analysisId === d.id && (() => {
+                const catStats = {};
+                d.questions.forEach((q) => {
+                  if (!q.userAnswer) return;
+                  const cat = getCategory(q.number, d.type);
+                  if (!catStats[cat]) catStats[cat] = { correct: 0, wrong: 0 };
+                  if (q.userAnswer === q.answer) catStats[cat].correct++;
+                  else catStats[cat].wrong++;
+                });
+                const rows = CAT_ORDER.filter((c) => catStats[c])
+                  .map((c) => ({ label: c, ...catStats[c] }))
+                  .sort((a, b) => b.wrong - a.wrong);
+                return rows.length === 0 ? null : (
+                  <div className="analysis-box" onClick={(e) => e.stopPropagation()}>
+                    {rows.map(({ label, correct: cr, wrong: wr }) => (
+                      <div key={label} className="analysis-row">
+                        <span className="analysis-label">{label}</span>
+                        <span className="analysis-vals">
+                          <span style={{ color: "var(--good)" }}>✓{cr}</span>
+                          {" "}
+                          <span style={{ color: "var(--bad)" }}>✗{wr}</span>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
               {updatingId === d.id && (
                 <div className="update-json-box" onClick={(e) => e.stopPropagation()}>
                   <p className="muted small" style={{ margin: "0 0 6px" }}>
