@@ -233,6 +233,11 @@ button.opt-letter:disabled { opacity: 0.85; }
   border-top: 1px solid var(--border);
 }
 
+/* Kategori seçici (Solve başlangıcı) */
+.cat-pick-card { cursor: pointer; transition: border-color 0.15s; }
+.cat-pick-card:active { border-color: var(--primary); }
+.cat-pick-label { font-weight: 600; font-size: 16px; margin-bottom: 2px; }
+
 /* Yanlışlar kategori accordion */
 .cat-section { margin-bottom: 10px; }
 .cat-head {
