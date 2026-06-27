@@ -14,11 +14,13 @@ export default function Home({ navigate }) {
   const addDeneme = useStore((s) => s.addDeneme);
   const removeDeneme = useStore((s) => s.removeDeneme);
   const renameDeneme = useStore((s) => s.renameDeneme);
+  const setDenemeType = useStore((s) => s.setDenemeType);
   const [renamingId, setRenamingId] = useState(null);
   const [renamingName, setRenamingName] = useState("");
   const fileRef = useRef();
   const [fileName, setFileName] = useState(null);
   const [jsonText, setJsonText] = useState("");
+  const [dType, setDType] = useState("yokdil");
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
 
@@ -29,6 +31,7 @@ export default function Home({ navigate }) {
     setFileName(file.name);
     setJsonText("");
     setError(null);
+    setDType("yokdil");
   };
 
   const onCopy = () => {
@@ -52,7 +55,7 @@ export default function Home({ navigate }) {
       return;
     }
     const name = fileName.replace(/\.pdf$/i, "");
-    const id = addDeneme(name, questions);
+    const id = addDeneme(name, questions, dType);
     setFileName(null);
     setJsonText("");
     navigate("solve", id);
@@ -92,6 +95,13 @@ export default function Home({ navigate }) {
             <button className="btn btn-sm prompt-copy-btn" onClick={onCopy}>
               {copied ? "✓ Kopyalandı" : "Kopyala"}
             </button>
+          </div>
+          <div className="type-row">
+            <span className="muted small">Sınav türü:</span>
+            <div className="seg">
+              <button className={dType === "yokdil" ? "active" : ""} onClick={() => setDType("yokdil")}>YÖKDİL</button>
+              <button className={dType === "yds" ? "active" : ""} onClick={() => setDType("yds")}>YDS</button>
+            </div>
           </div>
           <textarea
             className="input json-paste"
@@ -172,6 +182,16 @@ export default function Home({ navigate }) {
                 </div>
               </div>
               <div className="deneme-actions">
+                <button
+                  className={"btn btn-sm type-badge" + (d.type === "yds" ? " type-yds" : " type-yokdil")}
+                  title="Sınav türünü değiştir"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDenemeType(d.id, d.type === "yds" ? "yokdil" : "yds");
+                  }}
+                >
+                  {d.type === "yds" ? "YDS" : "YÖKDİL"}
+                </button>
                 <button className="icon-btn" title="İsim değiştir" onClick={(e) => {
                   e.stopPropagation();
                   setRenamingId(d.id);

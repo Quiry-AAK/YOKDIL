@@ -17,8 +17,8 @@ export const useStore = create(
         set((s) => ({ settings: { ...s.settings, ...patch } })),
 
       // --- Denemeler ---
-      denemes: [], // { id, name, createdAt, questions: [...] }
-      addDeneme: (name, questions) => {
+      denemes: [], // { id, name, type, createdAt, questions: [...] }
+      addDeneme: (name, questions, type = "yokdil") => {
         const id = uid();
         const prepared = questions.map((q, i) => ({
           ...q,
@@ -28,7 +28,7 @@ export const useStore = create(
         set((s) => ({
           denemes: [
             ...s.denemes,
-            { id, name, createdAt: Date.now(), questions: prepared },
+            { id, name, type, createdAt: Date.now(), questions: prepared },
           ],
         }));
         return id;
@@ -42,8 +42,11 @@ export const useStore = create(
         set((s) => ({
           denemes: s.denemes.map((d) => (d.id === id ? { ...d, name } : d)),
         })),
+      setDenemeType: (id, type) =>
+        set((s) => ({
+          denemes: s.denemes.map((d) => (d.id === id ? { ...d, type } : d)),
+        })),
 
-      // Bir soruyu cevapla. Doğru/yanlış döndürür ve yanlışsa yanlışlar paneline ekler.
       answerQuestion: (denemeId, questionId, letter) => {
         const deneme = get().denemes.find((d) => d.id === denemeId);
         if (!deneme) return false;
@@ -90,7 +93,7 @@ export const useStore = create(
       },
 
       // --- Yanlış sorular ---
-      wrongQuestions: [], // { id, denemeId, questionId, question, explanation, stats }
+      wrongQuestions: [],
       setExplanation: (wrongId, text) =>
         set((s) => ({
           wrongQuestions: s.wrongQuestions.map((w) =>
@@ -117,8 +120,8 @@ export const useStore = create(
         })),
 
       // --- Kelimeler ---
-      words: [], // { word, meaning_tr, pos, example_en, example_tr, distractors_tr, stats, addedAt }
-      pendingWords: [], // { word, context } — analiz bekleniyor
+      words: [],
+      pendingWords: [],
       addPendingWord: (word, context) => {
         const key = word.trim().toLowerCase();
         const alreadyKnown = get().words.some((w) => w.word.toLowerCase() === key);
@@ -177,9 +180,8 @@ export const useStore = create(
     }),
     {
       name: "yokdil-store-v1",
-      version: 2,
+      version: 3,
       migrate: (state, version) => {
-        // Gemini'ye geçiş: eski Claude modeli/anahtarı seçiliyse sıfırla.
         if (state?.settings) {
           const m = state.settings.model || "";
           if (!m || m.startsWith("claude")) {
@@ -188,6 +190,12 @@ export const useStore = create(
           if ((state.settings.apiKey || "").startsWith("sk-ant")) {
             state.settings.apiKey = "";
           }
+        }
+        // v2 → v3: tüm mevcut denemelere type: "yokdil" ekle (cevaplar korunur)
+        if (version < 3 && state?.denemes) {
+          state.denemes = state.denemes.map((d) =>
+            d.type ? d : { ...d, type: "yokdil" }
+          );
         }
         return state;
       },

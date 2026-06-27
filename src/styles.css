@@ -219,6 +219,31 @@ button.opt-letter:disabled { opacity: 0.85; }
 .sel-confirm { background: var(--primary); border: none; color: #fff; border-radius: 6px; padding: 3px 10px; cursor: pointer; font-size: 13px; font-weight: 600; }
 .sel-cancel { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 0; }
 
+/* Sınav türü badge (deneme kartında) */
+.type-badge { font-size: 11px; padding: 4px 8px; font-weight: 700; letter-spacing: 0.5px; }
+.type-yokdil { background: rgba(99,102,241,0.15); border-color: var(--primary); color: var(--primary2); }
+.type-yds { background: rgba(34,197,94,0.15); border-color: var(--good); color: #86efac; }
+
+/* Tür seçici satırı (Home yükleme akışı) */
+.type-row { display: flex; align-items: center; gap: 10px; margin: 4px 0 8px; }
+
+/* Yanlışlar kategori accordion */
+.cat-section { margin-bottom: 10px; }
+.cat-head {
+  width: 100%; display: flex; align-items: center; gap: 8px;
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px 14px;
+  cursor: pointer; text-align: left;
+}
+.cat-label { flex: 1; font-weight: 600; font-size: 15px; color: var(--text); }
+.cat-count {
+  background: var(--bad); color: #fff; font-size: 11px; font-weight: 700;
+  min-width: 22px; height: 22px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center; padding: 0 6px;
+}
+.cat-chevron { color: var(--muted); font-size: 12px; }
+.cat-items { padding-top: 6px; }
+
 /* Export/Import satırı */
 .io-row { display: flex; gap: 8px; margin-bottom: 10px; }
 
