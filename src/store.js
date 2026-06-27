@@ -46,6 +46,27 @@ export const useStore = create(
         set((s) => ({
           denemes: s.denemes.map((d) => (d.id === id ? { ...d, type } : d)),
         })),
+      updateDenemeQuestions: (id, newQuestions) => {
+        const deneme = get().denemes.find((d) => d.id === id);
+        if (!deneme) return 0;
+        const existingByNumber = Object.fromEntries(
+          deneme.questions.map((q) => [q.number, q])
+        );
+        const merged = newQuestions.map((nq, i) => {
+          const old = existingByNumber[nq.number];
+          return {
+            ...nq,
+            id: old ? old.id : `q${nq.number ?? i + 1}_${i}`,
+            userAnswer: old ? old.userAnswer : null,
+          };
+        });
+        set((s) => ({
+          denemes: s.denemes.map((d) =>
+            d.id === id ? { ...d, questions: merged } : d
+          ),
+        }));
+        return merged.length;
+      },
 
       answerQuestion: (denemeId, questionId, letter) => {
         const deneme = get().denemes.find((d) => d.id === denemeId);

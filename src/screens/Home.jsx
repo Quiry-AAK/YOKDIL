@@ -15,8 +15,12 @@ export default function Home({ navigate }) {
   const removeDeneme = useStore((s) => s.removeDeneme);
   const renameDeneme = useStore((s) => s.renameDeneme);
   const setDenemeType = useStore((s) => s.setDenemeType);
+  const updateDenemeQuestions = useStore((s) => s.updateDenemeQuestions);
   const [renamingId, setRenamingId] = useState(null);
   const [renamingName, setRenamingName] = useState("");
+  const [updatingId, setUpdatingId] = useState(null);
+  const [updateJson, setUpdateJson] = useState("");
+  const [updateError, setUpdateError] = useState(null);
   const fileRef = useRef();
   const [fileName, setFileName] = useState(null);
   const [jsonText, setJsonText] = useState("");
@@ -65,6 +69,25 @@ export default function Home({ navigate }) {
     setFileName(null);
     setJsonText("");
     setError(null);
+  };
+
+  const onUpdateSubmit = (denemeId) => {
+    setUpdateError(null);
+    let data;
+    try {
+      data = JSON.parse(updateJson.trim());
+    } catch {
+      setUpdateError("Geçersiz JSON.");
+      return;
+    }
+    const questions = Array.isArray(data) ? data : data.questions;
+    if (!Array.isArray(questions) || !questions.length) {
+      setUpdateError("JSON içinde \"questions\" dizisi bulunamadı.");
+      return;
+    }
+    updateDenemeQuestions(denemeId, questions);
+    setUpdatingId(null);
+    setUpdateJson("");
   };
 
   return (
@@ -197,6 +220,12 @@ export default function Home({ navigate }) {
                   setRenamingId(d.id);
                   setRenamingName(d.name);
                 }}>✏️</button>
+                <button className="icon-btn" title="JSON güncelle" onClick={(e) => {
+                  e.stopPropagation();
+                  setUpdatingId(updatingId === d.id ? null : d.id);
+                  setUpdateJson("");
+                  setUpdateError(null);
+                }}>🔄</button>
                 <button className="icon-btn" title="Dışa aktar" onClick={(e) => {
                   e.stopPropagation();
                   exportJSON(d, `${d.name}.json`);
@@ -206,6 +235,25 @@ export default function Home({ navigate }) {
                   if (confirm(`"${d.name}" silinsin mi?`)) removeDeneme(d.id);
                 }}>🗑</button>
               </div>
+              {updatingId === d.id && (
+                <div className="update-json-box" onClick={(e) => e.stopPropagation()}>
+                  <p className="muted small" style={{ margin: "0 0 6px" }}>
+                    Güncel JSON'u yapıştır — soru numarasına göre eşleştirilir, verdiğin cevaplar korunur.
+                  </p>
+                  <textarea
+                    className="input json-paste"
+                    placeholder='{"questions":[...]}'
+                    value={updateJson}
+                    onChange={(e) => setUpdateJson(e.target.value)}
+                    rows={4}
+                  />
+                  {updateError && <div className="alert">{updateError}</div>}
+                  <div className="claude-actions" style={{ marginTop: 8 }}>
+                    <button className="btn btn-ghost" onClick={() => { setUpdatingId(null); setUpdateJson(""); }}>İptal</button>
+                    <button className="btn btn-primary" disabled={!updateJson.trim()} onClick={() => onUpdateSubmit(d.id)}>Güncelle</button>
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}

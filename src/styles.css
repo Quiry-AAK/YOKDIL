@@ -227,6 +227,12 @@ button.opt-letter:disabled { opacity: 0.85; }
 /* Tür seçici satırı (Home yükleme akışı) */
 .type-row { display: flex; align-items: center; gap: 10px; margin: 4px 0 8px; }
 
+/* JSON güncelleme kutusu (deneme kartı altında) */
+.update-json-box {
+  width: 100%; margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
 /* Yanlışlar kategori accordion */
 .cat-section { margin-bottom: 10px; }
 .cat-head {
