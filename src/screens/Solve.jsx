@@ -128,11 +128,13 @@ export default function Solve({ denemeId, navigate }) {
           <p className="muted">{deneme.name}{selectedCat ? ` · ${selectedCat}` : ""}</p>
         </header>
         <div className="card score-card">
-          <div className="score-big">{pct}<span className="score-pct">%</span></div>
+          <div className="score-big">{(correct * 1.25).toFixed(2)}</div>
+          <p className="muted small" style={{ margin: "-12px 0 16px" }}>puan (doğru × 1,25)</p>
           <div className="score-row"><span className="score-label">Doğru</span><span className="score-val good">{correct}</span></div>
           <div className="score-row"><span className="score-label">Yanlış</span><span className="score-val bad">{wrong}</span></div>
           {unanswered > 0 && <div className="score-row"><span className="score-label">Boş</span><span className="score-val muted">{unanswered}</span></div>}
           <div className="score-row"><span className="score-label">Toplam</span><span className="score-val">{total}</span></div>
+          <div className="score-row"><span className="score-label">Yüzde</span><span className="score-val">%{pct}</span></div>
         </div>
         <div className="nav-row">
           <button className="btn" onClick={() => { setShowScore(false); setIdx(0); }}>Tekrar İncele</button>

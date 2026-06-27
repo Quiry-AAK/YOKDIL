@@ -171,7 +171,7 @@ export default function Home({ navigate }) {
           const answered = d.questions.filter((q) => q.userAnswer).length;
           const correct = d.questions.filter((q) => q.userAnswer && q.userAnswer === q.answer).length;
           const wrong = answered - correct;
-          const pct = answered ? Math.round((correct / answered) * 100) : null;
+          const score = answered ? (correct * 1.25).toFixed(2) : null;
           const isRenaming = renamingId === d.id;
           return (
             <div key={d.id} className="card deneme-card">
@@ -201,7 +201,7 @@ export default function Home({ navigate }) {
                 )}
                 <p className="muted small">
                   {d.questions.length} soru · {answered} cevaplandı
-                  {answered > 0 && <> · <span style={{ color: "var(--good)" }}>✓{correct}</span> <span style={{ color: "var(--bad)" }}>✗{wrong}</span> · <strong style={{ color: "var(--primary2)" }}>%{pct}</strong></>}
+                  {answered > 0 && <> · <span style={{ color: "var(--good)" }}>✓{correct}</span> <span style={{ color: "var(--bad)" }}>✗{wrong}</span> · <strong style={{ color: "var(--primary2)" }}>{score} puan</strong></>}
                 </p>
                 <div className="progress">
                   <div className="progress-bar" style={{ width: `${(answered / d.questions.length) * 100}%` }} />
@@ -256,16 +256,21 @@ export default function Home({ navigate }) {
                   .sort((a, b) => b.wrong - a.wrong);
                 return rows.length === 0 ? null : (
                   <div className="analysis-box" onClick={(e) => e.stopPropagation()}>
-                    {rows.map(({ label, correct: cr, wrong: wr }) => (
-                      <div key={label} className="analysis-row">
-                        <span className="analysis-label">{label}</span>
-                        <span className="analysis-vals">
-                          <span style={{ color: "var(--good)" }}>✓{cr}</span>
-                          {" "}
-                          <span style={{ color: "var(--bad)" }}>✗{wr}</span>
-                        </span>
-                      </div>
-                    ))}
+                    {rows.map(({ label, correct: cr, wrong: wr }) => {
+                      const catPct = Math.round((cr / (cr + wr)) * 100);
+                      return (
+                        <div key={label} className="analysis-row">
+                          <span className="analysis-label">{label}</span>
+                          <span className="analysis-vals">
+                            <span style={{ color: "var(--good)" }}>✓{cr}</span>
+                            {" "}
+                            <span style={{ color: "var(--bad)" }}>✗{wr}</span>
+                            {" "}
+                            <span className="muted">%{catPct}</span>
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               })()}
