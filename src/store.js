@@ -60,10 +60,18 @@ export const useStore = create(
             userAnswer: old ? old.userAnswer : null,
           };
         });
+        const mergedByNumber = Object.fromEntries(merged.map((q) => [q.number, q]));
         set((s) => ({
           denemes: s.denemes.map((d) =>
             d.id === id ? { ...d, questions: merged } : d
           ),
+          // Yanlış soruların snapshot'ını da güncelle (passage vb. düzelsin)
+          wrongQuestions: s.wrongQuestions.map((w) => {
+            if (w.denemeId !== id) return w;
+            const fresh = mergedByNumber[w.question.number];
+            if (!fresh) return w;
+            return { ...w, question: { ...fresh, userAnswer: w.question.userAnswer } };
+          }),
         }));
         return merged.length;
       },
