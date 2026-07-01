@@ -29,6 +29,26 @@ SADECE aşağıdaki JSON formatında yanıt ver, başka hiçbir şey yazma:
 
 {"questions":[{"number":1,"passage":null,"text":"...","options":{"A":"...","B":"...","C":"...","D":"...","E":null},"answer":"A"},{"number":2,"passage":null,"text":"...","options":{"A":"...","B":"...","C":"...","D":"...","E":null},"answer":"B"}]}`;
 
+// ---- 1b) Kategoriye göre yeni soru üretme promptu (AI Soru Havuzu) ----
+
+export function buildGeneratePrompt(type, category, count = 10) {
+  const label = type === "yds" ? "YDS" : "YÖKDİL";
+  return `${count} adet orijinal ${label} tarzı, "${category}" kategorisinde İngilizce çoktan seçmeli soru üret.
+
+Kurallar:
+- Gerçek sınavdaki zorluk seviyesi ve formatına uygun olsun, sorular birbirinin tekrarı olmasın.
+- Her soru 4 veya 5 şıklı olsun (4 şıklıysa "options" içindeki E alanını null bırak).
+- "${category}" kategorisine uygun soru tipini kullan (örn. okuma parçası gerektiren bir kategoriyse ilgili sorulara ortak bir "passage" ekle, kelime/dil bilgisi gibi parçasız kategorilerde "passage" alanını null bırak).
+- Soru metni ve şıkları TAM, ORİJİNAL İngilizce haliyle yaz. Çevirme, kısaltma yapma.
+- "text" alanına asla passage metnini yazma; "text" sadece soru cümlesini içermeli.
+- "answer" alanına doğru şık harfini (A–E) yaz.
+- "number" alanına 1'den başlayarak sırayla numara ver.
+
+SADECE aşağıdaki JSON formatında yanıt ver, başka hiçbir şey yazma:
+
+{"questions":[{"number":1,"passage":null,"text":"...","options":{"A":"...","B":"...","C":"...","D":"...","E":null},"answer":"A"},{"number":2,"passage":null,"text":"...","options":{"A":"...","B":"...","C":"...","D":"...","E":null},"answer":"B"}]}`;
+}
+
 // ---- 2) Yanlış yapılan soru için açıklama ----
 
 export async function explainQuestion({ apiKey, model, question }) {

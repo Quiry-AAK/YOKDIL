@@ -206,10 +206,54 @@ export const useStore = create(
         set((s) => ({ wrongQuestions: [...s.wrongQuestions, ...toAdd] }));
         return toAdd.length;
       },
+
+      // --- AI Soru Havuzu ---
+      aiPool: [], // { id, type, category, passage, text, options, answer, createdAt }
+      addAIPoolQuestions: (type, category, questions) => {
+        const prepared = questions.map((q) => ({
+          id: uid(),
+          type,
+          category,
+          passage: q.passage ?? null,
+          text: q.text,
+          options: q.options,
+          answer: q.answer,
+          createdAt: Date.now(),
+        }));
+        set((s) => ({ aiPool: [...s.aiPool, ...prepared] }));
+        return prepared.length;
+      },
+      removeAIPoolQuestion: (id) =>
+        set((s) => ({ aiPool: s.aiPool.filter((q) => q.id !== id) })),
+      answerAIPoolQuestion: (id, letter) => {
+        const q = get().aiPool.find((x) => x.id === id);
+        if (!q) return false;
+        const isCorrect = letter === q.answer;
+        set((s) => ({ aiPool: s.aiPool.filter((x) => x.id !== id) }));
+        if (!isCorrect) {
+          set((s) => ({
+            wrongQuestions: [
+              ...s.wrongQuestions,
+              {
+                id: uid(),
+                denemeId: null,
+                questionId: q.id,
+                denemeName: "AI Generated Question",
+                category: q.category,
+                question: { ...q, userAnswer: letter },
+                explanation: null,
+                stats: emptyStats(),
+                addedAt: Date.now(),
+              },
+            ],
+          }));
+        }
+        return isCorrect;
+      },
     }),
     {
       name: "yokdil-store-v1",
-      version: 3,
+      version: 4,
       migrate: (state, version) => {
         if (state?.settings) {
           const m = state.settings.model || "";
@@ -225,6 +269,10 @@ export const useStore = create(
           state.denemes = state.denemes.map((d) =>
             d.type ? d : { ...d, type: "yokdil" }
           );
+        }
+        // v3 → v4: AI soru havuzu eklendi
+        if (version < 4 && state && !state.aiPool) {
+          state.aiPool = [];
         }
         return state;
       },

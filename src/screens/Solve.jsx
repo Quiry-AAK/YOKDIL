@@ -152,7 +152,7 @@ export default function Solve({ denemeId, navigate }) {
     <div className="screen">
       <header className="screen-head solve-head">
         <button className="link" onClick={() => setCatPicker(true)}>
-          ← {selectedCat ?? deneme.name}
+          ← {deneme.name}
         </button>
         <span className="counter">Soru {idx + 1} / {questions.length}</span>
       </header>

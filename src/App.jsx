@@ -6,9 +6,11 @@ import Wrong from "./screens/Wrong.jsx";
 import Review from "./screens/Review.jsx";
 import Words from "./screens/Words.jsx";
 import Settings from "./screens/Settings.jsx";
+import AIPool from "./screens/AIPool.jsx";
 
 const TABS = [
   { key: "home", label: "Denemeler", icon: "📄" },
+  { key: "aipool", label: "AI Havuzu", icon: "🤖" },
   { key: "wrong", label: "Yanlışlarım", icon: "❌" },
   { key: "review", label: "Tekrar Çöz", icon: "🔁" },
   { key: "words", label: "Kelimeler", icon: "📖" },
@@ -29,6 +31,7 @@ export default function App() {
   let screen;
   if (view === "home") screen = <Home navigate={navigate} />;
   else if (view === "solve") screen = <Solve denemeId={activeDeneme} navigate={navigate} />;
+  else if (view === "aipool") screen = <AIPool navigate={navigate} />;
   else if (view === "wrong") screen = <Wrong navigate={navigate} />;
   else if (view === "review") screen = <Review navigate={navigate} />;
   else if (view === "words") screen = <Words navigate={navigate} />;

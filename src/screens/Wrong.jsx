@@ -38,7 +38,7 @@ function WrongCard({ w }) {
   return (
     <div className="card wrong-card">
       <div className="wrong-head" onClick={() => setOpen(!open)}>
-        <span className="muted small">{currentDenemeName} · Soru {q.number}</span>
+        <span className="muted small">{currentDenemeName}{q.number ? ` · Soru ${q.number}` : ""}</span>
         <span>{open ? "▲" : "▼"}</span>
       </div>
       <div className="q-text small">{q.text}</div>
@@ -116,7 +116,7 @@ export default function Wrong() {
   wrongQuestions.forEach((w) => {
     const deneme = denemes.find((d) => d.id === w.denemeId);
     const type = deneme?.type ?? "yokdil";
-    const cat = getCategory(w.question.number, type);
+    const cat = w.category || getCategory(w.question.number, type);
     if (!grouped[cat]) grouped[cat] = [];
     grouped[cat].push(w);
   });
