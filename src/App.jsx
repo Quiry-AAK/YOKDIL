@@ -8,6 +8,7 @@ import Words from "./screens/Words.jsx";
 import Settings from "./screens/Settings.jsx";
 import AIPool from "./screens/AIPool.jsx";
 import Topics from "./screens/Topics.jsx";
+import PatternQuiz from "./screens/PatternQuiz.jsx";
 
 const NAV_ITEMS = [
   { key: "home", label: "Denemeler", icon: "📄" },
@@ -15,6 +16,7 @@ const NAV_ITEMS = [
   { key: "wrong", label: "Yanlışlarım", icon: "❌" },
   { key: "review", label: "Tekrar Çöz", icon: "🔁" },
   { key: "topics", label: "Konular", icon: "📚" },
+  { key: "patternquiz", label: "Kalıp Quiz", icon: "🧩" },
   { key: "words", label: "Kelimeler", icon: "📖" },
   { key: "settings", label: "Ayarlar", icon: "⚙️" },
 ];
@@ -39,6 +41,7 @@ export default function App() {
   else if (view === "wrong") screen = <Wrong navigate={navigate} />;
   else if (view === "review") screen = <Review navigate={navigate} />;
   else if (view === "topics") screen = <Topics navigate={navigate} />;
+  else if (view === "patternquiz") screen = <PatternQuiz navigate={navigate} />;
   else if (view === "words") screen = <Words navigate={navigate} />;
   else if (view === "settings") screen = <Settings navigate={navigate} />;
 

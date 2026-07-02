@@ -187,6 +187,16 @@ export const useStore = create(
         })),
       removeWord: (word) =>
         set((s) => ({ words: s.words.filter((w) => w.word !== word) })),
+      applyWordReformat: (fixed) => {
+        const byWord = Object.fromEntries((fixed || []).map((f) => [f.word.toLowerCase(), f]));
+        set((s) => ({
+          words: s.words.map((w) => {
+            const f = byWord[w.word.toLowerCase()];
+            if (!f) return w;
+            return { ...w, meaning_tr: f.meaning_tr, distractors_tr: f.distractors_tr };
+          }),
+        }));
+      },
       importWords: (incoming) => {
         const existingKeys = new Set(get().words.map((w) => w.word.toLowerCase()));
         const toAdd = (incoming || []).filter(

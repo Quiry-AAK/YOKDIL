@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useStore } from "../store.js";
-import { analyzeWords } from "../lib/ai.js";
+import { analyzeWords, reformatWords } from "../lib/ai.js";
 import { pickWeighted, shuffle } from "../lib/sr.js";
 
 function exportJSON(data, filename) {
@@ -21,6 +21,7 @@ export default function Words() {
   const importWords = useStore((s) => s.importWords);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
   const removeWord = useStore((s) => s.removeWord);
+  const applyWordReformat = useStore((s) => s.applyWordReformat);
 
   const [mode, setMode] = useState("game");
   const [current, setCurrent] = useState(null);
@@ -29,6 +30,8 @@ export default function Words() {
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState(null);
   const [importMsg, setImportMsg] = useState(null);
+  const [fixing, setFixing] = useState(false);
+  const [fixMsg, setFixMsg] = useState(null);
   const importRef = useRef();
 
   const buildRound = () => {
@@ -65,6 +68,22 @@ export default function Words() {
       setAnalyzeError(e.message || "Analiz başarısız.");
     } finally {
       setAnalyzing(false);
+    }
+  };
+
+  const onFixFormat = async () => {
+    if (!settings.apiKey) { setFixMsg("Önce Ayarlar'dan API anahtarı ekle."); return; }
+    setFixing(true);
+    setFixMsg(null);
+    try {
+      const fixed = await reformatWords({ apiKey: settings.apiKey, model: settings.model, words });
+      applyWordReformat(fixed);
+      setFixMsg(`${fixed.length} kelimenin şık formatı düzeltildi.`);
+    } catch (e) {
+      setFixMsg(e.message || "Düzeltme başarısız.");
+    } finally {
+      setFixing(false);
+      setTimeout(() => setFixMsg(null), 3000);
     }
   };
 
@@ -127,7 +146,13 @@ export default function Words() {
             <button className="btn btn-sm" onClick={() => importRef.current?.click()}>İçe Aktar</button>
             <input ref={importRef} type="file" accept=".json" hidden onChange={onImport} />
           </div>
+          <div className="io-row">
+            <button className="btn btn-sm btn-ghost" onClick={onFixFormat} disabled={fixing}>
+              {fixing ? "Düzeltiliyor…" : "🔧 Şık Formatını Düzelt"}
+            </button>
+          </div>
           {importMsg && <div className="alert alert-ok">{importMsg}</div>}
+          {fixMsg && <div className="alert alert-ok">{fixMsg}</div>}
           <div className="list">
             {words.map((w) => (
               <div key={w.word} className="card word-card">

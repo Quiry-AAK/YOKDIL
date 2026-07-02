@@ -306,6 +306,16 @@ button.opt-letter:disabled { opacity: 0.85; }
 .pattern-phrase { font-weight: 700; font-size: 15px; color: var(--primary2); }
 .pattern-meaning { font-size: 13px; }
 
+/* Kalıp quiz - boşluk doldurma */
+.blank-sentence {
+  font-size: 17px; line-height: 1.8; text-align: center;
+  background: var(--bg); border-radius: 10px; padding: 16px;
+}
+.blank-slot {
+  display: inline-block; min-width: 70px; border-bottom: 2px solid var(--primary);
+  color: var(--primary2); font-weight: 700; text-align: center;
+}
+
 /* Seg kontrolünün 4+ buton içerince sarması */
 .seg-wrap { flex-wrap: wrap; width: 100%; }
 .seg-wrap button { flex: 1 1 auto; white-space: nowrap; padding: 7px 10px; font-size: 13px; }

@@ -110,6 +110,12 @@ Her eleman için:
 - example_tr: örnek cümlenin Türkçe çevirisi
 - distractors_tr: kelime oyunu için 3 adet mantıklı ama YANLIŞ Türkçe anlam
 
+ÖNEMLİ FORMAT KURALI: meaning_tr ve distractors_tr'nin dördü de AYNI biçimde
+yazılmalı — hepsi kısa ve tek bir ifade (1-3 kelime), hiçbirinde parantez
+içi açıklama, virgülle sıralanmış alternatif anlam ya da ekstra not
+olmamalı. Amaç: doğru cevabı sadece yazım biçiminden (uzunluk, parantez,
+virgül farkı) ayırt etmek mümkün olmasın, sadece anlamı bilerek seçilsin.
+
 Kelimeler:
 ${list}`;
   const response = await ai.models.generateContent({
@@ -118,6 +124,50 @@ ${list}`;
     config: {
       responseMimeType: "application/json",
       responseSchema: { type: Type.ARRAY, items: wordSchema },
+    },
+  });
+  return JSON.parse(textOf(response));
+}
+
+// ---- 4) Mevcut kelimelerin şık formatını düzeltme (tek seferlik bakım) ----
+
+const reformatSchema = {
+  type: Type.OBJECT,
+  properties: {
+    word: { type: Type.STRING },
+    meaning_tr: { type: Type.STRING },
+    distractors_tr: { type: Type.ARRAY, items: { type: Type.STRING } },
+  },
+  required: ["word", "meaning_tr", "distractors_tr"],
+};
+
+export async function reformatWords({ apiKey, model, words }) {
+  const ai = getAI(apiKey);
+  const list = words
+    .map(
+      (w, i) =>
+        `${i + 1}. word: "${w.word}" | meaning_tr: "${w.meaning_tr}" | distractors_tr: ${JSON.stringify(w.distractors_tr)}`
+    )
+    .join("\n");
+  const prompt = `Aşağıda kelime oyunu için kelime + doğru anlam + 3 yanlış anlam (distractor) listesi var.
+Sorun: bazılarında doğru cevap (meaning_tr) ile yanlış şıklar (distractors_tr) farklı
+biçimde yazılmış (biri parantezli, biri virgüllü, biri daha uzun/kısa) — bu da
+doğru cevabı anlamı bilmeden, sadece yazım biçiminden tahmin etmeyi kolaylaştırıyor.
+
+Görevin: her kelime için meaning_tr ve distractors_tr'nin DÖRDÜNÜ de aynı kısa
+biçimde yeniden yaz (1-3 kelime, parantez yok, virgülle sıralama yok). Anlamları
+DEĞİŞTİRME, sadece biçimlerini eşitle. word alanını olduğu gibi geri döndür.
+
+Kelimeler:
+${list}
+
+Sırayı koruyarak, girdiyle aynı sayıda eleman içeren bir JSON dizisi döndür.`;
+  const response = await ai.models.generateContent({
+    model,
+    contents: prompt,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: { type: Type.ARRAY, items: reformatSchema },
     },
   });
   return JSON.parse(textOf(response));

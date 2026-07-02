@@ -77,3 +77,47 @@ export const PREP_VERBS = [
   { phrase: "derive from", meaning: "türemek, kaynaklanmak", example: { en: "The word 'biology' derives from Greek roots.", tr: "\"Biology\" kelimesi Yunanca köklerden türemiştir." } },
   { phrase: "prevent (someone) from", meaning: "-den alıkoymak, engellemek", example: { en: "Heavy rain prevented the team from finishing the survey.", tr: "Şiddetli yağmur ekibin araştırmayı bitirmesini engelledi." } },
 ];
+
+// Gerund (V-ing) ya da infinitive (to V) alan fiiller — cümle boşluğuna
+// hangi formun geleceğini test eden mini quiz için kullanılır.
+// pattern "gerund" → correct = V-ing, wrong = to V (ve tersi).
+export const GERUND_INFINITIVE = [
+  { verb: "enjoy", meaning_tr: "hoşlanmak, keyif almak", pattern: "gerund", before: "She enjoys", after: "novels in her spare time.", correct: "reading", wrong: "to read" },
+  { verb: "avoid", meaning_tr: "kaçınmak", pattern: "gerund", before: "He always tries to avoid", after: "unnecessary risks.", correct: "taking", wrong: "to take" },
+  { verb: "mind", meaning_tr: "sakınca görmek, rahatsız olmak", pattern: "gerund", before: "Would you mind", after: "the window for a moment?", correct: "closing", wrong: "to close" },
+  { verb: "suggest", meaning_tr: "önermek", pattern: "gerund", before: "The doctor suggested", after: "more water every day.", correct: "drinking", wrong: "to drink" },
+  { verb: "consider", meaning_tr: "düşünmek, göz önünde bulundurmak", pattern: "gerund", before: "The committee is considering", after: "the proposal next week.", correct: "reviewing", wrong: "to review" },
+  { verb: "admit", meaning_tr: "kabul etmek, itiraf etmek", pattern: "gerund", before: "He finally admitted", after: "the mistake in his report.", correct: "making", wrong: "to make" },
+  { verb: "finish", meaning_tr: "bitirmek", pattern: "gerund", before: "They finished", after: "the project ahead of schedule.", correct: "designing", wrong: "to design" },
+  { verb: "deny", meaning_tr: "inkâr etmek", pattern: "gerund", before: "The company denied", after: "any responsibility for the accident.", correct: "having", wrong: "to have" },
+  { verb: "imagine", meaning_tr: "hayal etmek", pattern: "gerund", before: "It's hard to imagine", after: "life without electricity.", correct: "living", wrong: "to live" },
+  { verb: "practice", meaning_tr: "alıştırma yapmak", pattern: "gerund", before: "Students should practice", after: "difficult grammar structures regularly.", correct: "using", wrong: "to use" },
+  { verb: "risk", meaning_tr: "riske girmek", pattern: "gerund", before: "Investors risk", after: "large sums of money on new ventures.", correct: "losing", wrong: "to lose" },
+  { verb: "postpone", meaning_tr: "ertelemek", pattern: "gerund", before: "The council decided to postpone", after: "the meeting until next month.", correct: "holding", wrong: "to hold" },
+  { verb: "resist", meaning_tr: "direnmek, karşı koymak", pattern: "gerund", before: "It was hard to resist", after: "the temptation to give up.", correct: "feeling", wrong: "to feel" },
+  { verb: "appreciate", meaning_tr: "takdir etmek, değer vermek", pattern: "gerund", before: "We would appreciate", after: "your feedback on this issue.", correct: "receiving", wrong: "to receive" },
+
+  { verb: "want", meaning_tr: "istemek", pattern: "infinitive", before: "The company wants", after: "its market share by next year.", correct: "to increase", wrong: "increasing" },
+  { verb: "decide", meaning_tr: "karar vermek", pattern: "infinitive", before: "They decided", after: "the project until further notice.", correct: "to postpone", wrong: "postponing" },
+  { verb: "plan", meaning_tr: "planlamak", pattern: "infinitive", before: "The government plans", after: "new regulations next year.", correct: "to introduce", wrong: "introducing" },
+  { verb: "promise", meaning_tr: "söz vermek", pattern: "infinitive", before: "The manager promised", after: "the issue as soon as possible.", correct: "to address", wrong: "addressing" },
+  { verb: "afford", meaning_tr: "gücü yetmek", pattern: "infinitive", before: "Many families cannot afford", after: "private healthcare.", correct: "to pay for", wrong: "paying for" },
+  { verb: "manage", meaning_tr: "başarmak, becermek", pattern: "infinitive", before: "Despite the setbacks, she managed", after: "the project on time.", correct: "to complete", wrong: "completing" },
+  { verb: "agree", meaning_tr: "kabul etmek, razı olmak", pattern: "infinitive", before: "The board finally agreed", after: "the new proposal.", correct: "to support", wrong: "supporting" },
+  { verb: "refuse", meaning_tr: "reddetmek", pattern: "infinitive", before: "The workers refused", after: "under the new conditions.", correct: "to work", wrong: "working" },
+  { verb: "hope", meaning_tr: "ummak", pattern: "infinitive", before: "Scientists hope", after: "a cure within the next decade.", correct: "to find", wrong: "finding" },
+  { verb: "offer", meaning_tr: "teklif etmek", pattern: "infinitive", before: "The university offered", after: "additional scholarships to students.", correct: "to provide", wrong: "providing" },
+  { verb: "tend", meaning_tr: "eğiliminde olmak", pattern: "infinitive", before: "Older buildings tend", after: "more maintenance.", correct: "to require", wrong: "requiring" },
+  { verb: "fail", meaning_tr: "başaramamak", pattern: "infinitive", before: "The negotiations failed", after: "an agreement.", correct: "to produce", wrong: "producing" },
+  { verb: "arrange", meaning_tr: "düzenlemek, ayarlamak", pattern: "infinitive", before: "The organizers arranged", after: "extra seating for the event.", correct: "to provide", wrong: "providing" },
+  { verb: "expect", meaning_tr: "beklemek", pattern: "infinitive", before: "Analysts expect prices", after: "next quarter.", correct: "to rise", wrong: "rising" },
+
+  { verb: "stop", meaning_tr: "(bir şeyi yapmayı) bırakmak", pattern: "gerund", before: "He stopped", after: "for the company after ten years.", correct: "working", wrong: "to work", note: "stop + V-ing = bir eylemi bırakmak; stop + to V = bir şey yapmak için durmak" },
+  { verb: "remember", meaning_tr: "(yapacağını) hatırlamak", pattern: "infinitive", before: "Please remember", after: "the lights before you leave.", correct: "to turn off", wrong: "turning off", note: "remember to V = yapacağını hatırlamak; remember V-ing = yaptığını hatırlamak" },
+  { verb: "forget", meaning_tr: "(yapmayı) unutmak", pattern: "infinitive", before: "Don't forget", after: "your ID card to the exam.", correct: "to bring", wrong: "bringing", note: "forget to V = yapmayı unutmak; forget V-ing = yaptığını unutmak" },
+  { verb: "try", meaning_tr: "(bir yöntemi) denemek", pattern: "gerund", before: "If the door is stuck, try", after: "it a little harder.", correct: "pushing", wrong: "to push", note: "try V-ing = bir yöntemi sınamak; try to V = başarmak için çabalamak" },
+  { verb: "regret", meaning_tr: "(yapmış olmaktan) pişman olmak", pattern: "gerund", before: "She regretted", after: "such a hasty decision.", correct: "making", wrong: "to make", note: "regret V-ing = geçmişte yapılana pişman olmak; regret to V = kötü haber verirken kullanılır" },
+  { verb: "mean", meaning_tr: "(bir sonuca) yol açmak", pattern: "gerund", before: "Cutting the budget would mean", after: "several key employees.", correct: "losing", wrong: "to lose", note: "mean V-ing = bir sonuca yol açmak; mean to V = niyet etmek" },
+  { verb: "go on", meaning_tr: "(konu değiştirip) devam etmek", pattern: "infinitive", before: "After introducing the topic, she went on", after: "the main findings of the study.", correct: "to explain", wrong: "explaining", note: "go on to V = farklı bir şeye geçmek; go on V-ing = aynı şeye devam etmek" },
+  { verb: "need", meaning_tr: "(edilgen) ihtiyacı olmak", pattern: "gerund", before: "The old bridge needs", after: "before it becomes dangerous.", correct: "repairing", wrong: "to repair", note: "need V-ing (edilgen anlam) = need to be V3; need to V = özne kendisi yapmaya ihtiyaç duyar" },
+];
