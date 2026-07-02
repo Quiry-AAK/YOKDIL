@@ -9,7 +9,7 @@ import Settings from "./screens/Settings.jsx";
 import AIPool from "./screens/AIPool.jsx";
 import Topics from "./screens/Topics.jsx";
 
-const TABS = [
+const NAV_ITEMS = [
   { key: "home", label: "Denemeler", icon: "📄" },
   { key: "aipool", label: "AI Havuzu", icon: "🤖" },
   { key: "wrong", label: "Yanlışlarım", icon: "❌" },
@@ -22,12 +22,14 @@ const TABS = [
 export default function App() {
   const [view, setView] = useState("home");
   const [activeDeneme, setActiveDeneme] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const wrongCount = useStore((s) => s.wrongQuestions.length);
   const wordCount = useStore((s) => s.words.length);
 
   const navigate = (v, payload) => {
     if (v === "solve") setActiveDeneme(payload);
     setView(v);
+    setMenuOpen(false);
   };
 
   let screen;
@@ -40,29 +42,43 @@ export default function App() {
   else if (view === "words") screen = <Words navigate={navigate} />;
   else if (view === "settings") screen = <Settings navigate={navigate} />;
 
-  const activeTab = view === "solve" ? "home" : view;
+  const activeNav = view === "solve" ? "home" : view;
 
   return (
     <div className="app">
+      <header className="topbar">
+        <button className="hamburger-btn" onClick={() => setMenuOpen(true)} aria-label="Menü">
+          <span /><span /><span />
+        </button>
+        <span className="topbar-title">YÖKDİL Asistan</span>
+      </header>
+
       <main className="content">{screen}</main>
-      <nav className="tabbar">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            className={"tab" + (activeTab === t.key ? " active" : "")}
-            onClick={() => navigate(t.key)}
-          >
-            <span className="tab-icon">{t.icon}</span>
-            <span className="tab-label">{t.label}</span>
-            {t.key === "wrong" && wrongCount > 0 && (
-              <span className="badge">{wrongCount}</span>
-            )}
-            {t.key === "words" && wordCount > 0 && (
-              <span className="badge">{wordCount}</span>
-            )}
-          </button>
-        ))}
-      </nav>
+
+      {menuOpen && (
+        <div className="drawer-overlay" onClick={() => setMenuOpen(false)}>
+          <nav className="drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="drawer-head">
+              <span className="drawer-brand">YÖKDİL Asistan</span>
+              <button className="icon-btn" onClick={() => setMenuOpen(false)}>✕</button>
+            </div>
+            <div className="drawer-items">
+              {NAV_ITEMS.map((t) => (
+                <button
+                  key={t.key}
+                  className={"drawer-item" + (activeNav === t.key ? " active" : "")}
+                  onClick={() => navigate(t.key)}
+                >
+                  <span className="drawer-icon">{t.icon}</span>
+                  <span className="drawer-label">{t.label}</span>
+                  {t.key === "wrong" && wrongCount > 0 && <span className="badge drawer-badge">{wrongCount}</span>}
+                  {t.key === "words" && wordCount > 0 && <span className="badge drawer-badge">{wordCount}</span>}
+                </button>
+              ))}
+            </div>
+          </nav>
+        </div>
+      )}
     </div>
   );
 }

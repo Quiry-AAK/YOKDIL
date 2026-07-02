@@ -1,4 +1,4 @@
-// Dil bilgisi konu özetleri + genel sınav taktikleri — sadece anlatım, quiz yok.
+// Dil bilgisi konu özetleri + sinyal kelime haritası — sadece anlatım, quiz yok.
 
 export const GRAMMAR_TOPICS = [
   {
@@ -16,10 +16,11 @@ export const GRAMMAR_TOPICS = [
       { en: "Despite being tired, he kept working.", tr: "Yorgun olmasına rağmen çalışmaya devam etti." },
     ],
     pitfalls: [
-      "Although/despite karışıklığı: boşluktan sonra özne+fiil mi isim öbeği mi geldiğine bakmadan seçim yapmak",
-      "because + isim öbeği veya because of + özne+fiil gibi ters kullanım",
-      "so that (amaç) ile so...that (sonuç) kalıplarını birbirine karıştırmak",
+      "❌ Despite he was tired... → ✅ Despite being tired... (despite'tan sonra özne+fiil gelmez, isim/-ing gelir)",
+      "❌ Because of he was late... → ✅ Because he was late... (because of'tan sonra isim/-ing gelir, özne+fiil gelmez)",
+      "so that (amaç) ile so...that (sonuç) kalıplarını birbirine karıştırmak — so that'ten önce virgül yoktur, amaç bildirir",
       "whereas/while ile although'u aynı şeymiş gibi kullanmak — whereas daha çok karşılaştırma, although daha çok zıtlık bildirir",
+      "therefore/however gibi bağlaçları cümle ortasında bağlaç gibi kullanmak — bunlar genelde noktalı virgül veya nokta ile ayrılan yeni cümle başında kullanılır, and/but gibi doğrudan bağlamaz",
     ],
   },
   {
@@ -36,10 +37,11 @@ export const GRAMMAR_TOPICS = [
       { en: "Not only did she win, but she also broke the record.", tr: "Sadece kazanmakla kalmadı, rekoru da kırdı." },
     ],
     pitfalls: [
-      "No sooner...than yerine when/before kullanmak — bu kalıp sadece than ile çalışır",
-      "Hardly...when yerine than kullanmak — kalıplar birbirinin yerine geçmez",
+      "❌ No sooner had the plane landed when... → ✅ ...than... (No sooner...than sabit kalıptır, when/before ile kullanılmaz)",
+      "❌ Hardly had she arrived than... → ✅ ...when... (Hardly...when sabit kalıptır, than ile kullanılmaz)",
       "Devrik yapının sadece ilk cümlecikte kaldığını unutup ikinci cümleciği de devrik kurmak (Not only...but also'da but also kısmı normal kalır)",
-      "Cümle başındaki zarfı fark edip yardımcı fiili öne almayı unutmak (Never I have seen gibi yanlış sıralama)",
+      "❌ Never I have seen... → ✅ Never have I seen... (zarfı fark edip yardımcı fiili özneden önce almayı unutmak)",
+      "Only after / Only when / Only by ile başlayan cümlelerde devrikliği unutup düz cümle sırasına dönmek",
     ],
   },
   {
@@ -57,10 +59,11 @@ export const GRAMMAR_TOPICS = [
       { en: "If I had studied harder, I would be a doctor now.", tr: "Daha çok çalışsaydım şimdi doktor olurdum. (mixed)" },
     ],
     pitfalls: [
-      "unless ile birlikte ikinci bir olumsuzluk kullanmak (unless...not gibi çifte olumsuzluk)",
-      "Type 2 ve Type 3'ün fiil zamanlarını karıştırmak (if + past perfect yerine if + past kullanmak)",
+      "❌ Unless you don't hurry... → ✅ Unless you hurry... (unless zaten olumsuzluk taşır, ikinci bir \"not\" eklenmez)",
+      "❌ If he had more time, he would have finished. → ✅ If he had had more time... (Type 2/3 fiil zamanlarını karıştırmak)",
       "Mixed conditional'da ana cümle ile şart cümleciğinin zamanını birbirine uydurmaya çalışmak — mixed'de iki farklı zaman bilinçli olarak bir aradadır",
-      "Ana cümlede would yerine will kullanmak (Type 2/3'te will kullanılmaz)",
+      "❌ If it rains, we will canceled. → ✅ ...we will cancel. (Type 1'de ana cümlede will + V1 kullanılır, will + V3 değil)",
+      "provided that / as long as / on condition that gibi \"if\" yerine geçen koşul bağlaçlarını tanımamak",
     ],
   },
   {
@@ -78,10 +81,11 @@ export const GRAMMAR_TOPICS = [
       { en: "She had her car repaired.", tr: "Arabasını tamir ettirdi." },
     ],
     pitfalls: [
+      "❌ The report must submitted. → ✅ The report must be submitted. (modal + passive'te be fiilini atlamak)",
+      "❌ She had repaired her car (yaptırma anlamı kastediliyorsa). → ✅ She had her car repaired. (causative sıralamasını karıştırmak: have + nesne + V3)",
       "Özne eylemi yapmıyorken aktif yapı kurmak (cümlenin öznesinin eylemden etkilenen taraf olduğunu fark etmemek)",
-      "Modal + passive kalıbında be fiilini unutmak (must done yerine must be done olmalı)",
-      "Causative yapıda \"have something done\" yerine \"have do something\" gibi yanlış sıralama kullanmak",
-      "Passive cümlede zamanı be fiiline değil ana fiile yansıtmaya çalışmak",
+      "Passive cümlede zamanı be fiiline değil ana fiile yansıtmaya çalışmak (was being written yerine was write gibi hatalar)",
+      "\"by + agent\" görülmese bile pasif yapının gerekli olabileceğini unutmak — agent çoğu zaman cümlede belirtilmez",
     ],
   },
   {
@@ -101,9 +105,10 @@ export const GRAMMAR_TOPICS = [
     ],
     pitfalls: [
       "must have (kesin çıkarım) ile should have (pişmanlık/eleştiri) anlamını birbirine karıştırmak",
-      "Geçmiş modal kalıbında V3 yerine V1 kullanmak (must have go yerine must have gone olmalı)",
-      "needn't have done (gereksiz yapılmış) ile didn't need to do (gerekli değildi, yapılmadı) anlamlarını karıştırmak",
-      "can't have done (imkânsız geçmiş tahmini) yerine mustn't have done gibi olmayan bir kalıp kurmak",
+      "❌ must have go → ✅ must have gone (geçmiş modal kalıbında V3 yerine V1 kullanmak)",
+      "needn't have done (gereksiz yapılmış) ile didn't need to do (gerekli değildi, muhtemelen yapılmadı) anlamlarını karıştırmak",
+      "❌ mustn't have done → ✅ can't have done (imkânsız geçmiş tahmini için mustn't değil can't kullanılır)",
+      "could have done (geçmişte yapılabilirdi ama yapılmadı) ile was able to do (geçmişte gerçekten yapabildi) ayrımını gözden kaçırmak",
     ],
   },
   {
@@ -119,10 +124,11 @@ export const GRAMMAR_TOPICS = [
       { en: "The book, which I bought yesterday, is great.", tr: "Dün aldığım kitap harika. (non-defining, ek bilgi)" },
     ],
     pitfalls: [
-      "Virgüllü (non-defining) cümlecikte that kullanmak — bu kalıpta that asla kullanılmaz",
+      "❌ The bridge, that was built in 1930... → ✅ ...which was built... (virgüllü/non-defining cümlecikte that asla kullanılmaz)",
       "İyelik ilişkisi arandığında whose yerine who/which kullanmak",
       "Kişi için which, nesne için who kullanmak gibi tür karışıklığı",
       "Defining/non-defining ayrımını virgüle bakmadan tahmin etmeye çalışmak",
+      "Relative clause içinde gereksiz özne tekrarı yapmak (the man who he called... → the man who called...)",
     ],
   },
   {
@@ -139,9 +145,10 @@ export const GRAMMAR_TOPICS = [
     ],
     pitfalls: [
       "Zaman kaydırmayı (backshift) unutup direkt orijinal zamanı kullanmak",
-      "Dolaylı soruda devrik yapıyı koruyup yardımcı fiili öne almaya devam etmek (asked where did I live gibi yanlış)",
+      "❌ She asked where did I live. → ✅ She asked where I lived. (dolaylı soruda devrik yapıyı korumak)",
       "Zaman/yer zarflarını değiştirmeyi unutmak (tomorrow'u the next day yapmadan bırakmak)",
       "Emir cümlesini that-clause ile çevirmeye çalışmak; doğrusu told/asked + to V kalıbıdır",
+      "Genel geçerlere (değişmeyen gerçekler) rağmen zamanı yine de kaydırmak — bazı bağlamlarda present kalabilir, ama sınavda genelde backshift beklenir",
     ],
   },
   {
@@ -156,9 +163,10 @@ export const GRAMMAR_TOPICS = [
       { en: "I don't know why she left early.", tr: "Neden erken ayrıldığını bilmiyorum." },
     ],
     pitfalls: [
-      "wh-clause içinde soru cümlesi sırasını korumak (I don't know why did she leave gibi yanlış)",
-      "that-clause'u gereksiz yere that olmadan bırakıp cümleyi belirsizleştirmek (bazı bağlamda that atlanabilir ama sınavda net kullanım aranır)",
+      "❌ I don't know why did she leave. → ✅ I don't know why she left. (wh-clause içinde soru sırasını korumak)",
+      "that-clause'u gereksiz yere that olmadan bırakıp cümleyi belirsizleştirmek",
       "Noun clause'un cümledeki görevini (özne mi nesne mi) karıştırmak",
+      "whether/if ile kurulan noun clause'larda \"or not\" gerekip gerekmediğini karıştırmak",
     ],
   },
   {
@@ -177,6 +185,7 @@ export const GRAMMAR_TOPICS = [
       "Sarkan ortaç (dangling participle): ortacın öznesiyle ana cümlenin öznesinin uyuşmaması — gramatik olarak hatalı ama anlam \"makul\" göründüğü için sık seçilir",
       "-ing (aktif) ile -ed/V3 (pasif) formunu birbirine karıştırmak",
       "Ortaç cümleciğinin hangi zaman/sebep/koşul cümleciğinin kısaltılmış hâli olduğunu yanlış çıkarmak",
+      "Having + V3 (tamamlanmış eylem) ile şimdiki zamana ait basit -ing yapısını karıştırmak",
     ],
   },
   {
@@ -193,9 +202,10 @@ export const GRAMMAR_TOPICS = [
       { en: "I met him in 2005.", tr: "Onunla 2005'te tanıştım." },
     ],
     pitfalls: [
-      "since ile birlikte present perfect yerine simple past kullanmak (I have known him since... yerine I knew him since... gibi yanlış)",
+      "❌ I have known him since he is a child. → ✅ ...since he was a child. (since'ten sonraki cümlecik genelde simple past'tir, ana cümle present perfect kalır)",
       "for/since'i birbirine karıştırmak — for süre, since başlangıç noktası bildirir",
       "Belirli bir geçmiş zaman ifadesi (in 2005, yesterday) varken present perfect kullanmak",
+      "Present Perfect Continuous ile Present Perfect Simple arasındaki süreklilik/sonuç vurgusu farkını gözden kaçırmak",
     ],
   },
   {
@@ -211,8 +221,8 @@ export const GRAMMAR_TOPICS = [
       { en: "The more you practice, the better you get.", tr: "Ne kadar çok pratik yaparsan o kadar iyi olursun." },
     ],
     pitfalls: [
-      "Çift comparative kullanmak (more bigger, more better gibi)",
-      "than yerine from/that kullanmak (bigger from him yerine bigger than him olmalı)",
+      "❌ more bigger / more better → ✅ bigger / better (çift comparative kullanmak)",
+      "❌ bigger from him → ✅ bigger than him (than yerine from/that kullanmak)",
       "the + comparative...the + comparative kalıbında \"the\"yı atlamak",
       "as...as kalıbı arasına sıfatın yanlış hâlini (comparative/superlative) koymak",
     ],
@@ -229,9 +239,9 @@ export const GRAMMAR_TOPICS = [
       { en: "I wish I had listened to my parents.", tr: "Keşke aileme kulak verseydim." },
     ],
     pitfalls: [
-      "wish'ten sonra will kullanmak — doğrusu would'tur (I wish you will stop yanlış)",
+      "❌ I wish you will stop. → ✅ I wish you would stop. (wish'ten sonra will değil would kullanılır)",
       "Şimdiki zamana ait bir dilek için past perfect, geçmişe ait bir pişmanlık için sadece past simple kullanmak (zamanları ters kullanmak)",
-      "wish + would kalıbını kendi isteklerimiz için kullanmak — bu kalıp başkasının davranışından rahatsızlık içindir, \"I wish I would...\" doğal değildir",
+      "wish + would kalıbını kendi isteklerimiz için kullanmak — bu kalıp başkasının davranışından rahatsızlık içindir",
     ],
   },
   {
@@ -243,8 +253,8 @@ export const GRAMMAR_TOPICS = [
       "get used to + V-ing → bir şeye alışmaya başlamak (I am getting used to the new job.)",
     ],
     pitfalls: [
-      "used to'yu şimdiki zamanda kullanmaya çalışmak (I use to smoke gibi hatalı kullanım) — sadece geçmiş için geçerlidir",
-      "be used to / get used to kalıplarından sonra V-ing yerine yalın fiil (V1) kullanmak",
+      "❌ I use to smoke. → ✅ I used to smoke. (used to'yu şimdiki zamanda kullanmaya çalışmak — sadece geçmiş için geçerlidir)",
+      "❌ be used to do → ✅ be used to doing (be used to / get used to kalıplarından sonra V-ing gerekir, yalın fiil değil)",
       "used to (geçmiş alışkanlık) ile be used to (alışkın olmak) anlamlarını karıştırmak — biri eylem biri durum bildirir",
     ],
   },
@@ -258,9 +268,10 @@ export const GRAMMAR_TOPICS = [
       "sıfat + enough + to V → yeterlilik (old enough to drive)",
     ],
     pitfalls: [
-      "so ile such'ı karıştırmak: so'dan sonra isim gelmez (so a good book yanlış, such a good book doğru)",
-      "such kalıbında a/an'in sırasını yanlış koymak (a such good book yerine such a good book olmalı)",
-      "enough'ın sıfattan önce mi sonra mı geldiğini karıştırmak — enough sıfattan SONRA gelir (enough old değil, old enough)",
+      "❌ so a good book that → ✅ such a good book that (so'dan sonra isim gelmez, such kullanılır)",
+      "❌ a such good book → ✅ such a good book (a/an'in sırasını yanlış koymak)",
+      "❌ enough old → ✅ old enough (enough sıfattan SONRA gelir)",
+      "too + sıfat + to V kalıbının olumsuz bir sonuç (yapamama) bildirdiğini unutup olumlu bağlamda kullanmak",
     ],
   },
   {
@@ -274,48 +285,72 @@ export const GRAMMAR_TOPICS = [
       "try to V (çabalamak) ≠ try V-ing (denemek, bir yöntemi sınamak)",
     ],
     pitfalls: [
-      "Sadece gerund alan bir fiilden sonra infinitive kullanmak (enjoy to swim yanlış, enjoy swimming doğru)",
+      "❌ enjoy to swim → ✅ enjoy swimming (sadece gerund alan bir fiilden sonra infinitive kullanmak)",
+      "❌ decide swimming → ✅ decide to swim (sadece infinitive alan bir fiilden sonra gerund kullanmak)",
       "stop to V / stop V-ing anlam farkını fark etmeden rastgele seçmek",
       "remember/forget/try gibi çift anlamlı fiillerde cümledeki bağlamı göz ardı edip ezbere gerund ya da infinitive seçmek",
-    ],
-  },
-  {
-    id: "prep-verbs",
-    title: "Fiil + Edat Kalıpları (Prepositional Verbs)",
-    points: [
-      "Sık çıkanlar: depend on, consist of, result in, result from, insist on, succeed in, believe in, apply for, deal with, care for/about",
-      "Edat genelde anlamdan çıkarılamaz, kalıp olarak ezberlenmesi gerekir",
-      "Aynı fiil farklı edatla farklı anlam kazanabilir: result in (bir şeyle sonuçlanmak) / result from (bir şeyden kaynaklanmak)",
-    ],
-    pitfalls: [
-      "Türkçe düşünüp edatı mantıkla tahmin etmeye çalışmak (interested about gibi yanlış, doğrusu interested in)",
-      "result in / result from gibi yön farkı olan kalıpları karıştırmak",
-      "Aynı fiilin farklı edatlarla farklı anlam kazandığını fark etmemek",
-    ],
-  },
-  {
-    id: "phrasal-verbs",
-    title: "Phrasal Verbs (Deyimsel Fiiller)",
-    points: [
-      "Sık çıkanlar: come up with (bulmak/önermek), put up with (katlanmak), look forward to (dört gözle beklemek), carry out (yürütmek), come across (rastlamak), take over (devralmak), give up (vazgeçmek), run out of (tükenmek)",
-      "look forward to + V-ing alır, to burada edattır infinitive değil",
-      "Anlamı parçalardan çıkarılamaz, kalıp olarak öğrenilmelidir",
-    ],
-    pitfalls: [
-      "look forward to'dan sonra V1 kullanmak (look forward to see yanlış, look forward to seeing doğru)",
-      "Phrasal verb'ün anlamını parçalardan (kelime kelime) çıkarmaya çalışmak — çoğu zaman yanıltıcıdır",
-      "Ayrılabilir (separable) phrasal verb'lerde zamiri doğru yere koymamak (give up it yanlış, give it up doğru)",
+      "Edattan sonra gelen fiili infinitive yapmak — edattan sonra HER ZAMAN gerund gelir (interested in study → interested in studying)",
     ],
   },
 ];
 
-export const GENERAL_TIPS = [
-  "Zamanı iyi yönet: zor sorulara takılıp kalma, işaretle ve devam et, sona kalırsan geri dön.",
-  "Kelime bilmediğin sorularda gramer ipuçlarından yararlan (fiil türü, edat, zaman).",
-  "Okuma parçalarını en sona bırakma — en çok soru orada (YÖKDİL'de 15, YDS'de 20 soru).",
-  "Şıkları elemeye çalış, kesin yanlış olanları hemen çıkar, ihtimalleri daralt.",
-  "Emin olmadığın soruyu boş bırakma — puanlama sadece doğru sayısına göre yapılır (doğru × 1,25), yanlış cevap doğruyu götürmez.",
-  "Sık çıkan kalıp yapıları (bağlaç + yapı) pratikle otomatik tanır hâle gel, sınavda düşünmeden fark et.",
-  "Aşırı genelleme içeren şıklara (always, never, all, completely) şüpheyle yaklaş — genelde tuzaktır.",
-  "Cümleyi/parçayı sonuna kadar okumadan erken karar verme, sondaki bir ifade cevabı değiştirebilir.",
+// Sinyal kelime → beklenen yapı haritası. Sınavda boşluktan önce/sonra
+// bu kelimelerden birini görünce hangi yapının arandığını hızlıca hatırlatır.
+export const SIGNAL_WORDS = [
+  {
+    group: "Zaman Sinyalleri",
+    items: [
+      { signal: "yesterday, last night/week/year, ... ago, in 1990 gibi geçmiş yıl", structure: "Simple Past (V2) — belirli, bitmiş bir geçmiş zaman noktası." },
+      { signal: "recently, lately, just, already, yet, so far, up to now, over the last/past + süre", structure: "Present Perfect (have/has + V3) — net bir geçmiş zaman ifadesi yoksa." },
+      { signal: "since + belirli zaman noktası (since 2010, since he was a child)", structure: "Present Perfect / Present Perfect Continuous — ana cümlede; \"since\" cümleciğinde genelde Simple Past." },
+      { signal: "for + süre ifadesi (for two years, for a while)", structure: "Present Perfect (Continuous) — sürenin hâlâ devam ettiğini gösterir." },
+      { signal: "now, right now, at the moment, at present, currently, Look!/Listen!", structure: "Present Continuous." },
+      { signal: "always, usually, often, every day/week, generally, as a rule", structure: "Simple Present." },
+      { signal: "by the time + Simple Past cümlesi", structure: "Diğer cümlede Past Perfect (had + V3) — ilk eylemin ondan önce tamamlandığını gösterir." },
+      { signal: "by + gelecek zaman noktası (by 2030, by next year)", structure: "Future Perfect (will have + V3)." },
+      { signal: "when / while / as + sürmekte olan eylem", structure: "Past Continuous (arka plan eylemi) + Simple Past (araya giren kısa eylem)." },
+      { signal: "never...before, this/it is the first time (that)...", structure: "Present Perfect." },
+      { signal: "tomorrow, next week/year, soon, in the near future", structure: "Future (will / be going to)." },
+    ],
+  },
+  {
+    group: "Şart Cümlesi Sinyalleri",
+    items: [
+      { signal: "if + Simple Present (şart cümleciğinde)", structure: "Ana cümlede will + V1 (Type 1 — gerçek/olası)." },
+      { signal: "if + Simple Past (şart cümleciğinde)", structure: "Ana cümlede would + V1 (Type 2 — şimdi gerçek dışı)." },
+      { signal: "if + had + V3 / Past Perfect (şart cümleciğinde)", structure: "Ana cümlede would have + V3 (Type 3 — geçmişte gerçekleşmemiş)." },
+      { signal: "unless", structure: "= if...not; cümlede ikinci bir olumsuzluk KULLANILMAZ, fiil olumlu kalır." },
+      { signal: "provided that, providing that, as long as, on condition that", structure: "if gibi koşul bildirir, genelde Simple Present ile kullanılır." },
+    ],
+  },
+  {
+    group: "Bağlaç Sinyalleri",
+    items: [
+      { signal: "although / though / even though", structure: "Sonrasında ÖZNE+FİİL (tam cümle) gelir." },
+      { signal: "despite / in spite of", structure: "Sonrasında isim ya da -ing (fiilsi isim) gelir, ÖZNE+FİİL gelmez." },
+      { signal: "because", structure: "Sonrasında ÖZNE+FİİL gelir." },
+      { signal: "because of", structure: "Sonrasında isim / -ing gelir." },
+      { signal: "so + sıfat/zarf + that", structure: "Sonuç cümleciği; boşluktan sonra isim YOKSA so kullanılır." },
+      { signal: "such + (a/an) + sıfat + isim + that", structure: "Sonuç cümleciği; boşluktan sonra isim VARSA such kullanılır." },
+      { signal: "not only...but also, no sooner...than, hardly...when, never/rarely/seldom (cümle başında)", structure: "Devrik cümle — yardımcı fiil özneden önce gelir." },
+    ],
+  },
+  {
+    group: "Edilgen Çatı Sinyalleri",
+    items: [
+      { signal: "by + failleyen kişi/nesne (by the committee, by scientists)", structure: "Muhtemelen edilgen (passive) yapı aranıyor — be + V3." },
+      { signal: "Cümlede özne eylemi kendisi yapmıyor / eylemi yapan belirtilmemiş ya da önemsiz", structure: "Passive (be + V3) tercih edilir." },
+      { signal: "must/should/can + fiil, ama özne eylemden etkileniyor", structure: "Modal + be + V3 (must be done, should be considered)." },
+    ],
+  },
+  {
+    group: "Özne-Fiil Uyumu Sinyalleri",
+    items: [
+      { signal: "neither...nor, either...or", structure: "Fiil, bağlaca EN YAKIN olan özneye göre çekimlenir." },
+      { signal: "each of / every one of + çoğul isim", structure: "Fiil TEKİL olur (each, every tekillik bildirir)." },
+      { signal: "the number of + çoğul isim", structure: "Fiil TEKİL olur (\"the number\" tekildir)." },
+      { signal: "a number of + çoğul isim", structure: "Fiil ÇOĞUL olur (\"a number of\" = birçok, çoğul anlam taşır)." },
+      { signal: "araya giren bir isim öbeği (of + isim, with + isim gibi)", structure: "Fiil, araya giren isme değil CÜMLENİN ASIL ÖZNESİNE göre çekimlenir." },
+    ],
+  },
 ];

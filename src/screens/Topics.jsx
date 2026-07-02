@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { GRAMMAR_TOPICS, GENERAL_TIPS } from "../lib/grammarTopics.js";
+import { GRAMMAR_TOPICS, SIGNAL_WORDS } from "../lib/grammarTopics.js";
 import { TOPICS } from "../lib/topics.js";
+import { PHRASAL_VERBS, PREP_VERBS } from "../lib/vocabPatterns.js";
 
 function GrammarCard({ topic, open, onToggle }) {
   return (
@@ -28,7 +29,7 @@ function GrammarCard({ topic, open, onToggle }) {
             <>
               <h4 className="topic-subhead">Tuzaklar</h4>
               <ul className="topic-points topic-pitfall-list">
-                {topic.pitfalls.map((p, i) => <li key={i}>⚠️ {p}</li>)}
+                {topic.pitfalls.map((p, i) => <li key={i}>{p}</li>)}
               </ul>
             </>
           )}
@@ -94,9 +95,50 @@ function TacticCard({ topic, open, onToggle }) {
   );
 }
 
+function SignalGroup({ group }) {
+  return (
+    <div className="topic-card topic-card-static">
+      <div className="topic-head topic-head-static">
+        <span className="topic-title">{group.group}</span>
+      </div>
+      <div className="topic-body">
+        <div className="signal-list">
+          {group.items.map((it, i) => (
+            <div key={i} className="signal-row">
+              <span className="signal-word">{it.signal}</span>
+              <span className="signal-arrow">→</span>
+              <span className="signal-structure">{it.structure}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PatternList({ items }) {
+  return (
+    <div className="list">
+      {items.map((it, i) => (
+        <div key={i} className="pattern-card">
+          <div className="pattern-head">
+            <span className="pattern-phrase">{it.phrase}</span>
+            <span className="pattern-meaning muted">{it.meaning}</span>
+          </div>
+          <div className="topic-example" style={{ marginTop: 6 }}>
+            <span className="topic-example-en">{it.example.en}</span>
+            <span className="topic-example-tr muted">{it.example.tr}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Topics() {
-  const [tab, setTab] = useState("grammar"); // grammar | tactics | general
+  const [tab, setTab] = useState("grammar"); // grammar | signals | tactics | patterns
   const [openId, setOpenId] = useState(null);
+  const [patternSub, setPatternSub] = useState("phrasal"); // phrasal | prep
 
   const toggle = (id) => setOpenId(openId === id ? null : id);
 
@@ -104,10 +146,11 @@ export default function Topics() {
     <div className="screen">
       <header className="screen-head">
         <h1>Konu Anlatımı</h1>
-        <div className="seg">
+        <div className="seg seg-wrap">
           <button className={tab === "grammar" ? "active" : ""} onClick={() => { setTab("grammar"); setOpenId(null); }}>Dil Bilgisi</button>
+          <button className={tab === "signals" ? "active" : ""} onClick={() => { setTab("signals"); setOpenId(null); }}>Sinyal Kelimeler</button>
           <button className={tab === "tactics" ? "active" : ""} onClick={() => { setTab("tactics"); setOpenId(null); }}>Taktikler</button>
-          <button className={tab === "general" ? "active" : ""} onClick={() => { setTab("general"); setOpenId(null); }}>Genel</button>
+          <button className={tab === "patterns" ? "active" : ""} onClick={() => { setTab("patterns"); setOpenId(null); }}>Kalıplar</button>
         </div>
       </header>
 
@@ -119,6 +162,17 @@ export default function Topics() {
         </div>
       )}
 
+      {tab === "signals" && (
+        <>
+          <p className="muted small" style={{ marginBottom: 12 }}>
+            Boşluktan önce/sonra bu kelimelerden birini görünce, karşısındaki yapıyı ara.
+          </p>
+          <div className="list">
+            {SIGNAL_WORDS.map((g) => <SignalGroup key={g.group} group={g} />)}
+          </div>
+        </>
+      )}
+
       {tab === "tactics" && (
         <div className="list">
           {TOPICS.map((t) => (
@@ -127,12 +181,14 @@ export default function Topics() {
         </div>
       )}
 
-      {tab === "general" && (
-        <div className="card">
-          <ul className="topic-points">
-            {GENERAL_TIPS.map((tip, i) => <li key={i}>{tip}</li>)}
-          </ul>
-        </div>
+      {tab === "patterns" && (
+        <>
+          <div className="seg" style={{ marginBottom: 14 }}>
+            <button className={patternSub === "phrasal" ? "active" : ""} onClick={() => setPatternSub("phrasal")}>Phrasal Verbs ({PHRASAL_VERBS.length})</button>
+            <button className={patternSub === "prep" ? "active" : ""} onClick={() => setPatternSub("prep")}>Edatlı Fiiller ({PREP_VERBS.length})</button>
+          </div>
+          <PatternList items={patternSub === "phrasal" ? PHRASAL_VERBS : PREP_VERBS} />
+        </>
       )}
     </div>
   );

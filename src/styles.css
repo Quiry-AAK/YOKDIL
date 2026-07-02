@@ -26,7 +26,7 @@ body {
 }
 
 .app { display: flex; flex-direction: column; height: 100%; max-width: 720px; margin: 0 auto; }
-.content { flex: 1; overflow-y: auto; padding-bottom: 80px; }
+.content { flex: 1; overflow-y: auto; padding-bottom: 20px; }
 
 .screen { padding: 18px 16px; }
 .screen-head { margin-bottom: 16px; }
@@ -34,27 +34,54 @@ body {
 .muted { color: var(--muted); }
 .small { font-size: 13px; }
 
-/* Tab bar */
-.tabbar {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  max-width: 720px; margin: 0 auto;
-  display: flex; background: var(--bg2);
-  border-top: 1px solid var(--border);
-  padding: 6px 4px env(safe-area-inset-bottom);
+/* Üst bar (hamburger menü tetikleyici) */
+.topbar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px env(safe-area-inset-top);
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  flex-shrink: 0; position: sticky; top: 0; z-index: 20;
 }
-.tab {
-  flex: 1; background: none; border: none; color: var(--muted);
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  padding: 6px 2px; font-size: 11px; cursor: pointer; position: relative;
+.hamburger-btn {
+  background: none; border: none; cursor: pointer; padding: 4px;
+  display: flex; flex-direction: column; gap: 4px; justify-content: center;
 }
-.tab.active { color: var(--primary2); }
-.tab-icon { font-size: 20px; }
+.hamburger-btn span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 2px; }
+.topbar-title { font-weight: 700; font-size: 16px; color: var(--text); }
+
+/* Sol açılır kapanır menü (drawer) */
+.drawer-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+  z-index: 50; display: flex;
+}
+.drawer {
+  width: 78%; max-width: 300px; height: 100%;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  animation: drawer-slide-in 0.18s ease-out;
+  padding-top: env(safe-area-inset-top);
+}
+@keyframes drawer-slide-in { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+.drawer-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px; border-bottom: 1px solid var(--border);
+}
+.drawer-brand { font-weight: 700; font-size: 16px; }
+.drawer-items { display: flex; flex-direction: column; padding: 8px; overflow-y: auto; }
+.drawer-item {
+  display: flex; align-items: center; gap: 12px;
+  background: none; border: none; color: var(--text);
+  padding: 13px 12px; border-radius: 10px; font-size: 15px;
+  cursor: pointer; text-align: left; position: relative;
+}
+.drawer-item.active { background: rgba(99,102,241,0.15); color: var(--primary2); font-weight: 600; }
+.drawer-icon { font-size: 19px; width: 24px; text-align: center; }
+.drawer-label { flex: 1; }
 .badge {
-  position: absolute; top: 0; right: 22%;
   background: var(--bad); color: #fff; font-size: 10px;
   min-width: 16px; height: 16px; border-radius: 8px;
   display: flex; align-items: center; justify-content: center; padding: 0 4px;
 }
+.drawer-badge { position: static; }
 
 /* Cards & buttons */
 .card {
@@ -257,6 +284,31 @@ button.opt-letter:disabled { opacity: 0.85; }
 .topic-tip-example { font-size: 13px; line-height: 1.6; margin: 0; font-style: italic; }
 .topic-pitfall .topic-tip-title { color: #fca5a5; }
 .topic-pitfall-list { color: #fca5a5; }
+.topic-card-static { cursor: default; }
+.topic-head-static { cursor: default; font-size: 15px; font-weight: 700; color: var(--primary2); padding-bottom: 8px; }
+
+/* Sinyal kelimeler */
+.signal-list { display: flex; flex-direction: column; gap: 10px; }
+.signal-row {
+  display: flex; flex-direction: column; gap: 4px;
+  background: var(--bg); border-radius: 8px; padding: 10px 12px;
+}
+.signal-word { font-weight: 600; font-size: 14px; }
+.signal-arrow { display: none; }
+.signal-structure { font-size: 13px; color: var(--primary2); line-height: 1.5; }
+
+/* Kalıplar (phrasal/edatlı fiiller) */
+.pattern-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 10px;
+}
+.pattern-head { display: flex; flex-direction: column; gap: 2px; }
+.pattern-phrase { font-weight: 700; font-size: 15px; color: var(--primary2); }
+.pattern-meaning { font-size: 13px; }
+
+/* Seg kontrolünün 4+ buton içerince sarması */
+.seg-wrap { flex-wrap: wrap; width: 100%; }
+.seg-wrap button { flex: 1 1 auto; white-space: nowrap; padding: 7px 10px; font-size: 13px; }
 .topic-summary {
   margin-top: 14px; padding: 10px 12px; border-radius: 8px;
   background: rgba(99,102,241,0.1); border: 1px solid var(--primary);
