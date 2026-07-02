@@ -24,6 +24,14 @@ function GrammarCard({ topic, open, onToggle }) {
               ))}
             </div>
           )}
+          {topic.pitfalls?.length > 0 && (
+            <>
+              <h4 className="topic-subhead">Tuzaklar</h4>
+              <ul className="topic-points topic-pitfall-list">
+                {topic.pitfalls.map((p, i) => <li key={i}>⚠️ {p}</li>)}
+              </ul>
+            </>
+          )}
         </div>
       )}
     </div>

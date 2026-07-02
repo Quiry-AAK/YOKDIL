@@ -256,6 +256,7 @@ button.opt-letter:disabled { opacity: 0.85; }
 .topic-tip-body { font-size: 13px; line-height: 1.6; margin: 0 0 4px; color: var(--text); }
 .topic-tip-example { font-size: 13px; line-height: 1.6; margin: 0; font-style: italic; }
 .topic-pitfall .topic-tip-title { color: #fca5a5; }
+.topic-pitfall-list { color: #fca5a5; }
 .topic-summary {
   margin-top: 14px; padding: 10px 12px; border-radius: 8px;
   background: rgba(99,102,241,0.1); border: 1px solid var(--primary);
