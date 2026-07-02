@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { GRAMMAR_TOPICS, SIGNAL_WORDS } from "../lib/grammarTopics.js";
 import { TOPICS } from "../lib/topics.js";
-import { PHRASAL_VERBS, PREP_VERBS } from "../lib/vocabPatterns.js";
+import { PHRASAL_VERBS, PREP_VERBS, GERUND_INFINITIVE } from "../lib/vocabPatterns.js";
 
 function GrammarCard({ topic, open, onToggle }) {
   return (
@@ -135,10 +135,31 @@ function PatternList({ items }) {
   );
 }
 
+function GerundList({ items }) {
+  return (
+    <div className="list">
+      {items.map((it, i) => (
+        <div key={i} className="pattern-card">
+          <div className="pattern-head">
+            <span className="pattern-phrase">{it.verb}</span>
+            <span className="pattern-meaning muted">
+              {it.meaning_tr} · {it.pattern === "gerund" ? "V-ing alır" : "to V alır"}
+            </span>
+          </div>
+          <div className="topic-example" style={{ marginTop: 6 }}>
+            <span className="topic-example-en">{it.before} {it.correct} {it.after}</span>
+          </div>
+          {it.note && <p className="topic-tip-example muted" style={{ marginTop: 6 }}>{it.note}</p>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Topics() {
   const [tab, setTab] = useState("grammar"); // grammar | signals | tactics | patterns
   const [openId, setOpenId] = useState(null);
-  const [patternSub, setPatternSub] = useState("phrasal"); // phrasal | prep
+  const [patternSub, setPatternSub] = useState("phrasal"); // phrasal | prep | gerund
 
   const toggle = (id) => setOpenId(openId === id ? null : id);
 
@@ -183,11 +204,16 @@ export default function Topics() {
 
       {tab === "patterns" && (
         <>
-          <div className="seg" style={{ marginBottom: 14 }}>
+          <div className="seg seg-wrap" style={{ marginBottom: 14 }}>
             <button className={patternSub === "phrasal" ? "active" : ""} onClick={() => setPatternSub("phrasal")}>Phrasal Verbs ({PHRASAL_VERBS.length})</button>
             <button className={patternSub === "prep" ? "active" : ""} onClick={() => setPatternSub("prep")}>Edatlı Fiiller ({PREP_VERBS.length})</button>
+            <button className={patternSub === "gerund" ? "active" : ""} onClick={() => setPatternSub("gerund")}>Gerund/Infinitive ({GERUND_INFINITIVE.length})</button>
           </div>
-          <PatternList items={patternSub === "phrasal" ? PHRASAL_VERBS : PREP_VERBS} />
+          {patternSub === "gerund" ? (
+            <GerundList items={GERUND_INFINITIVE} />
+          ) : (
+            <PatternList items={patternSub === "phrasal" ? PHRASAL_VERBS : PREP_VERBS} />
+          )}
         </>
       )}
     </div>
