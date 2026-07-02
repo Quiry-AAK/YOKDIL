@@ -312,7 +312,7 @@ button.opt-letter:disabled { opacity: 0.85; }
   background: var(--bg); border-radius: 10px; padding: 16px;
 }
 .blank-slot {
-  display: inline-block; min-width: 70px; border-bottom: 2px solid var(--primary);
+  display: inline-block; min-width: 70px;
   color: var(--primary2); font-weight: 700; text-align: center;
 }
 

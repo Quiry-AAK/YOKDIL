@@ -50,7 +50,7 @@ export default function PatternQuiz() {
 
   const next = (c) => {
     const list = listFor(c ?? cat);
-    const q = (c ?? cat) === "gerund" ? buildBlankQuestion(list) : buildMeaningQuestion(list);
+    const q = (c ?? cat) === "phrasal" ? buildMeaningQuestion(list) : buildBlankQuestion(list);
     setQuestion(q);
     setPicked(null);
   };
@@ -128,7 +128,7 @@ export default function PatternQuiz() {
 
       {question?.kind === "blank" && (
         <div className="card game-card">
-          <p className="muted" style={{ marginBottom: 6 }}>{question.item.meaning_tr}</p>
+          <p className="muted" style={{ marginBottom: 6 }}>{question.item.meaning_tr ?? question.item.meaning}</p>
           <div className="blank-sentence">
             {question.item.before}{" "}
             <span className="blank-slot">{picked ? picked.text : "______"}</span>{" "}
