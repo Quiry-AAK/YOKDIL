@@ -227,6 +227,41 @@ button.opt-letter:disabled { opacity: 0.85; }
 /* Tür seçici satırı (Home yükleme akışı) */
 .type-row { display: flex; align-items: center; gap: 10px; margin: 4px 0 8px; }
 
+/* Konu anlatımı */
+.topic-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 10px; overflow: hidden;
+}
+.topic-head {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; background: none; border: none; color: var(--text);
+  padding: 14px 16px; cursor: pointer; text-align: left; font-size: 15px; font-weight: 600;
+}
+.topic-title { flex: 1; }
+.topic-body { padding: 0 16px 16px; }
+.topic-desc { font-size: 14px; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
+.topic-subhead { font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary2); margin: 16px 0 8px; }
+.topic-points { margin: 0; padding-left: 20px; line-height: 1.8; font-size: 14px; }
+.topic-points li { margin-bottom: 6px; }
+.topic-examples { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.topic-example {
+  background: var(--bg); border-left: 3px solid var(--primary);
+  border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px;
+}
+.topic-example-en { font-style: italic; font-size: 14px; }
+.topic-example-tr { font-size: 13px; }
+.topic-tip { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.topic-tip:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.topic-tip-title { font-weight: 600; font-size: 14px; margin: 0 0 4px; }
+.topic-tip-body { font-size: 13px; line-height: 1.6; margin: 0 0 4px; color: var(--text); }
+.topic-tip-example { font-size: 13px; line-height: 1.6; margin: 0; font-style: italic; }
+.topic-pitfall .topic-tip-title { color: #fca5a5; }
+.topic-summary {
+  margin-top: 14px; padding: 10px 12px; border-radius: 8px;
+  background: rgba(99,102,241,0.1); border: 1px solid var(--primary);
+  font-size: 13px; line-height: 1.6;
+}
+
 /* Analiz paneli */
 .analysis-box {
   width: 100%; margin-top: 10px; padding-top: 10px;
