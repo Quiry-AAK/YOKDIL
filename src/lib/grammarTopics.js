@@ -119,12 +119,18 @@ export const GRAMMAR_TOPICS = [
       "that → hem kişi hem nesne için kullanılır, ama virgülden sonra ASLA kullanılmaz",
       "Defining (virgülsüz) → cümle için gerekli bilgi; non-defining (virgüllü) → ek/çıkarılabilir bilgi",
       "Non-defining cümlecikte that kullanılamaz, who/which kullanılır",
+      "which/where ayrımı edata bağlıdır: cümledeki fiil bir edat istiyorsa (live IN, work AT, stay IN gibi) 'which' TEK BAŞINA yetmez — ya edat+which (in which) ya da doğrudan where kullanılır",
+      "where = edat + which; yani 'in which' ile 'where' birbirinin yerine geçer, ama sadece 'which' (edatsız) o cümlede eksik/yanlış olur",
     ],
     examples: [
       { en: "The book, which I bought yesterday, is great.", tr: "Dün aldığım kitap harika. (non-defining, ek bilgi)" },
+      { en: "The hotel where we stayed was excellent.", tr: "Kaldığımız otel mükemmeldi. (stay IN bir yeri gerektirir → where ya da in which)" },
+      { en: "The hotel in which we stayed was excellent.", tr: "Yukarıdakiyle aynı anlam, sadece daha resmi." },
     ],
     pitfalls: [
       "❌ The bridge, that was built in 1930... → ✅ ...which was built... (virgüllü/non-defining cümlecikte that asla kullanılmaz)",
+      "❌ The hotel which we stayed was excellent. → ✅ The hotel where we stayed... / The hotel in which we stayed... (fiil edat istiyorsa — stay IN — yalın which yetmez, edat eksik kalır)",
+      "❌ The company which he works is well-known. → ✅ The company where he works... / ...which he works AT... (work AT edat ister; either edatı which'ten önce koy ya da where kullan, ikisini birden atlama)",
       "İyelik ilişkisi arandığında whose yerine who/which kullanmak",
       "Kişi için which, nesne için who kullanmak gibi tür karışıklığı",
       "Defining/non-defining ayrımını virgüle bakmadan tahmin etmeye çalışmak",
