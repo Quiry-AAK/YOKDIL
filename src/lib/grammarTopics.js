@@ -370,6 +370,71 @@ export const SIGNAL_WORDS = [
       { signal: "araya giren bir isim öbeği (of + isim, with + isim gibi)", structure: "Fiil, araya giren isme değil CÜMLENİN ASIL ÖZNESİNE göre çekimlenir." },
     ],
   },
+  {
+    group: "Bağlaç Çevirileri — Zıtlık (Çeviri soruları için)",
+    items: [
+      { signal: "although / though / even though", structure: "-e rağmen, gerçi, her ne kadar ... olsa da" },
+      { signal: "despite / in spite of", structure: "-e rağmen" },
+      { signal: "whereas / while (karşılaştırma anlamında)", structure: "iken, oysa, -dığı hâlde" },
+      { signal: "however", structure: "ancak, fakat, bununla birlikte" },
+      { signal: "nevertheless / nonetheless", structure: "yine de, buna rağmen" },
+      { signal: "on the other hand", structure: "öte yandan, diğer yandan" },
+      { signal: "yet (cümle başında bağlaç olarak)", structure: "ama, yine de" },
+      { signal: "even so", structure: "yine de, buna karşın" },
+    ],
+  },
+  {
+    group: "Bağlaç Çevirileri — Sebep / Sonuç (Çeviri soruları için)",
+    items: [
+      { signal: "because / since / as (sebep anlamında)", structure: "çünkü, -dığı için, -diğinden" },
+      { signal: "because of / due to / owing to", structure: "-den dolayı, -den ötürü, sebebiyle" },
+      { signal: "therefore / thus / hence", structure: "bu nedenle, dolayısıyla, bu yüzden" },
+      { signal: "as a result / consequently", structure: "sonuç olarak, bunun sonucunda" },
+      { signal: "so (cümle içinde sonuç bağlacı)", structure: "bu yüzden, bu nedenle" },
+      { signal: "so + sıfat/zarf + that / such + isim + that", structure: "o kadar ... ki" },
+      { signal: "given that", structure: "göz önüne alındığında, -dığına göre" },
+    ],
+  },
+  {
+    group: "Bağlaç Çevirileri — Amaç / Koşul (Çeviri soruları için)",
+    items: [
+      { signal: "so that / in order that", structure: "-mesi için, ki" },
+      { signal: "in order to / so as to", structure: "-mek için, -mek amacıyla" },
+      { signal: "if", structure: "eğer, -se/-sa" },
+      { signal: "unless", structure: "-medikçe, -mezse, eğer ... değilse" },
+      { signal: "provided that / providing that", structure: "şartıyla, koşuluyla" },
+      { signal: "as long as", structure: "-dığı sürece" },
+      { signal: "in case", structure: "-me ihtimaline karşı, olur da diye" },
+      { signal: "even if", structure: "-se bile, olsa bile" },
+    ],
+  },
+  {
+    group: "Bağlaç Çevirileri — Zaman (Çeviri soruları için)",
+    items: [
+      { signal: "when", structure: "-diğinde, -ince" },
+      { signal: "while", structure: "-irken, -dığı sırada" },
+      { signal: "as (zaman anlamında)", structure: "-irken, -dıkça" },
+      { signal: "before", structure: "-meden önce" },
+      { signal: "after", structure: "-dikten sonra" },
+      { signal: "since (zaman anlamında)", structure: "-den beri" },
+      { signal: "until / till", structure: "-e kadar (bir eylem o ana kadar sürer)" },
+      { signal: "by the time", structure: "-e kadar, -dığında (bir eylem o zamana kadar biter)" },
+      { signal: "as soon as", structure: "-er -mez" },
+      { signal: "once", structure: "-dığında, bir kere ... dikten sonra" },
+    ],
+  },
+  {
+    group: "Bağlaç Çevirileri — Ekleme / Örnekleme (Çeviri soruları için)",
+    items: [
+      { signal: "moreover / furthermore / in addition", structure: "ayrıca, bunun yanı sıra, dahası" },
+      { signal: "besides", structure: "üstelik, ayrıca" },
+      { signal: "not only ... but also", structure: "sadece ... değil aynı zamanda da" },
+      { signal: "similarly / likewise", structure: "benzer şekilde" },
+      { signal: "for example / for instance", structure: "örneğin" },
+      { signal: "namely / that is (i.e.)", structure: "yani, daha doğrusu" },
+      { signal: "in other words", structure: "başka bir deyişle" },
+    ],
+  },
 ];
 
 // YÖKDİL/YDS'de anlamca yakın göründüğü için sık karıştırılan kelime çiftleri.
