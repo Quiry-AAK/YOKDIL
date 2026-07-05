@@ -10,6 +10,11 @@ function exportJSON(data, filename) {
   URL.revokeObjectURL(url);
 }
 
+function pickActiveDeneme(denemes) {
+  if (!denemes.length) return null;
+  return denemes.find((d) => d.questions.some((q) => !q.userAnswer)) ?? denemes[denemes.length - 1];
+}
+
 export default function Home({ navigate }) {
   const denemes = useStore((s) => s.denemes);
   const addDeneme = useStore((s) => s.addDeneme);
@@ -296,6 +301,28 @@ export default function Home({ navigate }) {
             </div>
           );
         })}
+      </div>
+
+      <div className="quick-actions">
+        <button
+          className="quick-btn"
+          disabled={!denemes.length}
+          onClick={() => {
+            const active = pickActiveDeneme(denemes);
+            if (active) navigate("solve", active.id);
+          }}
+        >
+          <span className="quick-icon">▶️</span>
+          <span>Deneme Çöz</span>
+        </button>
+        <button className="quick-btn" onClick={() => navigate("wrong")}>
+          <span className="quick-icon">❌</span>
+          <span>Yanlışlarım</span>
+        </button>
+        <button className="quick-btn" onClick={() => navigate("patternquiz")}>
+          <span className="quick-icon">🧩</span>
+          <span>Kalıp Quiz</span>
+        </button>
       </div>
     </div>
   );

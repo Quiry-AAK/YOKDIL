@@ -20,7 +20,12 @@ Görevin: Tüm soruları sırayla, numaralarıyla birlikte eksiksiz çıkarmak.
 Kurallar:
 - Soru metni ve A–E şıklarını TAM, ORİJİNAL İngilizce haliyle yaz. Çevirme, kısaltma veya düzeltme yapma.
 - Okuma parçası (reading passage) varsa: o parçaya ait soru grubunun TÜM sorularının "passage" alanına aynı parça metnini koy. Parçasız sorularda "passage" alanını null bırak.
-- "text" alanına asla passage metnini yazma; "text" sadece soru cümlesini içermeli.
+- "text" ve "passage" İKİ AYRI ALANDIR, aralarında ASLA metin tekrarı olmamalı:
+  - "passage" SADECE okuma parçasının kendisini içerir (soru cümlesi veya numarası olmadan).
+  - "text" SADECE o sorunun kendi cümlesini/boşluk doldurma ifadesini içerir; passage metninin tamamını ya da bir kısmını ASLA "text" içine kopyalama.
+  - Yanlış örnek: passage="...(parça)..." VE text="...(aynı parça)... Question: ..." → İKİ ALANDA DA parça yazılmış, bu HATALIDIR.
+  - Doğru örnek: passage="...(parça)..." VE text="What does the passage mainly discuss?" → sadece soru cümlesi text'te.
+- JSON'u göndermeden önce kendini kontrol et: her sorunun "text" alanını "passage" alanıyla karşılaştır, ikisi arasında ortak/tekrar eden cümle var mı diye bak; varsa "text"ten çıkar.
 - 4 şıklı sorularda E alanını null bırak.
 - Cevap anahtarı PDF'in SON sayfasındadır. Her sorunun "answer" alanına doğru şık harfini (A–E) yaz.
 - Soruları numara sırasına göre küçükten büyüğe sırala.

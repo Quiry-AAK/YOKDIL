@@ -1,34 +1,53 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useStore } from "../store.js";
 import MarkableText from "../components/MarkableText.jsx";
-import { getCategory, CAT_ORDER } from "../lib/categories.js";
 
 const LETTERS = ["A", "B", "C", "D", "E"];
+const FULL_EXAM_SECONDS = 180 * 60; // YÖKDİL/YDS: 80 soru / 180 dakika
+
+function formatClock(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+function formatElapsed(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (m === 0) return `${s} saniye`;
+  return `${m} dakika ${s} saniye`;
+}
 
 export default function Solve({ denemeId, navigate }) {
   const deneme = useStore((s) => s.denemes.find((d) => d.id === denemeId));
   const answerQuestion = useStore((s) => s.answerQuestion);
 
-  const [catPicker, setCatPicker] = useState(true);
-  const [selectedCat, setSelectedCat] = useState(null); // null = Mix (tümü)
-  const [idx, setIdx] = useState(0);
+  const totalSeconds = deneme ? Math.round(FULL_EXAM_SECONDS * (deneme.questions.length / 80)) : 0;
+
+  const [idx, setIdx] = useState(() => {
+    if (!deneme) return 0;
+    const first = deneme.questions.findIndex((q) => !q.userAnswer);
+    return first === -1 ? 0 : first;
+  });
   const [showScore, setShowScore] = useState(false);
+  const [remaining, setRemaining] = useState(totalSeconds);
+  const intervalRef = useRef(null);
 
-  const catEntries = useMemo(() => {
-    if (!deneme) return [];
-    const counts = {};
-    deneme.questions.forEach((q) => {
-      const c = getCategory(q.number, deneme.type);
-      counts[c] = (counts[c] || 0) + 1;
-    });
-    return CAT_ORDER.filter((c) => counts[c]).map((c) => ({ label: c, count: counts[c] }));
-  }, [deneme?.id, deneme?.type]);
-
-  const questions = useMemo(() => {
-    if (!deneme) return [];
-    if (!selectedCat) return deneme.questions;
-    return deneme.questions.filter((q) => getCategory(q.number, deneme.type) === selectedCat);
-  }, [deneme, selectedCat]);
+  useEffect(() => {
+    if (!deneme) return;
+    setRemaining(totalSeconds);
+    intervalRef.current = setInterval(() => {
+      setRemaining((r) => {
+        if (r <= 1) {
+          clearInterval(intervalRef.current);
+          return 0;
+        }
+        return r - 1;
+      });
+    }, 1000);
+    return () => clearInterval(intervalRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deneme?.id]);
 
   if (!deneme) {
     return (
@@ -39,56 +58,11 @@ export default function Solve({ denemeId, navigate }) {
     );
   }
 
-  // ---- Kategori seçici ----
-  if (catPicker) {
-    return (
-      <div className="screen">
-        <header className="screen-head">
-          <button className="link" onClick={() => navigate("home")}>← {deneme.name}</button>
-        </header>
-        <p className="muted" style={{ marginBottom: 14 }}>Hangi bölümden çözmek istersin?</p>
-        <div className="list">
-          <div
-            className="card cat-pick-card"
-            onClick={() => {
-              setSelectedCat(null);
-              const first = deneme.questions.findIndex((q) => !q.userAnswer);
-              setIdx(first === -1 ? 0 : first);
-              setCatPicker(false);
-            }}
-          >
-            <div className="cat-pick-label">Mix — Tüm Sorular</div>
-            <div className="cat-pick-sub muted small">
-              {deneme.questions.length} soru · {deneme.questions.filter((q) => q.userAnswer).length} cevaplandı
-            </div>
-          </div>
-          {catEntries.map(({ label, count }) => {
-            const qs = deneme.questions.filter((q) => getCategory(q.number, deneme.type) === label);
-            const answered = qs.filter((q) => q.userAnswer).length;
-            return (
-              <div
-                key={label}
-                className="card cat-pick-card"
-                onClick={() => {
-                  setSelectedCat(label);
-                  const first = qs.findIndex((q) => !q.userAnswer);
-                  setIdx(first === -1 ? 0 : first);
-                  setCatPicker(false);
-                }}
-              >
-                <div className="cat-pick-label">{label}</div>
-                <div className="cat-pick-sub muted small">{count} soru · {answered} cevaplandı</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
-
+  const questions = deneme.questions;
   const q = questions[idx];
   const answered = !!q.userAnswer;
   const isCorrect = q.userAnswer === q.answer;
+  const elapsed = totalSeconds - remaining;
 
   const choose = (letter) => {
     if (answered) return;
@@ -102,20 +76,19 @@ export default function Solve({ denemeId, navigate }) {
 
   const onBitir = () => {
     const fresh = useStore.getState().denemes.find((d) => d.id === denemeId);
-    const freshQs = selectedCat
-      ? fresh?.questions.filter((x) => getCategory(x.number, fresh.type) === selectedCat)
-      : fresh?.questions;
-    const allDone = freshQs?.every((x) => x.userAnswer);
-    if (allDone) setShowScore(true);
-    else navigate("home");
+    const allDone = fresh?.questions.every((x) => x.userAnswer);
+    if (allDone) {
+      clearInterval(intervalRef.current);
+      setShowScore(true);
+    } else {
+      navigate("home");
+    }
   };
 
   // ---- Skor ekranı ----
   if (showScore) {
     const fresh = useStore.getState().denemes.find((d) => d.id === denemeId);
-    const qs = selectedCat
-      ? (fresh?.questions.filter((x) => getCategory(x.number, fresh.type) === selectedCat) || [])
-      : (fresh?.questions || []);
+    const qs = fresh?.questions || [];
     const total = qs.length;
     const correct = qs.filter((x) => x.userAnswer === x.answer).length;
     const wrong = qs.filter((x) => x.userAnswer && x.userAnswer !== x.answer).length;
@@ -125,7 +98,7 @@ export default function Solve({ denemeId, navigate }) {
       <div className="screen">
         <header className="screen-head">
           <h1>Sonuç</h1>
-          <p className="muted">{deneme.name}{selectedCat ? ` · ${selectedCat}` : ""}</p>
+          <p className="muted">{deneme.name}</p>
         </header>
         <div className="card score-card">
           <div className="score-big">{(correct * 1.25).toFixed(2)}</div>
@@ -135,13 +108,11 @@ export default function Solve({ denemeId, navigate }) {
           {unanswered > 0 && <div className="score-row"><span className="score-label">Boş</span><span className="score-val muted">{unanswered}</span></div>}
           <div className="score-row"><span className="score-label">Toplam</span><span className="score-val">{total}</span></div>
           <div className="score-row"><span className="score-label">Yüzde</span><span className="score-val">%{pct}</span></div>
+          <div className="score-row"><span className="score-label">Süre</span><span className="score-val">{formatElapsed(elapsed)}</span></div>
         </div>
         <div className="nav-row">
           <button className="btn" onClick={() => { setShowScore(false); setIdx(0); }}>Tekrar İncele</button>
-          <button className="btn btn-primary" onClick={() => { setShowScore(false); setCatPicker(true); }}>Bölüm Seç</button>
-        </div>
-        <div className="nav-row" style={{ marginTop: 0 }}>
-          <button className="btn btn-primary btn-big" onClick={() => navigate("home")}>Ana Sayfa</button>
+          <button className="btn btn-primary" onClick={() => navigate("home")}>Ana Sayfa</button>
         </div>
       </div>
     );
@@ -151,11 +122,12 @@ export default function Solve({ denemeId, navigate }) {
   return (
     <div className="screen">
       <header className="screen-head solve-head">
-        <button className="link" onClick={() => setCatPicker(true)}>
+        <button className="link" onClick={() => navigate("home")}>
           ← {deneme.name}
         </button>
-        <span className="counter">Soru {idx + 1} / {questions.length}</span>
+        <span className={"counter timer-badge" + (remaining <= 300 ? " timer-low" : "")}>⏱ {formatClock(remaining)}</span>
       </header>
+      <p className="muted small" style={{ marginTop: -12, marginBottom: 12 }}>Soru {idx + 1} / {questions.length}</p>
 
       <p className="hint-bar">
         💡 Cevap için <b>harfe (A/B/C…)</b> dokun · İngilizce <b>kelimeye</b> dokunca bekleme listesine eklenir.
