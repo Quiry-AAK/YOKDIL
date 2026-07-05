@@ -360,3 +360,210 @@ export const SIGNAL_WORDS = [
     ],
   },
 ];
+
+// YÖKDİL/YDS'de anlamca yakın göründüğü için sık karıştırılan kelime çiftleri.
+export const CONFUSED_PAIRS = [
+  {
+    id: "among-between",
+    title: "among vs between",
+    rule: "between iki kişi/şey arasında (ya da bir grup içindeki her biriyle tek tek ilişkiyi vurgularken); among üç veya daha fazla kişi/şeyden oluşan bir grubun İÇİNDE kullanılır.",
+    examples: [
+      { en: "Between you and me, I don't trust him.", tr: "Sadece aramızda kalsın, ona güvenmiyorum. (2 kişi)" },
+      { en: "The prize was shared among the five winners.", tr: "Ödül beş kazanan arasında paylaştırıldı. (3+ kişi, grup içinde)" },
+    ],
+  },
+  {
+    id: "affect-effect",
+    title: "affect vs effect",
+    rule: "affect fiildir, \"etkilemek\" anlamına gelir. effect genelde isimdir, \"etki\" anlamına gelir (have an effect on).",
+    examples: [
+      { en: "The new policy will affect thousands of workers.", tr: "Yeni politika binlerce çalışanı etkileyecek." },
+      { en: "The policy had a positive effect on productivity.", tr: "Politika verimlilik üzerinde olumlu bir etki yarattı." },
+    ],
+  },
+  {
+    id: "economic-economical",
+    title: "economic vs economical",
+    rule: "economic \"ekonomiyle ilgili\" demektir. economical \"tutumlu, idareli, az masraflı\" demektir.",
+    examples: [
+      { en: "The economic crisis affected millions of people.", tr: "Ekonomik kriz milyonlarca insanı etkiledi." },
+      { en: "She bought an economical car that uses less fuel.", tr: "Daha az yakıt tüketen tutumlu bir araba aldı." },
+    ],
+  },
+  {
+    id: "historic-historical",
+    title: "historic vs historical",
+    rule: "historic \"tarihi önemi olan, önemli\" demektir. historical \"tarihle ilgili, geçmişe ait\" demektir (önemli olması gerekmez).",
+    examples: [
+      { en: "The signing of the treaty was a historic moment.", tr: "Antlaşmanın imzalanması tarihi bir andı." },
+      { en: "The museum contains historical documents from the 1800s.", tr: "Müze 1800'lerden kalma tarihi belgeler içeriyor." },
+    ],
+  },
+  {
+    id: "principal-principle",
+    title: "principal vs principle",
+    rule: "principal sıfat olarak \"başlıca, temel\", isim olarak \"okul müdürü/anapara\" demektir. principle her zaman isimdir, \"ilke, prensip\" demektir.",
+    examples: [
+      { en: "The principal cause of the accident was speeding.", tr: "Kazanın başlıca nedeni hız yapmaktı." },
+      { en: "The scientist explained the basic principles of physics.", tr: "Bilim insanı fiziğin temel ilkelerini açıkladı." },
+    ],
+  },
+  {
+    id: "later-latter",
+    title: "later vs latter",
+    rule: "later \"daha sonra\" demektir (zaman). latter \"ikisinden sonuncusu, sondan bahsedilen\" demektir (former ile karşılaştırılır).",
+    examples: [
+      { en: "We will discuss this later in the meeting.", tr: "Bunu toplantıda daha sonra konuşacağız." },
+      { en: "Of the two options, the latter is more practical.", tr: "İki seçenekten ikincisi (sonuncusu) daha pratik." },
+    ],
+  },
+  {
+    id: "farther-further",
+    title: "farther vs further",
+    rule: "farther somut/fiziksel mesafe için kullanılır. further soyut anlamda \"daha fazla, ek\" demektir (further research, further information).",
+    examples: [
+      { en: "The village is ten miles farther than we thought.", tr: "Köy düşündüğümüzden on mil daha uzakta." },
+      { en: "Further research is needed to confirm these results.", tr: "Bu sonuçları doğrulamak için ek araştırma gerekiyor." },
+    ],
+  },
+  {
+    id: "few-little",
+    title: "few/a few vs little/a little",
+    rule: "few ve a few sayılabilir çoğul isimlerle kullanılır; little ve a little sayılamayan isimlerle kullanılır. few/little \"neredeyse hiç yok\" (olumsuz); a few/a little \"birazcık var\" (olumlu) anlamı taşır.",
+    examples: [
+      { en: "Few people attended the lecture.", tr: "Derse neredeyse hiç kimse katılmadı." },
+      { en: "A few students asked questions.", tr: "Birkaç öğrenci soru sordu." },
+      { en: "There is little hope of finding survivors.", tr: "Hayatta kalanları bulma umudu neredeyse hiç yok." },
+      { en: "We have a little time before the meeting.", tr: "Toplantıdan önce biraz zamanımız var." },
+    ],
+  },
+  {
+    id: "many-much",
+    title: "many vs much",
+    rule: "many sayılabilir çoğul isimlerle kullanılır (many experts). much sayılamayan isimlerle kullanılır (much time).",
+    examples: [
+      { en: "Many experts believe the trend will continue.", tr: "Birçok uzman eğilimin devam edeceğine inanıyor." },
+      { en: "The project required much time and effort.", tr: "Proje çok zaman ve emek gerektirdi." },
+    ],
+  },
+  {
+    id: "other-another",
+    title: "other vs another vs the other",
+    rule: "another tekil, belirsiz bir şey daha demektir. other çoğul ya da belirli isimlerle kullanılır. the other belirlidir, ikiden kalan tek şeyi/kişiyi işaret eder.",
+    examples: [
+      { en: "Would you like another cup of coffee?", tr: "Bir kahve daha ister misin?" },
+      { en: "Other studies have reached different conclusions.", tr: "Diğer çalışmalar farklı sonuçlara ulaştı." },
+      { en: "One twin is quiet; the other is very outgoing.", tr: "İkizlerden biri sessiz; diğeri çok girişken." },
+    ],
+  },
+  {
+    id: "each-every",
+    title: "each vs every",
+    rule: "each bireyi tek tek vurgular, 2 veya daha fazla öge için kullanılabilir. every bir grubun bütününü vurgular, genelde 3+ öge için kullanılır.",
+    examples: [
+      { en: "Each student received individual feedback.", tr: "Her bir öğrenci ayrı ayrı geri bildirim aldı." },
+      { en: "Every employee must complete the training.", tr: "Her çalışan eğitimi tamamlamalıdır." },
+    ],
+  },
+  {
+    id: "all-whole",
+    title: "all vs whole",
+    rule: "all çoğul veya sayılamayan isimlerle, the/my gibi belirteç olmadan da kullanılabilir. whole tekil isimle kullanılır ve genelde önünde the/a/my gibi bir belirteç bulunur.",
+    examples: [
+      { en: "All the students passed the exam.", tr: "Öğrencilerin tümü sınavı geçti." },
+      { en: "She spent the whole day studying.", tr: "Bütün günü ders çalışarak geçirdi." },
+    ],
+  },
+  {
+    id: "beside-besides",
+    title: "beside vs besides",
+    rule: "beside \"yanında\" demektir (yer bildirir). besides \"üstelik, ayrıca, -e ek olarak\" demektir (bilgi ekler).",
+    examples: [
+      { en: "He sat beside her during the ceremony.", tr: "Tören boyunca onun yanında oturdu." },
+      { en: "Besides being expensive, the plan is also impractical.", tr: "Pahalı olmasının yanı sıra, plan aynı zamanda pratik de değil." },
+    ],
+  },
+  {
+    id: "above-over",
+    title: "above vs over",
+    rule: "above dikey olarak yukarıda olmayı, temas olmadan, ya da sayısal olarak fazlalığı bildirir. over bir şeyin üzerinde/üzerinden geçerek, kapsayarak ya da aşarak anlamı taşır, temas olabilir.",
+    examples: [
+      { en: "The temperature rose above 40 degrees.", tr: "Sıcaklık 40 derecenin üzerine çıktı." },
+      { en: "They built a bridge over the river.", tr: "Nehrin üzerine bir köprü inşa ettiler." },
+    ],
+  },
+  {
+    id: "during-while-for",
+    title: "during vs while vs for",
+    rule: "during + isim (bir olay/dönem boyunca). while + özne+fiil (bir eylem sürerken). for + süre ifadesi (ne kadar sürdüğünü bildirir).",
+    examples: [
+      { en: "She fell asleep during the lecture.", tr: "Ders sırasında uyuyakaldı." },
+      { en: "While the manager was speaking, everyone listened carefully.", tr: "Yönetici konuşurken herkes dikkatle dinledi." },
+      { en: "The project has been delayed for three months.", tr: "Proje üç aydır ertelenmiş durumda." },
+    ],
+  },
+  {
+    id: "until-by",
+    title: "until vs by",
+    rule: "until bir zamana KADAR devam eden bir eylemle kullanılır. by bir zamana kadar TAMAMLANMIŞ olması gereken bir eylemle kullanılır.",
+    examples: [
+      { en: "She will stay in London until Friday.", tr: "Cumaya kadar Londra'da kalacak. (cumaya kadar sürüyor)" },
+      { en: "The report must be submitted by Friday.", tr: "Rapor cumaya kadar teslim edilmelidir. (cumaya kadar tamamlanmalı)" },
+    ],
+  },
+  {
+    id: "say-tell",
+    title: "say vs tell",
+    rule: "say kişi nesnesi almadan kullanılır (say that / say something). tell mutlaka bir kişi nesnesiyle kullanılır (tell someone that).",
+    examples: [
+      { en: "He said that he was busy.", tr: "Meşgul olduğunu söyledi." },
+      { en: "He told me that he was busy.", tr: "Bana meşgul olduğunu söyledi." },
+    ],
+  },
+  {
+    id: "speak-talk",
+    title: "speak vs talk",
+    rule: "speak daha resmidir, genelde tek yönlü konuşma ya da dil bilme anlamında kullanılır. talk daha gündeliktir, karşılıklı sohbeti ifade eder.",
+    examples: [
+      { en: "She can speak three languages.", tr: "Üç dil konuşabiliyor." },
+      { en: "They talked about their plans for the weekend.", tr: "Hafta sonu planları hakkında sohbet ettiler." },
+    ],
+  },
+  {
+    id: "borrow-lend",
+    title: "borrow vs lend",
+    rule: "borrow \"ödünç almak\" demektir (borrow FROM someone). lend \"ödünç vermek\" demektir (lend TO someone / lend someone something).",
+    examples: [
+      { en: "Can I borrow your pen?", tr: "Kalemini ödünç alabilir miyim?" },
+      { en: "She lent him some money.", tr: "Ona biraz para ödünç verdi." },
+    ],
+  },
+  {
+    id: "remember-remind",
+    title: "remember vs remind",
+    rule: "remember kişinin kendiliğinden hatırlamasıdır. remind birinin başka birine bir şeyi hatırlatmasıdır (remind someone to do something / of something).",
+    examples: [
+      { en: "I remember meeting him at the conference.", tr: "Onunla konferansta tanıştığımı hatırlıyorum." },
+      { en: "Please remind me to call the client tomorrow.", tr: "Lütfen yarın müşteriyi aramam gerektiğini bana hatırlat." },
+    ],
+  },
+  {
+    id: "actually-currently-eventually",
+    title: "actually vs currently vs eventually",
+    rule: "actually \"aslında, gerçekte\" demektir (beklenenin aksini vurgular). currently \"şu anda, hâlihazırda\" demektir. eventually \"sonunda, en nihayetinde\" demektir (uzun bir süreçten sonra).",
+    examples: [
+      { en: "Actually, the results were quite different from what we expected.", tr: "Aslında sonuçlar beklediğimizden oldukça farklıydı." },
+      { en: "The company is currently developing a new product.", tr: "Şirket şu anda yeni bir ürün geliştiriyor." },
+      { en: "After months of delay, the project eventually succeeded.", tr: "Aylarca süren gecikmenin ardından proje sonunda başarılı oldu." },
+    ],
+  },
+  {
+    id: "likely-probably",
+    title: "likely vs probably",
+    rule: "probably bir zarftır, cümlede be fiilinden sonra ya da ana fiilden önce yer alır. likely genelde \"be likely to V\" ya da \"it is likely that\" kalıbıyla kullanılır, tek başına zarf gibi cümle ortasına konmaz.",
+    examples: [
+      { en: "The meeting will probably be postponed.", tr: "Toplantı muhtemelen ertelenecek." },
+      { en: "The meeting is likely to be postponed.", tr: "Toplantının ertelenmesi muhtemel." },
+    ],
+  },
+];

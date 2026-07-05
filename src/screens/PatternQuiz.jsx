@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PHRASAL_VERBS, PREP_VERBS, GERUND_INFINITIVE } from "../lib/vocabPatterns.js";
+import { PHRASAL_VERBS, PREP_VERBS, GERUND_INFINITIVE, NOUN_PREP_PATTERNS } from "../lib/vocabPatterns.js";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -18,6 +18,7 @@ const CATEGORIES = [
   { key: "phrasal", label: "Phrasal Verbs", sub: `${PHRASAL_VERBS.length} kalıp` },
   { key: "prep", label: "Edatlı Fiiller", sub: `${PREP_VERBS.length} kalıp` },
   { key: "gerund", label: "Gerund / Infinitive", sub: `${GERUND_INFINITIVE.length} fiil` },
+  { key: "collocation", label: "Kalıp İfadeler", sub: `${NOUN_PREP_PATTERNS.length} kalıp` },
 ];
 
 function buildMeaningQuestion(list) {
@@ -46,7 +47,11 @@ export default function PatternQuiz() {
   const [picked, setPicked] = useState(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
 
-  const listFor = (c) => (c === "phrasal" ? PHRASAL_VERBS : c === "prep" ? PREP_VERBS : GERUND_INFINITIVE);
+  const listFor = (c) =>
+    c === "phrasal" ? PHRASAL_VERBS
+    : c === "prep" ? PREP_VERBS
+    : c === "collocation" ? NOUN_PREP_PATTERNS
+    : GERUND_INFINITIVE;
 
   const next = (c) => {
     const list = listFor(c ?? cat);
