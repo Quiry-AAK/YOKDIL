@@ -26,7 +26,27 @@ body {
 }
 
 .app { display: flex; flex-direction: column; height: 100%; max-width: 720px; margin: 0 auto; }
-.content { flex: 1; overflow-y: auto; padding-bottom: 20px; }
+.content { flex: 1; overflow-y: auto; padding-bottom: 80px; }
+
+/* Alt bar — Instagram tarzı sabit kısayol çubuğu */
+.bottombar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  max-width: 720px; margin: 0 auto;
+  display: flex; background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 6px 4px env(safe-area-inset-bottom);
+  z-index: 15;
+}
+.bottom-btn {
+  flex: 1; background: none; border: none; color: var(--muted);
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 6px 2px; font-size: 11px; cursor: pointer; position: relative;
+}
+.bottom-btn.active { color: var(--primary2); }
+.bottom-btn:disabled { opacity: 0.4; }
+.bottom-icon { font-size: 20px; }
+.bottom-label { font-weight: 600; }
+.bottom-badge { position: absolute; top: 0; right: 22%; }
 
 .screen { padding: 18px 16px; }
 .screen-head { margin-bottom: 16px; }
@@ -132,17 +152,6 @@ body {
 .counter { color: var(--muted); font-size: 14px; }
 .timer-badge { font-weight: 700; color: var(--primary2); font-variant-numeric: tabular-nums; }
 .timer-badge.timer-low { color: var(--bad); }
-
-/* Ana sayfa kısayol butonları */
-.quick-actions { display: flex; gap: 10px; margin-top: 22px; }
-.quick-btn {
-  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
-  background: var(--card2); border: 1px solid var(--border); border-radius: 12px;
-  padding: 16px 6px; color: var(--text); font-size: 13px; font-weight: 600;
-  cursor: pointer; text-align: center;
-}
-.quick-btn:disabled { opacity: 0.4; cursor: default; }
-.quick-icon { font-size: 26px; }
 .hint-bar { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
 .question-card { }
 .passage {

@@ -9,6 +9,7 @@ import Settings from "./screens/Settings.jsx";
 import AIPool from "./screens/AIPool.jsx";
 import Topics from "./screens/Topics.jsx";
 import PatternQuiz from "./screens/PatternQuiz.jsx";
+import { pickActiveDeneme } from "./lib/denemeHelpers.js";
 
 const NAV_ITEMS = [
   { key: "home", label: "Denemeler", icon: "📄" },
@@ -27,6 +28,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const wrongCount = useStore((s) => s.wrongQuestions.length);
   const wordCount = useStore((s) => s.words.length);
+  const denemes = useStore((s) => s.denemes);
 
   const navigate = (v, payload) => {
     if (v === "solve") setActiveDeneme(payload);
@@ -57,6 +59,29 @@ export default function App() {
       </header>
 
       <main className="content">{screen}</main>
+
+      <nav className="bottombar">
+        <button
+          className={"bottom-btn" + (view === "solve" ? " active" : "")}
+          disabled={!denemes.length}
+          onClick={() => {
+            const active = pickActiveDeneme(denemes);
+            if (active) navigate("solve", active.id);
+          }}
+        >
+          <span className="bottom-icon">▶️</span>
+          <span className="bottom-label">Deneme Çöz</span>
+        </button>
+        <button className={"bottom-btn" + (view === "wrong" ? " active" : "")} onClick={() => navigate("wrong")}>
+          <span className="bottom-icon">❌</span>
+          <span className="bottom-label">Yanlışlarım</span>
+          {wrongCount > 0 && <span className="badge bottom-badge">{wrongCount}</span>}
+        </button>
+        <button className={"bottom-btn" + (view === "patternquiz" ? " active" : "")} onClick={() => navigate("patternquiz")}>
+          <span className="bottom-icon">🧩</span>
+          <span className="bottom-label">Kalıp Quiz</span>
+        </button>
+      </nav>
 
       {menuOpen && (
         <div className="drawer-overlay" onClick={() => setMenuOpen(false)}>
