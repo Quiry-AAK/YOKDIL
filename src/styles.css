@@ -152,6 +152,8 @@ body {
 .counter { color: var(--muted); font-size: 14px; }
 .timer-badge { font-weight: 700; color: var(--primary2); font-variant-numeric: tabular-nums; }
 .timer-badge.timer-low { color: var(--bad); }
+.solve-sub-row { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 12px; }
+.q-timer { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .hint-bar { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
 .question-card { }
 .passage {

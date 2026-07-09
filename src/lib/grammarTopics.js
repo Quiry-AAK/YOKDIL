@@ -642,4 +642,14 @@ export const CONFUSED_PAIRS = [
       { en: "The meeting is likely to be postponed.", tr: "Toplantının ertelenmesi muhtemel." },
     ],
   },
+  {
+    id: "as-as-vs-so-that",
+    title: "as...as vs so...as vs so...that",
+    rule: "as...as iki şeyin EŞİT olduğunu belirtir, hem olumlu hem olumsuz cümlede kullanılır. so...as SADECE olumsuz cümlelerde as...as'in yerine geçebilir (not so...as = not as...as); olumlu cümlede \"so tall as\" denmez. so...that ise eşitlikle ilgisi olmayan bambaşka bir yapıdır — SONUÇ bildirir (o kadar ... ki).",
+    examples: [
+      { en: "She is as tall as her brother.", tr: "O, kardeşi kadar uzun. (olumlu eşitlik, sadece as...as)" },
+      { en: "She is not as tall as her brother. / She is not so tall as her brother.", tr: "O, kardeşi kadar uzun değil. (olumsuzda ikisi de kullanılabilir)" },
+      { en: "He was so tired that he fell asleep immediately.", tr: "O kadar yorgundu ki hemen uyuyakaldı. (sonuç cümleciği, eşitlikle alakasız)" },
+    ],
+  },
 ];

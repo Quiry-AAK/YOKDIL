@@ -46,6 +46,25 @@ export const useStore = create(
         set((s) => ({
           denemes: s.denemes.map((d) => (d.id === id ? { ...d, type } : d)),
         })),
+      addDenemeTime: (id, deltaSeconds) =>
+        set((s) => ({
+          denemes: s.denemes.map((d) =>
+            d.id === id ? { ...d, timeSpent: (d.timeSpent || 0) + deltaSeconds } : d
+          ),
+        })),
+      addQuestionTime: (denemeId, questionId, deltaSeconds) =>
+        set((s) => ({
+          denemes: s.denemes.map((d) =>
+            d.id !== denemeId
+              ? d
+              : {
+                  ...d,
+                  questions: d.questions.map((q) =>
+                    q.id === questionId ? { ...q, timeSpent: (q.timeSpent || 0) + deltaSeconds } : q
+                  ),
+                }
+          ),
+        })),
       updateDenemeQuestions: (id, newQuestions) => {
         const deneme = get().denemes.find((d) => d.id === id);
         if (!deneme) return 0;
