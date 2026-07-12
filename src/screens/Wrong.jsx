@@ -16,6 +16,7 @@ function exportJSON(data, filename) {
 function WrongCard({ w }) {
   const settings = useStore((s) => s.settings);
   const setExplanation = useStore((s) => s.setExplanation);
+  const setWrongNote = useStore((s) => s.setWrongNote);
   const removeWrong = useStore((s) => s.removeWrong);
   const currentDenemeName = useStore(
     (s) => s.denemes.find((d) => d.id === w.denemeId)?.name ?? w.denemeName
@@ -23,6 +24,7 @@ function WrongCard({ w }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [noteDraft, setNoteDraft] = useState(w.note || "");
   const q = w.question;
 
   const loadExplanation = async () => {
@@ -38,7 +40,10 @@ function WrongCard({ w }) {
   return (
     <div className="card wrong-card">
       <div className="wrong-head" onClick={() => setOpen(!open)}>
-        <span className="muted small">{currentDenemeName}{q.number ? ` · Soru ${q.number}` : ""}</span>
+        <span className="muted small">
+          {currentDenemeName}{q.number ? ` · Soru ${q.number}` : ""}
+          {w.note && <span title="Not var"> 📝</span>}
+        </span>
         <span>{open ? "▲" : "▼"}</span>
       </div>
       <div className="q-text small">{q.text}</div>
@@ -71,6 +76,17 @@ function WrongCard({ w }) {
               </button>
             )}
             {error && <div className="alert">{error}</div>}
+          </div>
+          <div className="note-block">
+            <p className="muted small" style={{ margin: "0 0 6px" }}>Neden yanlış yaptın? (notun)</p>
+            <textarea
+              className="input note-input"
+              placeholder="ör. gerund/infinitive karıştırdım, cümleyi yanlış anladım…"
+              value={noteDraft}
+              onChange={(e) => setNoteDraft(e.target.value)}
+              onBlur={() => { if (noteDraft !== (w.note || "")) setWrongNote(w.id, noteDraft); }}
+              rows={2}
+            />
           </div>
           <button className="link danger" onClick={() => removeWrong(w.id)}>Bu soruyu listeden kaldır</button>
         </>

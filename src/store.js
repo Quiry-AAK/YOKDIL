@@ -166,6 +166,25 @@ export const useStore = create(
         set((s) => ({
           wrongQuestions: s.wrongQuestions.filter((w) => w.id !== wrongId),
         })),
+      setWrongNote: (wrongId, note) =>
+        set((s) => ({
+          wrongQuestions: s.wrongQuestions.map((w) =>
+            w.id === wrongId ? { ...w, note } : w
+          ),
+        })),
+
+      // --- Kalıp Quiz istatistikleri (phrasal/prep/gerund/collocation) ---
+      patternStats: {}, // { [key]: { seen, correct } }
+      recordPatternAnswer: (key, correct) =>
+        set((s) => {
+          const prev = s.patternStats[key] || emptyStats();
+          return {
+            patternStats: {
+              ...s.patternStats,
+              [key]: { seen: prev.seen + 1, correct: prev.correct + (correct ? 1 : 0) },
+            },
+          };
+        }),
 
       // --- Kelimeler ---
       words: [],

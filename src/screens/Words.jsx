@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useStore } from "../store.js";
 import { analyzeWords, reformatWords } from "../lib/ai.js";
-import { pickWeighted, shuffle } from "../lib/sr.js";
+import { shuffle } from "../lib/sr.js";
+import { pickLeastSeen, roundSizeChoices } from "../lib/round.js";
+import { useRound } from "../lib/useRound.js";
 
 function exportJSON(data, filename) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -24,7 +26,8 @@ export default function Words() {
   const applyWordReformat = useStore((s) => s.applyWordReformat);
 
   const [mode, setMode] = useState("game");
-  const [current, setCurrent] = useState(null);
+  const [phase, setPhase] = useState("pick"); // pick | play | score
+  const round = useRound();
   const [choices, setChoices] = useState([]);
   const [picked, setPicked] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -34,26 +37,33 @@ export default function Words() {
   const [fixMsg, setFixMsg] = useState(null);
   const importRef = useRef();
 
-  const buildRound = () => {
-    setPicked(null);
-    const all = useStore.getState().words;
-    if (!all.length) { setCurrent(null); return; }
-    const word = pickWeighted(all, (w) => w.stats);
-    const distractors = (word.distractors_tr || []).slice(0, 3);
-    const opts = shuffle([word.meaning_tr, ...distractors]).map((t) => ({
-      text: t, correct: t === word.meaning_tr,
-    }));
-    setCurrent(word); setChoices(opts);
-  };
-
   useEffect(() => {
-    if (mode === "game" && !current && words.length) buildRound();
-  }, [mode, words.length]);
+    if (!round.current) { setChoices([]); return; }
+    const distractors = (round.current.distractors_tr || []).slice(0, 3);
+    setChoices(shuffle([round.current.meaning_tr, ...distractors]).map((t) => ({
+      text: t, correct: t === round.current.meaning_tr,
+    })));
+    setPicked(null);
+  }, [round.current]);
+
+  const startRound = (n) => {
+    const pool = pickLeastSeen(useStore.getState().words, (w) => w.stats, n);
+    round.start(pool, (w) => w.word);
+    setPhase("play");
+  };
 
   const pick = (opt) => {
     if (picked) return;
     setPicked(opt);
-    recordWordAnswer(current.word, opt.correct);
+    recordWordAnswer(round.current.word, opt.correct);
+  };
+
+  useEffect(() => {
+    if (round.finished && phase === "play") setPhase("score");
+  }, [round.finished]);
+
+  const onNext = () => {
+    round.answer(picked.correct);
   };
 
   const onAnalyze = async () => {
@@ -109,7 +119,7 @@ export default function Words() {
       <header className="screen-head">
         <h1>Kelimeler</h1>
         <div className="seg">
-          <button className={mode === "game" ? "active" : ""} onClick={() => { setMode("game"); setCurrent(null); }}>Oyun</button>
+          <button className={mode === "game" ? "active" : ""} onClick={() => { setMode("game"); setPhase("pick"); }}>Oyun</button>
           <button className={mode === "list" ? "active" : ""} onClick={() => setMode("list")}>Liste ({words.length})</button>
         </div>
       </header>
@@ -171,35 +181,59 @@ export default function Words() {
         </>
       )}
 
-      {mode === "game" && current && (
-        <div className="card game-card">
-          <div className="game-word">{current.word}</div>
-          <p className="muted">Anlamı hangisi?</p>
-          <div className="options">
-            {choices.map((opt, i) => {
-              let cls = "option";
-              if (picked) { if (opt.correct) cls += " correct"; else if (opt === picked) cls += " wrong"; }
-              return (
-                <button key={i} className={cls} disabled={!!picked} onClick={() => pick(opt)}>
-                  <span className="opt-text">{opt.text}</span>
-                </button>
-              );
-            })}
-          </div>
-          {picked && (
-            <div className="reveal">
-              <div className={"feedback " + (picked.correct ? "good" : "bad")}>
-                {picked.correct ? "✓ Doğru!" : "✗ Yanlış."}
-              </div>
-              <div className="reveal-detail">
-                <span className="pos-tag">{current.pos}</span>
-                <p className="meaning">{current.word} = {current.meaning_tr}</p>
-                <p className="example">"{current.example_en}"</p>
-                <p className="example-tr muted">{current.example_tr}</p>
-              </div>
-              <button className="btn btn-primary btn-big" onClick={buildRound}>Sonraki Kelime →</button>
+      {mode === "game" && words.length > 0 && phase === "pick" && (
+        <div className="list">
+          <p className="muted" style={{ marginBottom: 12 }}>Kaç kelime çalışmak istiyorsun? En az görülenler önce gelir.</p>
+          {roundSizeChoices(words.length).map((n) => (
+            <div key={n} className="card cat-pick-card" onClick={() => startRound(n)}>
+              <div className="cat-pick-label">{n === words.length ? `Tümü (${n})` : `${n} kelime`}</div>
             </div>
-          )}
+          ))}
+        </div>
+      )}
+
+      {mode === "game" && phase === "play" && round.current && (
+        <>
+          <p className="muted small" style={{ marginBottom: 8 }}>Kalan: {round.remaining} / {round.total}</p>
+          <div className="card game-card">
+            <div className="game-word">{round.current.word}</div>
+            <p className="muted">Anlamı hangisi?</p>
+            <div className="options">
+              {choices.map((opt, i) => {
+                let cls = "option";
+                if (picked) { if (opt.correct) cls += " correct"; else if (opt === picked) cls += " wrong"; }
+                return (
+                  <button key={i} className={cls} disabled={!!picked} onClick={() => pick(opt)}>
+                    <span className="opt-text">{opt.text}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {picked && (
+              <div className="reveal">
+                <div className={"feedback " + (picked.correct ? "good" : "bad")}>
+                  {picked.correct ? "✓ Doğru!" : "✗ Yanlış."}
+                </div>
+                <div className="reveal-detail">
+                  <span className="pos-tag">{round.current.pos}</span>
+                  <p className="meaning">{round.current.word} = {round.current.meaning_tr}</p>
+                  <p className="example">"{round.current.example_en}"</p>
+                  <p className="example-tr muted">{round.current.example_tr}</p>
+                </div>
+                <button className="btn btn-primary btn-big" onClick={onNext}>Sonraki Kelime →</button>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {mode === "game" && phase === "score" && (
+        <div className="card score-card">
+          <div className="score-big">%{round.total ? Math.round((round.firstTryCorrect / round.total) * 100) : 0}</div>
+          <p className="muted small" style={{ margin: "-12px 0 16px" }}>tur puanı (ilk denemede doğru oranı)</p>
+          <div className="score-row"><span className="score-label">Kelime sayısı</span><span className="score-val">{round.total}</span></div>
+          <div className="score-row"><span className="score-label">İlk denemede doğru</span><span className="score-val good">{round.firstTryCorrect}</span></div>
+          <button className="btn btn-primary btn-big" style={{ marginTop: 16 }} onClick={() => setPhase("pick")}>Yeni Tur</button>
         </div>
       )}
     </div>
