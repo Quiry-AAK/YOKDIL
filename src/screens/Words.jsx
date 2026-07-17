@@ -29,8 +29,6 @@ export default function Words() {
   const importWords = useStore((s) => s.importWords);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
   const removeWord = useStore((s) => s.removeWord);
-  const setAllWordsSourceType = useStore((s) => s.setAllWordsSourceType);
-  const setAllPendingSourceType = useStore((s) => s.setAllPendingSourceType);
 
   const [mode, setMode] = useState("game");
   const [stage, setStage] = useState("group"); // group | size | play | score
@@ -156,14 +154,6 @@ export default function Words() {
             <button className="btn btn-sm" onClick={() => exportJSON(words, "kelimeler.json")}>Dışa Aktar</button>
             <button className="btn btn-sm" onClick={() => importRef.current?.click()}>İçe Aktar</button>
             <input ref={importRef} type="file" accept=".json" hidden onChange={onImport} />
-          </div>
-          <div className="io-row">
-            <button className="btn btn-sm btn-ghost" onClick={() => {
-              if (confirm(`Mevcut ${words.length} kelimenin tümü "YÖKDİL" olarak işaretlensin mi? (geçici düzeltme)`)) setAllWordsSourceType("yokdil");
-            }}>Mevcutları YÖKDİL Yap</button>
-            <button className="btn btn-sm btn-ghost" onClick={() => {
-              if (confirm(`Kuyruktaki ${pendingWords.length} kelimenin tümü "YDS" olarak işaretlensin mi? (geçici düzeltme)`)) setAllPendingSourceType("yds");
-            }}>Kuyruğu YDS Yap</button>
           </div>
           {importMsg && <div className="alert alert-ok">{importMsg}</div>}
           <div className="list">
