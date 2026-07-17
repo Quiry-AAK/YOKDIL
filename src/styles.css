@@ -230,6 +230,10 @@ button.opt-letter:disabled { opacity: 0.85; }
   display: inline-block; background: var(--primary); color: #fff;
   font-size: 12px; padding: 2px 8px; border-radius: 6px; font-weight: 600;
 }
+.source-tag {
+  display: inline-block; background: var(--bg); border: 1px solid var(--border); color: var(--muted);
+  font-size: 11px; padding: 2px 7px; border-radius: 6px; font-weight: 600;
+}
 .meaning { font-weight: 600; margin: 8px 0 4px; }
 .example { font-style: italic; margin: 4px 0; }
 .example-tr { margin: 2px 0 6px; font-size: 14px; }
@@ -373,6 +377,8 @@ button.opt-letter:disabled { opacity: 0.85; }
 /* Kategori seçici (Solve başlangıcı) */
 .cat-pick-card { cursor: pointer; transition: border-color 0.15s; }
 .cat-pick-card:active { border-color: var(--primary); }
+.cat-pick-card.disabled { opacity: 0.4; cursor: default; }
+.cat-pick-card.disabled:active { border-color: var(--border); }
 .cat-pick-label { font-weight: 600; font-size: 16px; margin-bottom: 2px; }
 
 /* Yanlışlar kategori accordion */

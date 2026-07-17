@@ -6,9 +6,18 @@ import { getCategory, CAT_ORDER } from "../lib/categories.js";
 
 const LETTERS = ["A", "B", "C", "D", "E"];
 
+const EXAM_TYPES = [
+  { key: null, label: "Mix — Tüm Yanlışlar" },
+  { key: "yokdil", label: "YÖKDİL Yanlışları" },
+  { key: "yds", label: "YDS Yanlışları" },
+];
+
+function getWrongType(w, denemes) {
+  return denemes.find((d) => d.id === w.denemeId)?.type ?? "yokdil";
+}
+
 function getWrongCat(w, denemes) {
-  const deneme = denemes.find((d) => d.id === w.denemeId);
-  return getCategory(w.question.number, deneme?.type ?? "yokdil");
+  return getCategory(w.question.number, getWrongType(w, denemes));
 }
 
 export default function Review() {
@@ -16,7 +25,8 @@ export default function Review() {
   const denemes = useStore((s) => s.denemes);
   const recordReview = useStore((s) => s.recordReview);
 
-  const [stage, setStage] = useState("category"); // category | size | play | score
+  const [stage, setStage] = useState("examtype"); // examtype | category | size | play | score
+  const [examType, setExamType] = useState(null); // null = mix
   const [selectedCat, setSelectedCat] = useState(null);
   const round = useRound();
   const [picked, setPicked] = useState(null);
@@ -29,16 +39,26 @@ export default function Review() {
     if (round.finished && stage === "play") setStage("score");
   }, [round.finished]);
 
-  // Kategori sayıları
+  const examPool = (et) =>
+    et ? wrongQuestions.filter((w) => getWrongType(w, denemes) === et) : wrongQuestions;
+
+  // Kategori sayıları (seçili sınav türüne göre)
   const catCounts = {};
-  wrongQuestions.forEach((w) => {
+  examPool(examType).forEach((w) => {
     const c = getWrongCat(w, denemes);
     catCounts[c] = (catCounts[c] || 0) + 1;
   });
   const catEntries = CAT_ORDER.filter((c) => catCounts[c]).map((c) => ({ label: c, count: catCounts[c] }));
 
-  const poolFor = (cat) =>
-    cat ? wrongQuestions.filter((w) => getWrongCat(w, denemes) === cat) : wrongQuestions;
+  const poolFor = (cat) => {
+    const base = examPool(examType);
+    return cat ? base.filter((w) => getWrongCat(w, denemes) === cat) : base;
+  };
+
+  const startExamType = (et) => {
+    setExamType(et);
+    setStage("category");
+  };
 
   const startCategory = (cat) => {
     setSelectedCat(cat);
@@ -75,18 +95,47 @@ export default function Review() {
     );
   }
 
-  // ---- Kategori seçici ----
-  if (stage === "category") {
+  // ---- Sınav türü seçici ----
+  if (stage === "examtype") {
     return (
       <div className="screen">
         <header className="screen-head">
           <h1>Tekrar Çöz</h1>
         </header>
+        <p className="muted" style={{ marginBottom: 14 }}>Hangi sınav türünden çalışmak istersin?</p>
+        <div className="list">
+          {EXAM_TYPES.map((et) => {
+            const count = examPool(et.key).length;
+            return (
+              <div
+                key={et.label}
+                className={"card cat-pick-card" + (count === 0 ? " disabled" : "")}
+                onClick={() => count > 0 && startExamType(et.key)}
+              >
+                <div className="cat-pick-label">{et.label}</div>
+                <div className="cat-pick-sub muted small">{count} soru</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  const examLabel = EXAM_TYPES.find((et) => et.key === examType)?.label ?? "Mix";
+
+  // ---- Kategori seçici ----
+  if (stage === "category") {
+    return (
+      <div className="screen">
+        <header className="screen-head solve-head">
+          <button className="link" onClick={() => setStage("examtype")}>← {examLabel}</button>
+        </header>
         <p className="muted" style={{ marginBottom: 14 }}>Hangi bölümden çalışmak istersin?</p>
         <div className="list">
           <div className="card cat-pick-card" onClick={() => startCategory(null)}>
             <div className="cat-pick-label">Mix — Tüm Yanlışlar</div>
-            <div className="cat-pick-sub muted small">{wrongQuestions.length} soru</div>
+            <div className="cat-pick-sub muted small">{examPool(examType).length} soru</div>
           </div>
           {catEntries.map(({ label, count }) => (
             <div key={label} className="card cat-pick-card" onClick={() => startCategory(label)}>

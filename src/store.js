@@ -189,17 +189,21 @@ export const useStore = create(
       // --- Kelimeler ---
       words: [],
       pendingWords: [],
-      addPendingWord: (word, context) => {
+      addPendingWord: (word, context, sourceType = null) => {
         const key = word.trim().toLowerCase();
         const alreadyKnown = get().words.some((w) => w.word.toLowerCase() === key);
         const alreadyPending = get().pendingWords.some((w) => w.word === key);
         if (alreadyKnown || alreadyPending) return false;
-        set((s) => ({ pendingWords: [...s.pendingWords, { word: key, context }] }));
+        set((s) => ({ pendingWords: [...s.pendingWords, { word: key, context, sourceType }] }));
         return true;
       },
       clearPendingWords: () => set({ pendingWords: [] }),
       removePendingWord: (word) =>
         set((s) => ({ pendingWords: s.pendingWords.filter((w) => w.word !== word) })),
+      setAllPendingSourceType: (sourceType) =>
+        set((s) => ({ pendingWords: s.pendingWords.map((w) => ({ ...w, sourceType })) })),
+      setAllWordsSourceType: (sourceType) =>
+        set((s) => ({ words: s.words.map((w) => ({ ...w, sourceType })) })),
       addWord: (wordObj) => {
         const key = wordObj.word.trim().toLowerCase();
         const exists = get().words.find((w) => w.word.toLowerCase() === key);

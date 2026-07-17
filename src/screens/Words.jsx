@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useStore } from "../store.js";
-import { analyzeWords, reformatWords } from "../lib/ai.js";
+import { analyzeWords } from "../lib/ai.js";
 import { shuffle } from "../lib/sr.js";
 import { pickLeastSeen, roundSizeChoices } from "../lib/round.js";
 import { useRound } from "../lib/useRound.js";
@@ -13,6 +13,12 @@ function exportJSON(data, filename) {
   URL.revokeObjectURL(url);
 }
 
+const GROUPS = [
+  { key: "mix", label: "Mix — Tüm Kelimeler" },
+  { key: "yokdil", label: "YÖKDİL Kelimeleri" },
+  { key: "yds", label: "YDS Kelimeleri" },
+];
+
 export default function Words() {
   const settings = useStore((s) => s.settings);
   const words = useStore((s) => s.words);
@@ -23,18 +29,18 @@ export default function Words() {
   const importWords = useStore((s) => s.importWords);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
   const removeWord = useStore((s) => s.removeWord);
-  const applyWordReformat = useStore((s) => s.applyWordReformat);
+  const setAllWordsSourceType = useStore((s) => s.setAllWordsSourceType);
+  const setAllPendingSourceType = useStore((s) => s.setAllPendingSourceType);
 
   const [mode, setMode] = useState("game");
-  const [phase, setPhase] = useState("pick"); // pick | play | score
+  const [stage, setStage] = useState("group"); // group | size | play | score
+  const [group, setGroup] = useState(null);
   const round = useRound();
   const [choices, setChoices] = useState([]);
   const [picked, setPicked] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState(null);
   const [importMsg, setImportMsg] = useState(null);
-  const [fixing, setFixing] = useState(false);
-  const [fixMsg, setFixMsg] = useState(null);
   const importRef = useRef();
 
   useEffect(() => {
@@ -46,10 +52,22 @@ export default function Words() {
     setPicked(null);
   }, [round.current]);
 
+  useEffect(() => {
+    if (round.finished && stage === "play") setStage("score");
+  }, [round.finished]);
+
+  const poolFor = (g) =>
+    g === "mix" ? words : words.filter((w) => w.sourceType === g);
+
+  const startGroup = (g) => {
+    setGroup(g);
+    setStage("size");
+  };
+
   const startRound = (n) => {
-    const pool = pickLeastSeen(useStore.getState().words, (w) => w.stats, n);
+    const pool = pickLeastSeen(poolFor(group), (w) => w.stats, n);
     round.start(pool, (w) => w.word);
-    setPhase("play");
+    setStage("play");
   };
 
   const pick = (opt) => {
@@ -57,10 +75,6 @@ export default function Words() {
     setPicked(opt);
     recordWordAnswer(round.current.word, opt.correct);
   };
-
-  useEffect(() => {
-    if (round.finished && phase === "play") setPhase("score");
-  }, [round.finished]);
 
   const onNext = () => {
     round.answer(picked.correct);
@@ -72,28 +86,15 @@ export default function Words() {
     setAnalyzing(true);
     try {
       const results = await analyzeWords({ apiKey: settings.apiKey, model: settings.model, words: pendingWords });
-      results.forEach((w) => addWord(w));
+      results.forEach((w) => {
+        const pw = pendingWords.find((p) => p.word === w.word);
+        addWord({ ...w, sourceType: pw?.sourceType ?? null });
+      });
       clearPendingWords();
     } catch (e) {
       setAnalyzeError(e.message || "Analiz başarısız.");
     } finally {
       setAnalyzing(false);
-    }
-  };
-
-  const onFixFormat = async () => {
-    if (!settings.apiKey) { setFixMsg("Önce Ayarlar'dan API anahtarı ekle."); return; }
-    setFixing(true);
-    setFixMsg(null);
-    try {
-      const fixed = await reformatWords({ apiKey: settings.apiKey, model: settings.model, words });
-      applyWordReformat(fixed);
-      setFixMsg(`${fixed.length} kelimenin şık formatı düzeltildi.`);
-    } catch (e) {
-      setFixMsg(e.message || "Düzeltme başarısız.");
-    } finally {
-      setFixing(false);
-      setTimeout(() => setFixMsg(null), 3000);
     }
   };
 
@@ -119,7 +120,7 @@ export default function Words() {
       <header className="screen-head">
         <h1>Kelimeler</h1>
         <div className="seg">
-          <button className={mode === "game" ? "active" : ""} onClick={() => { setMode("game"); setPhase("pick"); }}>Oyun</button>
+          <button className={mode === "game" ? "active" : ""} onClick={() => { setMode("game"); setStage("group"); }}>Oyun</button>
           <button className={mode === "list" ? "active" : ""} onClick={() => setMode("list")}>Liste ({words.length})</button>
         </div>
       </header>
@@ -157,18 +158,21 @@ export default function Words() {
             <input ref={importRef} type="file" accept=".json" hidden onChange={onImport} />
           </div>
           <div className="io-row">
-            <button className="btn btn-sm btn-ghost" onClick={onFixFormat} disabled={fixing}>
-              {fixing ? "Düzeltiliyor…" : "🔧 Şık Formatını Düzelt"}
-            </button>
+            <button className="btn btn-sm btn-ghost" onClick={() => {
+              if (confirm(`Mevcut ${words.length} kelimenin tümü "YÖKDİL" olarak işaretlensin mi? (geçici düzeltme)`)) setAllWordsSourceType("yokdil");
+            }}>Mevcutları YÖKDİL Yap</button>
+            <button className="btn btn-sm btn-ghost" onClick={() => {
+              if (confirm(`Kuyruktaki ${pendingWords.length} kelimenin tümü "YDS" olarak işaretlensin mi? (geçici düzeltme)`)) setAllPendingSourceType("yds");
+            }}>Kuyruğu YDS Yap</button>
           </div>
           {importMsg && <div className="alert alert-ok">{importMsg}</div>}
-          {fixMsg && <div className="alert alert-ok">{fixMsg}</div>}
           <div className="list">
             {words.map((w) => (
               <div key={w.word} className="card word-card">
                 <div className="word-head">
                   <h3>{w.word}</h3>
                   <span className="pos-tag">{w.pos}</span>
+                  {w.sourceType && <span className="source-tag">{w.sourceType === "yds" ? "YDS" : "YÖKDİL"}</span>}
                   <button className="icon-btn" onClick={() => removeWord(w.word)}>🗑</button>
                 </div>
                 <p className="meaning">{w.meaning_tr}</p>
@@ -181,18 +185,37 @@ export default function Words() {
         </>
       )}
 
-      {mode === "game" && words.length > 0 && phase === "pick" && (
+      {mode === "game" && words.length > 0 && stage === "group" && (
+        <div className="list">
+          <p className="muted" style={{ marginBottom: 12 }}>Hangi kelimelerle çalışmak istiyorsun?</p>
+          {GROUPS.map((g) => {
+            const count = poolFor(g.key).length;
+            return (
+              <div
+                key={g.key}
+                className={"card cat-pick-card" + (count === 0 ? " disabled" : "")}
+                onClick={() => count > 0 && startGroup(g.key)}
+              >
+                <div className="cat-pick-label">{g.label}</div>
+                <div className="cat-pick-sub muted small">{count} kelime</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {mode === "game" && stage === "size" && (
         <div className="list">
           <p className="muted" style={{ marginBottom: 12 }}>Kaç kelime çalışmak istiyorsun? En az görülenler önce gelir.</p>
-          {roundSizeChoices(words.length).map((n) => (
+          {roundSizeChoices(poolFor(group).length).map((n) => (
             <div key={n} className="card cat-pick-card" onClick={() => startRound(n)}>
-              <div className="cat-pick-label">{n === words.length ? `Tümü (${n})` : `${n} kelime`}</div>
+              <div className="cat-pick-label">{n === poolFor(group).length ? `Tümü (${n})` : `${n} kelime`}</div>
             </div>
           ))}
         </div>
       )}
 
-      {mode === "game" && phase === "play" && round.current && (
+      {mode === "game" && stage === "play" && round.current && (
         <>
           <p className="muted small" style={{ marginBottom: 8 }}>Kalan: {round.remaining} / {round.total}</p>
           <div className="card game-card">
@@ -227,13 +250,13 @@ export default function Words() {
         </>
       )}
 
-      {mode === "game" && phase === "score" && (
+      {mode === "game" && stage === "score" && (
         <div className="card score-card">
           <div className="score-big">%{round.total ? Math.round((round.firstTryCorrect / round.total) * 100) : 0}</div>
           <p className="muted small" style={{ margin: "-12px 0 16px" }}>tur puanı (ilk denemede doğru oranı)</p>
           <div className="score-row"><span className="score-label">Kelime sayısı</span><span className="score-val">{round.total}</span></div>
           <div className="score-row"><span className="score-label">İlk denemede doğru</span><span className="score-val good">{round.firstTryCorrect}</span></div>
-          <button className="btn btn-primary btn-big" style={{ marginTop: 16 }} onClick={() => setPhase("pick")}>Yeni Tur</button>
+          <button className="btn btn-primary btn-big" style={{ marginTop: 16 }} onClick={() => setStage("group")}>Yeni Tur</button>
         </div>
       )}
     </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useStore } from "../store.js";
 
-export default function MarkableText({ text, className }) {
+export default function MarkableText({ text, className, sourceType }) {
   const words = useStore((s) => s.words);
   const pendingWords = useStore((s) => s.pendingWords);
   const addPendingWord = useStore((s) => s.addPendingWord);
@@ -47,7 +47,7 @@ export default function MarkableText({ text, className }) {
     if (!phrase || phrase.length < 2) return;
     if (knownKeys.has(phrase)) flash(`"${phrase}" zaten kelimelerde var.`);
     else if (pendingKeys.has(phrase)) flash(`"${phrase}" zaten bekleme listesinde.`);
-    else { addPendingWord(phrase, text); flash(`✓ "${phrase}" bekleme listesine eklendi.`); }
+    else { addPendingWord(phrase, text, sourceType ?? null); flash(`✓ "${phrase}" bekleme listesine eklendi.`); }
   };
 
   return (

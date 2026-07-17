@@ -260,10 +260,10 @@ export default function AIPool() {
 
       <div className="card question-card">
         {q.passage && (
-          <div className="passage"><MarkableText text={q.passage} /></div>
+          <div className="passage"><MarkableText text={q.passage} sourceType={q.type ?? examType} /></div>
         )}
         <div className="q-text">
-          <MarkableText text={q.text} />
+          <MarkableText text={q.text} sourceType={q.type ?? examType} />
         </div>
         <div className="options">
           {LETTERS.filter((l) => q.options[l]).map((l) => {
@@ -275,7 +275,7 @@ export default function AIPool() {
             return (
               <div key={l} className={cls}>
                 <button className="opt-letter" onClick={() => choose(l)} disabled={answered} title="Bu şıkkı seç">{l}</button>
-                <span className="opt-text"><MarkableText text={q.options[l]} /></span>
+                <span className="opt-text"><MarkableText text={q.options[l]} sourceType={q.type ?? examType} /></span>
               </div>
             );
           })}

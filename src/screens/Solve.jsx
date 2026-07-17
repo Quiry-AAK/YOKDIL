@@ -213,11 +213,11 @@ export default function Solve({ denemeId, navigate }) {
 
       <div className="card question-card">
         {q.passage && (
-          <div className="passage"><MarkableText text={q.passage} /></div>
+          <div className="passage"><MarkableText text={q.passage} sourceType={deneme.type} /></div>
         )}
         <div className="q-text">
           <span className="q-num">{q.number}.</span>{" "}
-          <MarkableText text={q.text} />
+          <MarkableText text={q.text} sourceType={deneme.type} />
         </div>
         <div className="options">
           {LETTERS.filter((l) => q.options[l]).map((l) => {
@@ -229,7 +229,7 @@ export default function Solve({ denemeId, navigate }) {
             return (
               <div key={l} className={cls}>
                 <button className="opt-letter" onClick={() => choose(l)} disabled={answered} title="Bu şıkkı seç">{l}</button>
-                <span className="opt-text"><MarkableText text={q.options[l]} /></span>
+                <span className="opt-text"><MarkableText text={q.options[l]} sourceType={deneme.type} /></span>
               </div>
             );
           })}
