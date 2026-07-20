@@ -652,4 +652,14 @@ export const CONFUSED_PAIRS = [
       { en: "He was so tired that he fell asleep immediately.", tr: "O kadar yorgundu ki hemen uyuyakaldı. (sonuç cümleciği, eşitlikle alakasız)" },
     ],
   },
+  {
+    id: "because-vs-so",
+    title: "because vs so",
+    rule: "because SEBEP bildirir — sonrasında gelen cümle nedendir (çünkü). so SONUÇ bildirir — sonrasında gelen cümle nedenin doğurduğu sonuçtur (bu yüzden/dolayısıyla). İkisi de aynı iki fikri bağlar ama sırayı tersine çevirir; birbirinin yerine kullanılamaz. because cümle başında da olabilir (Because..., ana cümle...), so ise her zaman iki cümle arasında, sonuç cümlesinin başında yer alır — cümle başında tek başına duramaz.",
+    examples: [
+      { en: "We stayed home because it was raining.", tr: "Yağmur yağdığı için evde kaldık. (because + sebep)" },
+      { en: "It was raining, so we stayed home.", tr: "Yağmur yağıyordu, bu yüzden evde kaldık. (so + sonuç, aynı olay ama sıra ters)" },
+      { en: "Because it was raining, we stayed home.", tr: "Yağmur yağdığı için evde kaldık. (because cümle başında da olabilir)" },
+    ],
+  },
 ];
