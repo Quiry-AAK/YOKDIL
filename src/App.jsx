@@ -17,6 +17,7 @@ import WordMatch from "./screens/WordMatch.jsx";
 import WordHangman from "./screens/WordHangman.jsx";
 import WordAnagram from "./screens/WordAnagram.jsx";
 import WordCrossword from "./screens/WordCrossword.jsx";
+import WordLink from "./screens/WordLink.jsx";
 import { pickActiveDeneme } from "./lib/denemeHelpers.js";
 
 const NAV_ITEMS = [
@@ -33,6 +34,7 @@ const NAV_ITEMS = [
   { key: "hangman", label: "Adam Asmaca", icon: "🪢" },
   { key: "wordanagram", label: "Harf Karıştırma", icon: "🔠" },
   { key: "wordcrossword", label: "Çapraz Bulmaca", icon: "🔲" },
+  { key: "wordlink", label: "Sütun Eşleştirme", icon: "🔗" },
   { key: "words", label: "Kelimeler", icon: "📖" },
   { key: "wordcards", label: "Kelime Kartları", icon: "🎴" },
   { key: "settings", label: "Ayarlar", icon: "⚙️" },
@@ -69,6 +71,7 @@ export default function App() {
   else if (view === "hangman") screen = <WordHangman navigate={navigate} />;
   else if (view === "wordanagram") screen = <WordAnagram navigate={navigate} />;
   else if (view === "wordcrossword") screen = <WordCrossword navigate={navigate} />;
+  else if (view === "wordlink") screen = <WordLink navigate={navigate} />;
   else if (view === "settings") screen = <Settings navigate={navigate} />;
 
   const activeNav = view === "solve" ? "home" : view;
