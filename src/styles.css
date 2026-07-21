@@ -413,7 +413,7 @@ button.opt-letter:disabled { opacity: 0.85; }
 .tf-btn.correct { background: rgba(34,197,94,0.25); border-color: var(--good); }
 .tf-btn.wrong { background: rgba(239,68,68,0.25); border-color: var(--bad); }
 
-/* Cloze Test parça oyunu */
+/* Boşluk Doldurma oyunu — cümledeki boş bırakılan kelime */
 .cloze-active-blank {
   background: rgba(99,102,241,0.35); color: var(--primary2); font-weight: 700;
   border-radius: 4px; padding: 1px 4px;
