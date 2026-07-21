@@ -13,12 +13,12 @@ export function useRound() {
   const attemptedRef = useRef(new Set());
   const keyOfRef = useRef(() => null);
 
-  const start = (items, keyOf) => {
+  const start = (items, keyOf, opts = {}) => {
     keyOfRef.current = keyOf;
     attemptedRef.current = new Set();
-    const shuffled = shuffle(items);
-    setCurrent(shuffled[0] ?? null);
-    setQueue(shuffled.slice(1));
+    const ordered = opts.shuffleItems === false ? items : shuffle(items);
+    setCurrent(ordered[0] ?? null);
+    setQueue(ordered.slice(1));
     setTotal(items.length);
     setFirstTryCorrect(0);
     setFinished(items.length === 0);
