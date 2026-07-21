@@ -40,7 +40,9 @@ export default function WordBlank() {
     setBlank(b);
     const others = poolFor(group)
       .filter((w) => w.word.toLowerCase() !== round.current.word.toLowerCase());
-    const decoys = shuffle(others).slice(0, 3).map((w) => w.word);
+    const samePos = others.filter((w) => w.pos && w.pos === round.current.pos);
+    const decoyPool = samePos.length >= 3 ? samePos : others;
+    const decoys = shuffle(decoyPool).slice(0, 3).map((w) => w.word);
     setChoices(shuffle([round.current.word, ...decoys]).map((t) => ({
       text: t, correct: t.toLowerCase() === round.current.word.toLowerCase(),
     })));
@@ -130,6 +132,7 @@ export default function WordBlank() {
             <span className="muted small">Kalan: {round.remaining} / {round.total}</span>
           </header>
           <div className="card game-card">
+            <p className="muted small" style={{ marginBottom: 4 }}>{round.current.example_tr}</p>
             <div className="passage">
               {blank.pre}<span className="cloze-active-blank">_______</span>{blank.post}
             </div>
