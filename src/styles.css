@@ -420,6 +420,20 @@ button.opt-letter:disabled { opacity: 0.85; }
 }
 .cat-pick-label { font-weight: 600; font-size: 16px; margin-bottom: 2px; }
 
+/* Çeviri (tile) oyunu */
+.tile-answer-area {
+  display: flex; flex-wrap: wrap; gap: 8px; min-height: 56px;
+  background: var(--bg); border: 2px dashed var(--border); border-radius: 10px;
+  padding: 12px; margin: 10px 0 14px; align-content: flex-start;
+}
+.tile-pool-area { display: flex; flex-wrap: wrap; gap: 8px; }
+.tile {
+  padding: 10px 14px; border-radius: 10px; border: 2px solid var(--border);
+  background: var(--card2); color: var(--text); font-size: 15px; font-weight: 600;
+  cursor: pointer;
+}
+.tile-placed { background: rgba(99,102,241,0.18); border-color: var(--primary2); }
+
 /* Yanlışlar kategori accordion */
 .cat-section { margin-bottom: 10px; }
 .cat-head {

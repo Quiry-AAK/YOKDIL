@@ -13,6 +13,7 @@ import WordCards from "./screens/WordCards.jsx";
 import TrueFalse from "./screens/TrueFalse.jsx";
 import ExamGame from "./screens/ExamGame.jsx";
 import ClozeGame from "./screens/ClozeGame.jsx";
+import TranslationGame from "./screens/TranslationGame.jsx";
 import { pickActiveDeneme } from "./lib/denemeHelpers.js";
 
 const NAV_ITEMS = [
@@ -23,6 +24,7 @@ const NAV_ITEMS = [
   { key: "topics", label: "Konular", icon: "📚" },
   { key: "patternquiz", label: "Kalıp Quiz", icon: "🧩" },
   { key: "truefalse", label: "Doğru / Yanlış", icon: "⚡" },
+  { key: "translationgame", label: "Çeviri", icon: "🔤" },
   { key: "sentencecomp", label: "Cümle Tamamlama", icon: "✍️" },
   { key: "oddsentence", label: "Bozan Cümleyi Bul", icon: "🔍" },
   { key: "clozegame", label: "Cloze Test", icon: "🧠" },
@@ -59,6 +61,7 @@ export default function App() {
   else if (view === "sentencecomp") screen = <ExamGame topicKey="cumle-tamamlama" title="Cümle Tamamlama" subtitle="Cümleyi anlamca ve yapısal olarak doğru bitiren şıkkı seç." />;
   else if (view === "oddsentence") screen = <ExamGame topicKey="anlam-butunlugu" title="Bozan Cümleyi Bul" subtitle="Paragrafın akışını bozan cümleyi bul." />;
   else if (view === "clozegame") screen = <ClozeGame navigate={navigate} />;
+  else if (view === "translationgame") screen = <TranslationGame navigate={navigate} />;
   else if (view === "settings") screen = <Settings navigate={navigate} />;
 
   const activeNav = view === "solve" ? "home" : view;
