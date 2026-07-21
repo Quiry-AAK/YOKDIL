@@ -13,6 +13,9 @@ import WordCards from "./screens/WordCards.jsx";
 import TrueFalse from "./screens/TrueFalse.jsx";
 import TranslationGame from "./screens/TranslationGame.jsx";
 import WordBlank from "./screens/WordBlank.jsx";
+import WordMatch from "./screens/WordMatch.jsx";
+import WordHangman from "./screens/WordHangman.jsx";
+import WordAnagram from "./screens/WordAnagram.jsx";
 import { pickActiveDeneme } from "./lib/denemeHelpers.js";
 
 const NAV_ITEMS = [
@@ -25,6 +28,9 @@ const NAV_ITEMS = [
   { key: "truefalse", label: "Doğru / Yanlış", icon: "⚡" },
   { key: "translationgame", label: "Çeviri", icon: "🔤" },
   { key: "wordblank", label: "Boşluk Doldurma", icon: "📝" },
+  { key: "wordmatch", label: "Eşleştirme", icon: "🃏" },
+  { key: "hangman", label: "Adam Asmaca", icon: "🪢" },
+  { key: "wordanagram", label: "Harf Karıştırma", icon: "🔠" },
   { key: "words", label: "Kelimeler", icon: "📖" },
   { key: "wordcards", label: "Kelime Kartları", icon: "🎴" },
   { key: "settings", label: "Ayarlar", icon: "⚙️" },
@@ -57,6 +63,9 @@ export default function App() {
   else if (view === "truefalse") screen = <TrueFalse navigate={navigate} />;
   else if (view === "translationgame") screen = <TranslationGame navigate={navigate} />;
   else if (view === "wordblank") screen = <WordBlank navigate={navigate} />;
+  else if (view === "wordmatch") screen = <WordMatch navigate={navigate} />;
+  else if (view === "hangman") screen = <WordHangman navigate={navigate} />;
+  else if (view === "wordanagram") screen = <WordAnagram navigate={navigate} />;
   else if (view === "settings") screen = <Settings navigate={navigate} />;
 
   const activeNav = view === "solve" ? "home" : view;
