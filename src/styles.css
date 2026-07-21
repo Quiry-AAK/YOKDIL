@@ -379,6 +379,39 @@ button.opt-letter:disabled { opacity: 0.85; }
 .cat-pick-card:active { border-color: var(--primary); }
 .cat-pick-card.disabled { opacity: 0.4; cursor: default; }
 .cat-pick-card.disabled:active { border-color: var(--border); }
+
+/* Kelime kartları (kart oyunu) */
+.flip-card {
+  background: var(--card); border: 2px solid var(--border); border-radius: 18px;
+  padding: 40px 20px; min-height: 220px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  cursor: pointer; touch-action: pan-y; transition: border-color 0.15s;
+  user-select: none;
+}
+.flip-card.swipe-right { border-color: var(--good); }
+.flip-card.swipe-left { border-color: var(--bad); }
+.flip-card-front .game-word { margin-bottom: 8px; }
+.flip-card-back { width: 100%; }
+.flip-decide-row { display: flex; gap: 10px; margin-top: 16px; }
+.flip-decide-row .btn { flex: 1; padding: 14px; font-size: 15px; }
+.flip-btn-no { background: rgba(239,68,68,0.15); border-color: var(--bad); color: #fca5a5; }
+.flip-btn-yes { background: rgba(34,197,94,0.15); border-color: var(--good); color: #86efac; }
+
+/* Doğru/Yanlış hız turu */
+.tf-sentence {
+  font-size: 18px; line-height: 1.7; text-align: center; font-weight: 600;
+  background: var(--bg); border-radius: 10px; padding: 20px 14px; margin: 10px 0 16px;
+}
+.tf-buttons { display: flex; gap: 10px; }
+.tf-btn {
+  flex: 1; padding: 16px; font-size: 16px; font-weight: 700; border-radius: 12px;
+  cursor: pointer; border: 2px solid var(--border); background: var(--card2); color: var(--text);
+}
+.tf-btn:disabled { opacity: 0.6; }
+.tf-false { border-color: var(--bad); color: #fca5a5; }
+.tf-true { border-color: var(--good); color: #86efac; }
+.tf-btn.correct { background: rgba(34,197,94,0.25); border-color: var(--good); }
+.tf-btn.wrong { background: rgba(239,68,68,0.25); border-color: var(--bad); }
 .cat-pick-label { font-weight: 600; font-size: 16px; margin-bottom: 2px; }
 
 /* Yanlışlar kategori accordion */

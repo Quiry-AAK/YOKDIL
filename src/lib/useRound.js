@@ -37,7 +37,11 @@ export function useRound() {
       setQueue(queue.slice(1));
       if (!nextCurrent) setFinished(true);
     } else {
-      const newQueue = [...queue, current];
+      // Öğeyi yeni bir referansla kuyruğa geri koy — aksi hâlde tek öğe kalıp
+      // yanlış cevaplandığında setCurrent aynı referansı alır, React state
+      // güncellemesini es geçer (bailout) ve ekran donar.
+      const requeued = { ...current };
+      const newQueue = [...queue, requeued];
       setCurrent(newQueue[0]);
       setQueue(newQueue.slice(1));
     }
