@@ -186,6 +186,19 @@ export const useStore = create(
           };
         }),
 
+      // --- Sınav tipi oyunları istatistikleri (Cümle Tamamlama, Anlam Bütünlüğü vb.) ---
+      examStats: {}, // { [key]: { seen, correct } }
+      recordExamAnswer: (key, correct) =>
+        set((s) => {
+          const prev = s.examStats[key] || emptyStats();
+          return {
+            examStats: {
+              ...s.examStats,
+              [key]: { seen: prev.seen + 1, correct: prev.correct + (correct ? 1 : 0) },
+            },
+          };
+        }),
+
       // --- Kelimeler ---
       words: [],
       pendingWords: [],
