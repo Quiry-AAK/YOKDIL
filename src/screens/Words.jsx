@@ -26,6 +26,7 @@ export default function Words() {
   const academicWordStats = useStore((s) => s.academicWordStats);
   const recordAcademicWordAnswer = useStore((s) => s.recordAcademicWordAnswer);
   const removeWord = useStore((s) => s.removeWord);
+  const addPendingWord = useStore((s) => s.addPendingWord);
   const groups = useMemo(() => buildWordGroups(words, academicWordStats), [words, academicWordStats]);
 
   const [mode, setMode] = useState("game");
@@ -38,6 +39,9 @@ export default function Words() {
   const [analyzeError, setAnalyzeError] = useState(null);
   const [importMsg, setImportMsg] = useState(null);
   const importRef = useRef();
+  const [manualWord, setManualWord] = useState("");
+  const [manualTag, setManualTag] = useState("yokdil");
+  const [manualMsg, setManualMsg] = useState(null);
 
   useEffect(() => {
     if (!round.current) { setChoices([]); return; }
@@ -98,6 +102,15 @@ export default function Words() {
     }
   };
 
+  const submitManual = () => {
+    const w = manualWord.trim().toLowerCase();
+    if (!w) return;
+    const added = addPendingWord(w, null, manualTag);
+    setManualWord("");
+    setManualMsg(added ? `✓ "${w}" bekleme listesine eklendi.` : `"${w}" zaten ekli.`);
+    setTimeout(() => setManualMsg(null), 2200);
+  };
+
   const onImport = (e) => {
     const file = e.target.files?.[0];
     e.target.value = "";
@@ -124,6 +137,33 @@ export default function Words() {
           <button className={mode === "list" ? "active" : ""} onClick={() => setMode("list")}>Liste ({words.length})</button>
         </div>
       </header>
+
+      <div className="card">
+        <p className="muted small" style={{ marginBottom: 8 }}>Dışarıdan kelime ekle</p>
+        <div className="row">
+          <input
+            type="text"
+            className="input"
+            placeholder="ör. ambiguous"
+            value={manualWord}
+            onChange={(e) => setManualWord(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") submitManual(); }}
+          />
+          <button className="btn btn-primary" onClick={submitManual}>Ekle</button>
+        </div>
+        <div className="seg seg-wrap">
+          {[
+            { key: "yokdil", label: "YÖKDİL" },
+            { key: "yds", label: "YDS" },
+            { key: "diger", label: "Diğer" },
+          ].map((t) => (
+            <button key={t.key} className={manualTag === t.key ? "active" : ""} onClick={() => setManualTag(t.key)}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+        {manualMsg && <p className="muted small" style={{ marginTop: 6 }}>{manualMsg}</p>}
+      </div>
 
       {pendingWords.length > 0 && (
         <div className="card pending-card">
@@ -164,7 +204,11 @@ export default function Words() {
                 <div className="word-head">
                   <h3>{w.word}</h3>
                   <span className="pos-tag">{w.pos}</span>
-                  {w.sourceType && <span className="source-tag">{w.sourceType === "yds" ? "YDS" : "YÖKDİL"}</span>}
+                  {w.sourceType && (
+                    <span className="source-tag">
+                      {w.sourceType === "yds" ? "YDS" : w.sourceType === "diger" ? "Diğer" : "YÖKDİL"}
+                    </span>
+                  )}
                   <button className="icon-btn" onClick={() => removeWord(w.word)}>🗑</button>
                 </div>
                 <p className="meaning">{w.meaning_tr}</p>

@@ -9,8 +9,8 @@ export function buildWordGroups(words, academicWordStats) {
   const withStats = (list) => list.map((w) => ({ ...w, stats: academicWordStats[w.word] || emptyStats }));
   return [
     { key: "mix", label: "Mix — Tüm Kelimeler", pool: words, kind: "user" },
-    { key: "yokdil", label: "YÖKDİL Kelimeleri", pool: words.filter((w) => w.sourceType === "yokdil"), kind: "user" },
-    { key: "yds", label: "YDS Kelimeleri", pool: words.filter((w) => w.sourceType === "yds"), kind: "user" },
+    { key: "yokdil", label: "YÖKDİL Kelimeleri", pool: words.filter((w) => w.sourceType === "yokdil" || w.sourceType === "diger"), kind: "user" },
+    { key: "yds", label: "YDS Kelimeleri", pool: words.filter((w) => w.sourceType === "yds" || w.sourceType === "diger"), kind: "user" },
     { key: "academic-fen", label: "YÖKDİL Fen — Akademik Kelimeler", pool: withStats(YOKDIL_FEN_WORDS), kind: "academic" },
     { key: "academic-yds", label: "YDS — Akademik Kelimeler", pool: withStats(YDS_ACADEMIC_WORDS), kind: "academic" },
   ];
