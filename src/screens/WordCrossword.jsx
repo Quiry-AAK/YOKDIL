@@ -2,12 +2,7 @@ import { useState, useMemo } from "react";
 import { useStore } from "../store.js";
 import { pickLeastSeen } from "../lib/round.js";
 import { buildCrossword } from "../lib/crossword.js";
-
-const GROUPS = [
-  { key: "mix", label: "Mix — Tüm Kelimeler" },
-  { key: "yokdil", label: "YÖKDİL Kelimeleri" },
-  { key: "yds", label: "YDS Kelimeleri" },
-];
+import { buildWordGroups } from "../lib/wordSources.js";
 
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz".split("");
 
@@ -16,14 +11,16 @@ function crosswordSizeChoices(poolLength) {
   return opts.length ? opts : poolLength >= 3 ? [poolLength] : [];
 }
 
-function validPool(words, group) {
-  const base = group === "mix" ? words : words.filter((w) => w.sourceType === group);
-  return base.filter((w) => /^[a-z]+$/i.test(w.word) && w.word.length >= 3 && w.word.length <= 12);
+function filterValid(pool) {
+  return pool.filter((w) => /^[a-z]+$/i.test(w.word) && w.word.length >= 3 && w.word.length <= 12);
 }
 
 export default function WordCrossword() {
   const words = useStore((s) => s.words);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
+  const academicWordStats = useStore((s) => s.academicWordStats);
+  const recordAcademicWordAnswer = useStore((s) => s.recordAcademicWordAnswer);
+  const groups = useMemo(() => buildWordGroups(words, academicWordStats), [words, academicWordStats]);
 
   const [stage, setStage] = useState("group"); // group | size | play | score
   const [group, setGroup] = useState(null);
@@ -36,7 +33,12 @@ export default function WordCrossword() {
   const [genError, setGenError] = useState(false);
   const [lastN, setLastN] = useState(null);
 
-  const poolFor = (g) => validPool(words, g);
+  const poolFor = (key) => filterValid(groups.find((g) => g.key === key)?.pool ?? []);
+  const activeKind = groups.find((g) => g.key === group)?.kind;
+  const recordAnswer = (word, correct) => {
+    if (activeKind === "academic") recordAcademicWordAnswer(word, correct);
+    else recordWordAnswer(word, correct);
+  };
 
   const startGroup = (g) => { setGroup(g); setStage("size"); };
 
@@ -161,7 +163,7 @@ export default function WordCrossword() {
     setCheckResults(results);
     setCheckCount((n) => n + 1);
     if (allCorrect && anyFilled) {
-      puzzle.entries.forEach((e) => recordWordAnswer(e.word, true));
+      puzzle.entries.forEach((e) => recordAnswer(e.word, true));
       setStage("score");
     }
   };
@@ -174,7 +176,7 @@ export default function WordCrossword() {
             <h1>Çapraz Bulmaca</h1>
             <p className="muted">İpucu Türkçe anlam, cevap İngilizce kelime.</p>
           </header>
-          {words.length === 0 ? (
+          {groups.every((g) => poolFor(g.key).length === 0) ? (
             <div className="empty">
               <p>Henüz kelime yok.</p>
               <p className="muted">Soru çözerken kelimelere dokun; buraya düşsünler.</p>
@@ -182,7 +184,7 @@ export default function WordCrossword() {
           ) : (
             <div className="list">
               <p className="muted" style={{ marginBottom: 12 }}>Hangi kelimelerle çalışmak istiyorsun?</p>
-              {GROUPS.map((g) => {
+              {groups.map((g) => {
                 const count = poolFor(g.key).length;
                 return (
                   <div

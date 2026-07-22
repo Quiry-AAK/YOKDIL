@@ -1,13 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useStore } from "../store.js";
 import { shuffle, pickLeastSeen, roundSizeChoices } from "../lib/round.js";
 import { useRound } from "../lib/useRound.js";
-
-const GROUPS = [
-  { key: "mix", label: "Mix — Tüm Kelimeler" },
-  { key: "yokdil", label: "YÖKDİL Kelimeleri" },
-  { key: "yds", label: "YDS Kelimeleri" },
-];
+import { buildWordGroups } from "../lib/wordSources.js";
 
 function buildLetterTiles(word) {
   const correctLetters = word.toLowerCase().split("");
@@ -18,6 +13,9 @@ function buildLetterTiles(word) {
 export default function WordAnagram() {
   const words = useStore((s) => s.words);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
+  const academicWordStats = useStore((s) => s.academicWordStats);
+  const recordAcademicWordAnswer = useStore((s) => s.recordAcademicWordAnswer);
+  const groups = useMemo(() => buildWordGroups(words, academicWordStats), [words, academicWordStats]);
 
   const [stage, setStage] = useState("group"); // group | size | play | score
   const [group, setGroup] = useState(null);
@@ -25,7 +23,12 @@ export default function WordAnagram() {
   const [tiles, setTiles] = useState(null); // { correctLetters, pool, placed }
   const [checked, setChecked] = useState(null); // null | boolean
 
-  const poolFor = (g) => (g === "mix" ? words : words.filter((w) => w.sourceType === g));
+  const poolFor = (key) => groups.find((g) => g.key === key)?.pool ?? [];
+  const activeKind = groups.find((g) => g.key === group)?.kind;
+  const recordAnswer = (word, correct) => {
+    if (activeKind === "academic") recordAcademicWordAnswer(word, correct);
+    else recordWordAnswer(word, correct);
+  };
 
   useEffect(() => {
     if (!round.current) { setTiles(null); return; }
@@ -62,7 +65,7 @@ export default function WordAnagram() {
   const onCheck = () => {
     const isCorrect = tiles.placed.map((t) => t.ch).join("") === tiles.correctLetters.join("");
     setChecked(isCorrect);
-    recordWordAnswer(round.current.word, isCorrect);
+    recordAnswer(round.current.word, isCorrect);
   };
 
   const onNext = () => {
@@ -77,7 +80,7 @@ export default function WordAnagram() {
             <h1>Harf Karıştırma</h1>
             <p className="muted">Karışık harflerden dokunarak doğru kelimeyi kur.</p>
           </header>
-          {words.length === 0 ? (
+          {groups.every((g) => g.pool.length === 0) ? (
             <div className="empty">
               <p>Henüz kelime yok.</p>
               <p className="muted">Soru çözerken kelimelere dokun; buraya düşsünler.</p>
@@ -85,7 +88,7 @@ export default function WordAnagram() {
           ) : (
             <div className="list">
               <p className="muted" style={{ marginBottom: 12 }}>Hangi kelimelerle çalışmak istiyorsun?</p>
-              {GROUPS.map((g) => {
+              {groups.map((g) => {
                 const count = poolFor(g.key).length;
                 return (
                   <div

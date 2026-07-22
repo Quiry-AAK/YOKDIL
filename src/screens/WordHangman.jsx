@@ -1,13 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useStore } from "../store.js";
 import { pickLeastSeen, roundSizeChoices } from "../lib/round.js";
 import { useRound } from "../lib/useRound.js";
-
-const GROUPS = [
-  { key: "mix", label: "Mix — Tüm Kelimeler" },
-  { key: "yokdil", label: "YÖKDİL Kelimeleri" },
-  { key: "yds", label: "YDS Kelimeleri" },
-];
+import { buildWordGroups } from "../lib/wordSources.js";
 
 const MAX_WRONG = 6;
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz".split("");
@@ -23,6 +18,9 @@ function findBlank(word, sentence) {
 export default function WordHangman() {
   const words = useStore((s) => s.words);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
+  const academicWordStats = useStore((s) => s.academicWordStats);
+  const recordAcademicWordAnswer = useStore((s) => s.recordAcademicWordAnswer);
+  const groups = useMemo(() => buildWordGroups(words, academicWordStats), [words, academicWordStats]);
 
   const [stage, setStage] = useState("group"); // group | size | play | score
   const [group, setGroup] = useState(null);
@@ -31,7 +29,12 @@ export default function WordHangman() {
   const [wrongCount, setWrongCount] = useState(0);
   const [done, setDone] = useState(null); // null | true | false
 
-  const poolFor = (g) => (g === "mix" ? words : words.filter((w) => w.sourceType === g));
+  const poolFor = (key) => groups.find((g) => g.key === key)?.pool ?? [];
+  const activeKind = groups.find((g) => g.key === group)?.kind;
+  const recordAnswer = (word, correct) => {
+    if (activeKind === "academic") recordAcademicWordAnswer(word, correct);
+    else recordWordAnswer(word, correct);
+  };
 
   useEffect(() => {
     setGuessed(new Set());
@@ -65,14 +68,14 @@ export default function WordHangman() {
       const solved = letters.every((c) => !/[a-z]/.test(c) || next.has(c));
       if (solved) {
         setDone(true);
-        recordWordAnswer(round.current.word, true);
+        recordAnswer(round.current.word, true);
       }
     } else {
       const wc = wrongCount + 1;
       setWrongCount(wc);
       if (wc >= MAX_WRONG) {
         setDone(false);
-        recordWordAnswer(round.current.word, false);
+        recordAnswer(round.current.word, false);
       }
     }
   };
@@ -91,7 +94,7 @@ export default function WordHangman() {
             <h1>Adam Asmaca</h1>
             <p className="muted">Anlam ve cümle ipucuna bakarak kelimeyi harf harf bul.</p>
           </header>
-          {words.length === 0 ? (
+          {groups.every((g) => g.pool.length === 0) ? (
             <div className="empty">
               <p>Henüz kelime yok.</p>
               <p className="muted">Soru çözerken kelimelere dokun; buraya düşsünler.</p>
@@ -99,7 +102,7 @@ export default function WordHangman() {
           ) : (
             <div className="list">
               <p className="muted" style={{ marginBottom: 12 }}>Hangi kelimelerle çalışmak istiyorsun?</p>
-              {GROUPS.map((g) => {
+              {groups.map((g) => {
                 const count = poolFor(g.key).length;
                 return (
                   <div

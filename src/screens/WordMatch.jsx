@@ -1,12 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useStore } from "../store.js";
 import { shuffle, pickLeastSeen } from "../lib/round.js";
-
-const GROUPS = [
-  { key: "mix", label: "Mix — Tüm Kelimeler" },
-  { key: "yokdil", label: "YÖKDİL Kelimeleri" },
-  { key: "yds", label: "YDS Kelimeleri" },
-];
+import { buildWordGroups } from "../lib/wordSources.js";
 
 function matchSizeChoices(poolLength) {
   const opts = [4, 6, 8].filter((n) => n <= poolLength);
@@ -24,6 +19,9 @@ function buildCards(picked) {
 export default function WordMatch() {
   const words = useStore((s) => s.words);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
+  const academicWordStats = useStore((s) => s.academicWordStats);
+  const recordAcademicWordAnswer = useStore((s) => s.recordAcademicWordAnswer);
+  const groups = useMemo(() => buildWordGroups(words, academicWordStats), [words, academicWordStats]);
 
   const [stage, setStage] = useState("group"); // group | size | play | score
   const [group, setGroup] = useState(null);
@@ -34,7 +32,12 @@ export default function WordMatch() {
   const [moves, setMoves] = useState(0);
   const busyRef = useRef(false);
 
-  const poolFor = (g) => (g === "mix" ? words : words.filter((w) => w.sourceType === g));
+  const poolFor = (key) => groups.find((g) => g.key === key)?.pool ?? [];
+  const activeKind = groups.find((g) => g.key === group)?.kind;
+  const recordAnswer = (word, correct) => {
+    if (activeKind === "academic") recordAcademicWordAnswer(word, correct);
+    else recordWordAnswer(word, correct);
+  };
 
   const startGroup = (g) => {
     setGroup(g);
@@ -66,7 +69,7 @@ export default function WordMatch() {
     setMoves((m) => m + 1);
 
     if (first.wordKey === second.wordKey && first.side !== second.side) {
-      recordWordAnswer(first.wordKey, true);
+      recordAnswer(first.wordKey, true);
       setMatched((prev) => new Set(prev).add(first.wordKey));
       setFlipped([]);
     } else {
@@ -94,7 +97,7 @@ export default function WordMatch() {
             <h1>Eşleştirme</h1>
             <p className="muted">Kartları çevirip kelime ile Türkçe anlamını eşleştir.</p>
           </header>
-          {words.length === 0 ? (
+          {groups.every((g) => g.pool.length === 0) ? (
             <div className="empty">
               <p>Henüz kelime yok.</p>
               <p className="muted">Soru çözerken kelimelere dokun; buraya düşsünler.</p>
@@ -102,7 +105,7 @@ export default function WordMatch() {
           ) : (
             <div className="list">
               <p className="muted" style={{ marginBottom: 12 }}>Hangi kelimelerle çalışmak istiyorsun?</p>
-              {GROUPS.map((g) => {
+              {groups.map((g) => {
                 const count = poolFor(g.key).length;
                 return (
                   <div

@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useStore } from "../store.js";
 import { analyzeWords } from "../lib/ai.js";
 import { shuffle } from "../lib/sr.js";
 import { pickLeastSeen, roundSizeChoices } from "../lib/round.js";
 import { useRound } from "../lib/useRound.js";
+import { buildWordGroups } from "../lib/wordSources.js";
 
 function exportJSON(data, filename) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -12,12 +13,6 @@ function exportJSON(data, filename) {
   a.href = url; a.download = filename; a.click();
   URL.revokeObjectURL(url);
 }
-
-const GROUPS = [
-  { key: "mix", label: "Mix — Tüm Kelimeler" },
-  { key: "yokdil", label: "YÖKDİL Kelimeleri" },
-  { key: "yds", label: "YDS Kelimeleri" },
-];
 
 export default function Words() {
   const settings = useStore((s) => s.settings);
@@ -28,7 +23,10 @@ export default function Words() {
   const addWord = useStore((s) => s.addWord);
   const importWords = useStore((s) => s.importWords);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
+  const academicWordStats = useStore((s) => s.academicWordStats);
+  const recordAcademicWordAnswer = useStore((s) => s.recordAcademicWordAnswer);
   const removeWord = useStore((s) => s.removeWord);
+  const groups = useMemo(() => buildWordGroups(words, academicWordStats), [words, academicWordStats]);
 
   const [mode, setMode] = useState("game");
   const [stage, setStage] = useState("group"); // group | size | play | score
@@ -54,8 +52,12 @@ export default function Words() {
     if (round.finished && stage === "play") setStage("score");
   }, [round.finished]);
 
-  const poolFor = (g) =>
-    g === "mix" ? words : words.filter((w) => w.sourceType === g);
+  const poolFor = (key) => groups.find((g) => g.key === key)?.pool ?? [];
+  const activeKind = groups.find((g) => g.key === group)?.kind;
+  const recordAnswer = (word, correct) => {
+    if (activeKind === "academic") recordAcademicWordAnswer(word, correct);
+    else recordWordAnswer(word, correct);
+  };
 
   const startGroup = (g) => {
     setGroup(g);
@@ -71,7 +73,7 @@ export default function Words() {
   const pick = (opt) => {
     if (picked) return;
     setPicked(opt);
-    recordWordAnswer(round.current.word, opt.correct);
+    recordAnswer(round.current.word, opt.correct);
   };
 
   const onNext = () => {
@@ -141,7 +143,7 @@ export default function Words() {
         </div>
       )}
 
-      {words.length === 0 && pendingWords.length === 0 && (
+      {mode === "list" && words.length === 0 && pendingWords.length === 0 && (
         <div className="empty">
           <p>Henüz kelime yok.</p>
           <p className="muted">Soru çözerken kelimelere dokun; buraya düşsünler.</p>
@@ -175,10 +177,10 @@ export default function Words() {
         </>
       )}
 
-      {mode === "game" && words.length > 0 && stage === "group" && (
+      {mode === "game" && stage === "group" && (
         <div className="list">
           <p className="muted" style={{ marginBottom: 12 }}>Hangi kelimelerle çalışmak istiyorsun?</p>
-          {GROUPS.map((g) => {
+          {groups.map((g) => {
             const count = poolFor(g.key).length;
             return (
               <div

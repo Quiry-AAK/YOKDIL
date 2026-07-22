@@ -1,12 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useStore } from "../store.js";
 import { shuffle, pickLeastSeen } from "../lib/round.js";
-
-const GROUPS = [
-  { key: "mix", label: "Mix — Tüm Kelimeler" },
-  { key: "yokdil", label: "YÖKDİL Kelimeleri" },
-  { key: "yds", label: "YDS Kelimeleri" },
-];
+import { buildWordGroups } from "../lib/wordSources.js";
 
 function linkSizeChoices(poolLength) {
   const opts = [6, 8, 10, 12].filter((n) => n <= poolLength);
@@ -16,6 +11,9 @@ function linkSizeChoices(poolLength) {
 export default function WordLink() {
   const words = useStore((s) => s.words);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
+  const academicWordStats = useStore((s) => s.academicWordStats);
+  const recordAcademicWordAnswer = useStore((s) => s.recordAcademicWordAnswer);
+  const groups = useMemo(() => buildWordGroups(words, academicWordStats), [words, academicWordStats]);
 
   const [stage, setStage] = useState("group"); // group | size | play | score
   const [group, setGroup] = useState(null);
@@ -26,7 +24,12 @@ export default function WordLink() {
   const [wrongPair, setWrongPair] = useState([]); // [leftKey, rightKey]
   const [attempts, setAttempts] = useState(0);
 
-  const poolFor = (g) => (g === "mix" ? words : words.filter((w) => w.sourceType === g));
+  const poolFor = (key) => groups.find((g) => g.key === key)?.pool ?? [];
+  const activeKind = groups.find((g) => g.key === group)?.kind;
+  const recordAnswer = (word, correct) => {
+    if (activeKind === "academic") recordAcademicWordAnswer(word, correct);
+    else recordWordAnswer(word, correct);
+  };
 
   const startGroup = (g) => {
     setGroup(g);
@@ -53,7 +56,7 @@ export default function WordLink() {
   const attemptMatch = (leftKey, rightKey) => {
     setAttempts((a) => a + 1);
     if (leftKey === rightKey) {
-      recordWordAnswer(leftKey, true);
+      recordAnswer(leftKey, true);
       setMatched((prev) => new Set(prev).add(leftKey));
       setActive(null);
     } else {
@@ -79,7 +82,7 @@ export default function WordLink() {
             <h1>Sütun Eşleştirme</h1>
             <p className="muted">Solda İngilizce kelimeler, sağda Türkçe anlamları — doğru çiftleri bul.</p>
           </header>
-          {words.length === 0 ? (
+          {groups.every((g) => g.pool.length === 0) ? (
             <div className="empty">
               <p>Henüz kelime yok.</p>
               <p className="muted">Soru çözerken kelimelere dokun; buraya düşsünler.</p>
@@ -87,7 +90,7 @@ export default function WordLink() {
           ) : (
             <div className="list">
               <p className="muted" style={{ marginBottom: 12 }}>Hangi kelimelerle çalışmak istiyorsun?</p>
-              {GROUPS.map((g) => {
+              {groups.map((g) => {
                 const count = poolFor(g.key).length;
                 return (
                   <div

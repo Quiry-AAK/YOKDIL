@@ -1,17 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useStore } from "../store.js";
 import { pickLeastSeen, roundSizeChoices } from "../lib/round.js";
 import { useRound } from "../lib/useRound.js";
-
-const GROUPS = [
-  { key: "mix", label: "Mix — Tüm Kelimeler" },
-  { key: "yokdil", label: "YÖKDİL Kelimeleri" },
-  { key: "yds", label: "YDS Kelimeleri" },
-];
+import { buildWordGroups } from "../lib/wordSources.js";
 
 export default function WordCards() {
   const words = useStore((s) => s.words);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
+  const academicWordStats = useStore((s) => s.academicWordStats);
+  const recordAcademicWordAnswer = useStore((s) => s.recordAcademicWordAnswer);
+  const groups = useMemo(() => buildWordGroups(words, academicWordStats), [words, academicWordStats]);
 
   const [stage, setStage] = useState("group"); // group | size | play | score
   const [group, setGroup] = useState(null);
@@ -30,7 +28,12 @@ export default function WordCards() {
     if (round.finished && stage === "play") setStage("score");
   }, [round.finished]);
 
-  const poolFor = (g) => (g === "mix" ? words : words.filter((w) => w.sourceType === g));
+  const poolFor = (key) => groups.find((g) => g.key === key)?.pool ?? [];
+  const activeKind = groups.find((g) => g.key === group)?.kind;
+  const recordAnswer = (word, correct) => {
+    if (activeKind === "academic") recordAcademicWordAnswer(word, correct);
+    else recordWordAnswer(word, correct);
+  };
 
   const startGroup = (g) => {
     setGroup(g);
@@ -44,7 +47,7 @@ export default function WordCards() {
   };
 
   const decide = (knew) => {
-    recordWordAnswer(round.current.word, knew);
+    recordAnswer(round.current.word, knew);
     round.answer(knew);
   };
 
@@ -70,7 +73,7 @@ export default function WordCards() {
       {stage === "group" && (
         <>
           <header className="screen-head"><h1>Kelime Kartları</h1></header>
-          {words.length === 0 ? (
+          {groups.every((g) => g.pool.length === 0) ? (
             <div className="empty">
               <p>Henüz kelime yok.</p>
               <p className="muted">Soru çözerken kelimelere dokun; buraya düşsünler.</p>
@@ -78,7 +81,7 @@ export default function WordCards() {
           ) : (
             <div className="list">
               <p className="muted" style={{ marginBottom: 12 }}>Hangi kelimelerle çalışmak istiyorsun?</p>
-              {GROUPS.map((g) => {
+              {groups.map((g) => {
                 const count = poolFor(g.key).length;
                 return (
                   <div
