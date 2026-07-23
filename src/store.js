@@ -1,9 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { DIGER_SEED_WORDS } from "./lib/digerSeedWords.js";
 
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 
 const emptyStats = () => ({ seen: 0, correct: 0 });
+
+const makeDigerSeedWords = () =>
+  DIGER_SEED_WORDS.map((w) => ({ ...w, sourceType: "diger", stats: emptyStats(), addedAt: Date.now() }));
 
 export const useStore = create(
   persist(
@@ -200,7 +204,7 @@ export const useStore = create(
         }),
 
       // --- Kelimeler ---
-      words: [],
+      words: makeDigerSeedWords(),
       pendingWords: [],
       addPendingWord: (word, context, sourceType = null) => {
         const key = word.trim().toLowerCase();
@@ -314,7 +318,7 @@ export const useStore = create(
     }),
     {
       name: "yokdil-store-v1",
-      version: 4,
+      version: 5,
       migrate: (state, version) => {
         if (state?.settings) {
           const m = state.settings.model || "";
@@ -334,6 +338,13 @@ export const useStore = create(
         // v3 → v4: AI soru havuzu eklendi
         if (version < 4 && state && !state.aiPool) {
           state.aiPool = [];
+        }
+        // v4 → v5: "Diğer" kategorisi tohum kelimelerini mevcut kelimelerle birleştir
+        // (kullanıcının kendi eklediği kelimelerin üstüne yazmaz, sadece eksik olanları ekler)
+        if (version < 5 && state) {
+          const existing = new Set((state.words || []).map((w) => w.word.toLowerCase()));
+          const toAdd = makeDigerSeedWords().filter((w) => !existing.has(w.word.toLowerCase()));
+          state.words = [...(state.words || []), ...toAdd];
         }
         return state;
       },
