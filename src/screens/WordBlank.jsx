@@ -16,9 +16,7 @@ function findBlank(word, sentence) {
 export default function WordBlank() {
   const words = useStore((s) => s.words);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
-  const academicWordStats = useStore((s) => s.academicWordStats);
-  const recordAcademicWordAnswer = useStore((s) => s.recordAcademicWordAnswer);
-  const groups = useMemo(() => buildWordGroups(words, academicWordStats), [words, academicWordStats]);
+  const groups = useMemo(() => buildWordGroups(words), [words]);
 
   const [stage, setStage] = useState("group"); // group | size | play | score
   const [group, setGroup] = useState(null);
@@ -28,11 +26,6 @@ export default function WordBlank() {
   const [picked, setPicked] = useState(null);
 
   const poolFor = (key) => (groups.find((g) => g.key === key)?.pool ?? []).filter((w) => findBlank(w.word, w.example_en));
-  const activeKind = groups.find((g) => g.key === group)?.kind;
-  const recordAnswer = (word, correct) => {
-    if (activeKind === "academic") recordAcademicWordAnswer(word, correct);
-    else recordWordAnswer(word, correct);
-  };
 
   useEffect(() => {
     if (!round.current || !group) { setBlank(null); setChoices([]); return; }
@@ -68,7 +61,7 @@ export default function WordBlank() {
   const pick = (opt) => {
     if (picked) return;
     setPicked(opt);
-    recordAnswer(round.current.word, opt.correct);
+    recordWordAnswer(round.current.word, opt.correct);
   };
 
   const onNext = () => {

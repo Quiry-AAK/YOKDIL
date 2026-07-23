@@ -18,9 +18,7 @@ function findBlank(word, sentence) {
 export default function WordHangman() {
   const words = useStore((s) => s.words);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
-  const academicWordStats = useStore((s) => s.academicWordStats);
-  const recordAcademicWordAnswer = useStore((s) => s.recordAcademicWordAnswer);
-  const groups = useMemo(() => buildWordGroups(words, academicWordStats), [words, academicWordStats]);
+  const groups = useMemo(() => buildWordGroups(words), [words]);
 
   const [stage, setStage] = useState("group"); // group | size | play | score
   const [group, setGroup] = useState(null);
@@ -30,11 +28,6 @@ export default function WordHangman() {
   const [done, setDone] = useState(null); // null | true | false
 
   const poolFor = (key) => groups.find((g) => g.key === key)?.pool ?? [];
-  const activeKind = groups.find((g) => g.key === group)?.kind;
-  const recordAnswer = (word, correct) => {
-    if (activeKind === "academic") recordAcademicWordAnswer(word, correct);
-    else recordWordAnswer(word, correct);
-  };
 
   useEffect(() => {
     setGuessed(new Set());
@@ -68,14 +61,14 @@ export default function WordHangman() {
       const solved = letters.every((c) => !/[a-z]/.test(c) || next.has(c));
       if (solved) {
         setDone(true);
-        recordAnswer(round.current.word, true);
+        recordWordAnswer(round.current.word, true);
       }
     } else {
       const wc = wrongCount + 1;
       setWrongCount(wc);
       if (wc >= MAX_WRONG) {
         setDone(false);
-        recordAnswer(round.current.word, false);
+        recordWordAnswer(round.current.word, false);
       }
     }
   };

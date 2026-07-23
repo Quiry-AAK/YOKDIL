@@ -199,19 +199,6 @@ export const useStore = create(
           };
         }),
 
-      // --- Hazır akademik kelime veritabanları (YÖKDİL Fen / YDS) istatistikleri ---
-      academicWordStats: {}, // { [word]: { seen, correct } }
-      recordAcademicWordAnswer: (word, correct) =>
-        set((s) => {
-          const prev = s.academicWordStats[word] || emptyStats();
-          return {
-            academicWordStats: {
-              ...s.academicWordStats,
-              [word]: { seen: prev.seen + 1, correct: prev.correct + (correct ? 1 : 0) },
-            },
-          };
-        }),
-
       // --- Kelimeler ---
       words: [],
       pendingWords: [],

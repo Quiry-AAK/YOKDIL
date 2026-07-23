@@ -7,9 +7,7 @@ import { buildWordGroups } from "../lib/wordSources.js";
 export default function WordCards() {
   const words = useStore((s) => s.words);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
-  const academicWordStats = useStore((s) => s.academicWordStats);
-  const recordAcademicWordAnswer = useStore((s) => s.recordAcademicWordAnswer);
-  const groups = useMemo(() => buildWordGroups(words, academicWordStats), [words, academicWordStats]);
+  const groups = useMemo(() => buildWordGroups(words), [words]);
 
   const [stage, setStage] = useState("group"); // group | size | play | score
   const [group, setGroup] = useState(null);
@@ -29,11 +27,6 @@ export default function WordCards() {
   }, [round.finished]);
 
   const poolFor = (key) => groups.find((g) => g.key === key)?.pool ?? [];
-  const activeKind = groups.find((g) => g.key === group)?.kind;
-  const recordAnswer = (word, correct) => {
-    if (activeKind === "academic") recordAcademicWordAnswer(word, correct);
-    else recordWordAnswer(word, correct);
-  };
 
   const startGroup = (g) => {
     setGroup(g);
@@ -47,7 +40,7 @@ export default function WordCards() {
   };
 
   const decide = (knew) => {
-    recordAnswer(round.current.word, knew);
+    recordWordAnswer(round.current.word, knew);
     round.answer(knew);
   };
 

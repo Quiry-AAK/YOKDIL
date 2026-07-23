@@ -23,11 +23,9 @@ export default function Words() {
   const addWord = useStore((s) => s.addWord);
   const importWords = useStore((s) => s.importWords);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
-  const academicWordStats = useStore((s) => s.academicWordStats);
-  const recordAcademicWordAnswer = useStore((s) => s.recordAcademicWordAnswer);
   const removeWord = useStore((s) => s.removeWord);
   const addPendingWord = useStore((s) => s.addPendingWord);
-  const groups = useMemo(() => buildWordGroups(words, academicWordStats), [words, academicWordStats]);
+  const groups = useMemo(() => buildWordGroups(words), [words]);
 
   const [mode, setMode] = useState("game");
   const [stage, setStage] = useState("group"); // group | size | play | score
@@ -42,6 +40,7 @@ export default function Words() {
   const [manualWord, setManualWord] = useState("");
   const [manualTag, setManualTag] = useState("yokdil");
   const [manualMsg, setManualMsg] = useState(null);
+  const [listFilter, setListFilter] = useState("all"); // all | yokdil | yds | diger
 
   useEffect(() => {
     if (!round.current) { setChoices([]); return; }
@@ -57,11 +56,6 @@ export default function Words() {
   }, [round.finished]);
 
   const poolFor = (key) => groups.find((g) => g.key === key)?.pool ?? [];
-  const activeKind = groups.find((g) => g.key === group)?.kind;
-  const recordAnswer = (word, correct) => {
-    if (activeKind === "academic") recordAcademicWordAnswer(word, correct);
-    else recordWordAnswer(word, correct);
-  };
 
   const startGroup = (g) => {
     setGroup(g);
@@ -77,7 +71,7 @@ export default function Words() {
   const pick = (opt) => {
     if (picked) return;
     setPicked(opt);
-    recordAnswer(round.current.word, opt.correct);
+    recordWordAnswer(round.current.word, opt.correct);
   };
 
   const onNext = () => {
@@ -198,8 +192,20 @@ export default function Words() {
             <input ref={importRef} type="file" accept=".json" hidden onChange={onImport} />
           </div>
           {importMsg && <div className="alert alert-ok">{importMsg}</div>}
+          <div className="seg seg-wrap" style={{ marginBottom: 12 }}>
+            {[
+              { key: "all", label: `Tümü (${words.length})` },
+              { key: "yokdil", label: `YÖKDİL (${words.filter((w) => w.sourceType === "yokdil").length})` },
+              { key: "yds", label: `YDS (${words.filter((w) => w.sourceType === "yds").length})` },
+              { key: "diger", label: `Diğer (${words.filter((w) => w.sourceType === "diger").length})` },
+            ].map((f) => (
+              <button key={f.key} className={listFilter === f.key ? "active" : ""} onClick={() => setListFilter(f.key)}>
+                {f.label}
+              </button>
+            ))}
+          </div>
           <div className="list">
-            {words.map((w) => (
+            {words.filter((w) => listFilter === "all" || w.sourceType === listFilter).map((w) => (
               <div key={w.word} className="card word-card">
                 <div className="word-head">
                   <h3>{w.word}</h3>

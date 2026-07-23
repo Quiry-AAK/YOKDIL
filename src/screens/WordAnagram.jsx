@@ -13,9 +13,7 @@ function buildLetterTiles(word) {
 export default function WordAnagram() {
   const words = useStore((s) => s.words);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
-  const academicWordStats = useStore((s) => s.academicWordStats);
-  const recordAcademicWordAnswer = useStore((s) => s.recordAcademicWordAnswer);
-  const groups = useMemo(() => buildWordGroups(words, academicWordStats), [words, academicWordStats]);
+  const groups = useMemo(() => buildWordGroups(words), [words]);
 
   const [stage, setStage] = useState("group"); // group | size | play | score
   const [group, setGroup] = useState(null);
@@ -24,11 +22,6 @@ export default function WordAnagram() {
   const [checked, setChecked] = useState(null); // null | boolean
 
   const poolFor = (key) => groups.find((g) => g.key === key)?.pool ?? [];
-  const activeKind = groups.find((g) => g.key === group)?.kind;
-  const recordAnswer = (word, correct) => {
-    if (activeKind === "academic") recordAcademicWordAnswer(word, correct);
-    else recordWordAnswer(word, correct);
-  };
 
   useEffect(() => {
     if (!round.current) { setTiles(null); return; }
@@ -65,7 +58,7 @@ export default function WordAnagram() {
   const onCheck = () => {
     const isCorrect = tiles.placed.map((t) => t.ch).join("") === tiles.correctLetters.join("");
     setChecked(isCorrect);
-    recordAnswer(round.current.word, isCorrect);
+    recordWordAnswer(round.current.word, isCorrect);
   };
 
   const onNext = () => {
