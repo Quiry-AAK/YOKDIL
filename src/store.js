@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { DIGER_SEED_WORDS } from "./lib/digerSeedWords.js";
+import { shuffle } from "./lib/round.js";
 
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 
@@ -270,6 +271,21 @@ export const useStore = create(
         const toAdd = (incoming || []).filter((w) => w.id && !existingIds.has(w.id));
         set((s) => ({ wrongQuestions: [...s.wrongQuestions, ...toAdd] }));
         return toAdd.length;
+      },
+
+      // --- Günün Kelimeleri ---
+      dailyWords: [], // güncel çekilen kelimeler (word string listesi)
+      dailyWordsHistory: [], // bugüne kadar çekilmiş tüm kelimeler — bir kez çekilen kelime tekrar çekilmez
+      pullDailyWords: (n) => {
+        const s = get();
+        const usedSet = new Set(s.dailyWordsHistory);
+        const available = shuffle(s.words.filter((w) => !usedSet.has(w.word)));
+        const picked = available.slice(0, n).map((w) => w.word);
+        set({
+          dailyWords: picked,
+          dailyWordsHistory: [...s.dailyWordsHistory, ...picked],
+        });
+        return picked.length;
       },
 
       // --- AI Soru Havuzu ---

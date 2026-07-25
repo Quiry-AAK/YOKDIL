@@ -15,8 +15,10 @@ function findBlank(word, sentence) {
 
 export default function WordBlank() {
   const words = useStore((s) => s.words);
+  const dailyWords = useStore((s) => s.dailyWords);
+  const dailyWordsHistory = useStore((s) => s.dailyWordsHistory);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
-  const groups = useMemo(() => buildWordGroups(words), [words]);
+  const groups = useMemo(() => buildWordGroups(words, dailyWords, dailyWordsHistory), [words, dailyWords, dailyWordsHistory]);
 
   const [stage, setStage] = useState("group"); // group | size | play | score
   const [group, setGroup] = useState(null);

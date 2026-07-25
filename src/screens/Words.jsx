@@ -17,6 +17,8 @@ function exportJSON(data, filename) {
 export default function Words() {
   const settings = useStore((s) => s.settings);
   const words = useStore((s) => s.words);
+  const dailyWords = useStore((s) => s.dailyWords);
+  const dailyWordsHistory = useStore((s) => s.dailyWordsHistory);
   const pendingWords = useStore((s) => s.pendingWords);
   const clearPendingWords = useStore((s) => s.clearPendingWords);
   const removePendingWord = useStore((s) => s.removePendingWord);
@@ -25,7 +27,7 @@ export default function Words() {
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
   const removeWord = useStore((s) => s.removeWord);
   const addPendingWord = useStore((s) => s.addPendingWord);
-  const groups = useMemo(() => buildWordGroups(words), [words]);
+  const groups = useMemo(() => buildWordGroups(words, dailyWords, dailyWordsHistory), [words, dailyWords, dailyWordsHistory]);
 
   const [mode, setMode] = useState("game");
   const [stage, setStage] = useState("group"); // group | size | play | score
