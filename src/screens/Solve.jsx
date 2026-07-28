@@ -20,7 +20,7 @@ function formatElapsed(sec) {
   return `${m} dakika ${s} saniye`;
 }
 
-export default function Solve({ denemeId, navigate }) {
+export default function Solve({ denemeId, navigate, startInReport }) {
   const deneme = useStore((s) => s.denemes.find((d) => d.id === denemeId));
   const answerQuestion = useStore((s) => s.answerQuestion);
   const addDenemeTime = useStore((s) => s.addDenemeTime);
@@ -34,9 +34,11 @@ export default function Solve({ denemeId, navigate }) {
     const first = deneme.questions.findIndex((q) => !q.userAnswer);
     return first === -1 ? 0 : first;
   });
-  const [showScore, setShowScore] = useState(false);
+  const [showScore, setShowScore] = useState(!!startInReport);
   const [remaining, setRemaining] = useState(Math.max(0, totalSeconds - persistedElapsed));
-  const [qElapsed, setQElapsed] = useState(0);
+  const [qElapsed, setQElapsed] = useState(() => deneme?.questions[idx]?.timeSpent || 0);
+  const [showNav, setShowNav] = useState(false);
+  const [eliminatedByQ, setEliminatedByQ] = useState({});
 
   const pendingDenemeRef = useRef(0);
   const pendingQuestionRef = useRef(0);
@@ -54,14 +56,16 @@ export default function Solve({ denemeId, navigate }) {
     }
   };
 
-  // Soru değişince küçük soru zamanlayıcısı sıfırlanır
+  // Soru değişince küçük soru zamanlayıcısı o sorunun daha önce biriken
+  // süresinden devam eder (0'a sıfırlanmaz)
   useEffect(() => {
-    setQElapsed(0);
+    setQElapsed(deneme?.questions[idx]?.timeSpent || 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx]);
 
-  // Ana geri sayım — sadece ekran aktifken (görünürken) çalışır, kalıcı olarak birikir
+  // Ana geri sayım — sadece ekran aktifken (görünürken) ve rapor ekranında değilken çalışır, kalıcı olarak birikir
   useEffect(() => {
-    if (!deneme) return;
+    if (!deneme || showScore) return;
     const currentQId = deneme.questions[idx]?.id;
     let id = null;
 
@@ -89,7 +93,7 @@ export default function Solve({ denemeId, navigate }) {
       flush(currentQId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deneme?.id, idx]);
+  }, [deneme?.id, idx, showScore]);
 
   if (!deneme) {
     return (
@@ -104,10 +108,20 @@ export default function Solve({ denemeId, navigate }) {
   const q = questions[idx];
   const answered = !!q.userAnswer;
   const isCorrect = q.userAnswer === q.answer;
+  const eliminatedSet = new Set(eliminatedByQ[q.id] || []);
 
   const choose = (letter) => {
     if (answered) return;
     answerQuestion(deneme.id, q.id, letter);
+  };
+
+  const toggleEliminate = (letter) => {
+    setEliminatedByQ((prev) => {
+      const cur = new Set(prev[q.id] || []);
+      if (cur.has(letter)) cur.delete(letter);
+      else cur.add(letter);
+      return { ...prev, [q.id]: [...cur] };
+    });
   };
 
   const go = (delta) => {
@@ -203,7 +217,7 @@ export default function Solve({ denemeId, navigate }) {
         <span className={"counter timer-badge" + (remaining <= 300 ? " timer-low" : "")}>⏱ {formatClock(remaining)}</span>
       </header>
       <div className="solve-sub-row">
-        <p className="muted small" style={{ margin: 0 }}>Soru {idx + 1} / {questions.length}</p>
+        <button className="qnav-trigger" onClick={() => setShowNav(true)}>Soru {idx + 1} / {questions.length} ▾</button>
         <span className="q-timer">🕐 {formatClock(qElapsed)}</span>
       </div>
 
@@ -221,15 +235,23 @@ export default function Solve({ denemeId, navigate }) {
         </div>
         <div className="options">
           {LETTERS.filter((l) => q.options[l]).map((l) => {
-            let cls = "option";
+            let cls = "option with-eliminate";
             if (answered) {
               if (l === q.answer) cls += " correct";
               else if (l === q.userAnswer) cls += " wrong";
             }
+            if (eliminatedSet.has(l)) cls += " eliminated";
             return (
               <div key={l} className={cls}>
-                <button className="opt-letter" onClick={() => choose(l)} disabled={answered} title="Bu şıkkı seç">{l}</button>
-                <span className="opt-text"><MarkableText text={q.options[l]} sourceType={deneme.type} /></span>
+                <div className="opt-row">
+                  <button className="opt-letter" onClick={() => choose(l)} disabled={answered} title="Bu şıkkı seç">{l}</button>
+                  <span className="opt-text"><MarkableText text={q.options[l]} sourceType={deneme.type} /></span>
+                </div>
+                {!answered && (
+                  <button className="opt-eliminate-btn" onClick={() => toggleEliminate(l)}>
+                    {eliminatedSet.has(l) ? "↺ Geri al" : "✕ Bu şıkkı ele"}
+                  </button>
+                )}
               </div>
             );
           })}
@@ -250,6 +272,29 @@ export default function Solve({ denemeId, navigate }) {
           <button className="btn btn-primary" onClick={onBitir}>Bitir</button>
         )}
       </div>
+
+      {showNav && (
+        <div className="drawer-overlay qnav-overlay" onClick={() => setShowNav(false)}>
+          <div className="qnav-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="qnav-head">
+              <span>Soruya Git</span>
+              <button className="icon-btn" onClick={() => setShowNav(false)}>✕</button>
+            </div>
+            <div className="qnav-grid">
+              {questions.map((qq, i) => {
+                let cls = "qnav-cell";
+                if (i === idx) cls += " current";
+                if (qq.userAnswer) cls += qq.userAnswer === qq.answer ? " correct" : " wrong";
+                return (
+                  <button key={qq.id} className={cls} onClick={() => { setIdx(i); setShowNav(false); }}>
+                    {qq.number}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

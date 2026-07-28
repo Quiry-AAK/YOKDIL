@@ -193,6 +193,40 @@ button.opt-letter:disabled { opacity: 0.85; }
 .option.wrong .opt-letter { background: var(--bad); border-color: var(--bad); color: #fff; }
 .opt-text { flex: 1; }
 
+.option.with-eliminate { flex-direction: column; align-items: stretch; gap: 6px; }
+.opt-row { display: flex; align-items: flex-start; gap: 10px; }
+.opt-eliminate-btn {
+  align-self: flex-start; margin-left: 42px;
+  background: none; border: 1px solid var(--border); border-radius: 6px;
+  color: var(--muted); font-size: 11px; padding: 3px 8px; cursor: pointer;
+}
+.opt-eliminate-btn:hover { border-color: var(--bad); color: var(--bad); }
+.option.eliminated .opt-text { text-decoration: line-through; opacity: 0.45; }
+.option.eliminated .opt-eliminate-btn { border-color: var(--primary2); color: var(--primary2); }
+
+.qnav-trigger {
+  background: none; border: none; color: var(--text); font-size: 13px;
+  font-weight: 600; cursor: pointer; padding: 0;
+}
+.qnav-overlay { align-items: flex-end; justify-content: center; }
+.qnav-panel {
+  width: 100%; max-width: 480px; background: var(--bg2);
+  border: 1px solid var(--border); border-bottom: none;
+  border-radius: 16px 16px 0 0; padding: 16px;
+  max-height: 70vh; overflow-y: auto;
+  animation: qnav-slide-up 0.18s ease-out;
+}
+@keyframes qnav-slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.qnav-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; font-weight: 700; }
+.qnav-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.qnav-cell {
+  aspect-ratio: 1 / 1; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--card2); color: var(--text); font-weight: 600; cursor: pointer;
+}
+.qnav-cell.current { border-color: var(--primary2); border-width: 2px; }
+.qnav-cell.correct { background: rgba(34,197,94,0.25); border-color: var(--good); }
+.qnav-cell.wrong { background: rgba(239,68,68,0.25); border-color: var(--bad); }
+
 .feedback { margin-top: 14px; padding: 10px 12px; border-radius: 10px; font-weight: 600; }
 .feedback.good { background: rgba(34,197,94,0.15); color: #86efac; }
 .feedback.bad { background: rgba(239,68,68,0.15); color: #fca5a5; }

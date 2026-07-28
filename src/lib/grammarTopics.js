@@ -309,6 +309,29 @@ export const GRAMMAR_TOPICS = [
       "Edattan sonra gelen fiili infinitive yapmak — edattan sonra HER ZAMAN gerund gelir (interested in study → interested in studying)",
     ],
   },
+  {
+    id: "perfect-infinitive",
+    title: "Perfect Infinitive (to have + V3)",
+    points: [
+      "to have + V3, ana fiilin bildirdiği zamandan ÖNCE gerçekleşmiş bir eylemi anlatır — fiilsi yapıda 'geçmişe atıf'",
+      "En sık seem, appear, claim, pretend, happen, tend gibi fiillerden sonra kullanılır: seem to have + V3, appear to have + V3, claim to have + V3",
+      "Pasif haber/söylenti cümlelerinde sık görülür: is said/believed/thought/reported/known to have + V3 (geçmişte ... olduğu söyleniyor/sanılıyor)",
+      "would like/love/hate to have + V3: yapılamamış bir geçmiş dileği/pişmanlığı anlatır (keşke yapabilseydim)",
+      "Basit infinitive (to + V1) aynı anda ya da sonra gerçekleşen bir eylemi anlatırken, perfect infinitive (to have + V3) ondan ÖNCE tamamlanmış bir eylemi anlatır",
+    ],
+    examples: [
+      { en: "He seems to have left the country.", tr: "Ülkeyi terk etmiş gibi görünüyor. (terk etme, 'görünüyor'dan önce gerçekleşti)" },
+      { en: "The building is believed to have been built in the 16th century.", tr: "Binanın 16. yüzyılda inşa edildiğine inanılıyor." },
+      { en: "She claims to have met the president.", tr: "Cumhurbaşkanıyla tanıştığını iddia ediyor." },
+      { en: "I would like to have seen that movie last week.", tr: "Keşke geçen hafta o filmi görebilseydim. (yapılamamış geçmiş dilek)" },
+    ],
+    pitfalls: [
+      "❌ He seems to leave yesterday. → ✅ He seems to have left yesterday. (geçmişe atıfta basit infinitive kullanmak)",
+      "seem to have + V3 (geçmişte olmuş, şimdi öyle görünüyor) ile seem to + V1 (şu anki/genel durum) arasındaki zaman farkını gözden kaçırmak",
+      "is said to have + V3 yapısını, aynı anlamı taşıyan 'It is said that + Past' cümlesine dönüştürememek — ikisi eşdeğerdir",
+      "would like to have + V3 (geçmişte yapılamamış bir dilek) ile would like to + V1 (şimdi/gelecekteki bir istek) yapısını karıştırmak",
+    ],
+  },
 ];
 
 // Sinyal kelime → beklenen yapı haritası. Sınavda boşluktan önce/sonra

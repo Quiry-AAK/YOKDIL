@@ -51,7 +51,7 @@ export default function App() {
   const denemes = useStore((s) => s.denemes);
 
   const navigate = (v, payload) => {
-    if (v === "solve") setActiveDeneme(payload);
+    if (v === "solve" || v === "denemeReport") setActiveDeneme(payload);
     setView(v);
     setMenuOpen(false);
   };
@@ -59,6 +59,7 @@ export default function App() {
   let screen;
   if (view === "home") screen = <Home navigate={navigate} />;
   else if (view === "solve") screen = <Solve denemeId={activeDeneme} navigate={navigate} />;
+  else if (view === "denemeReport") screen = <Solve denemeId={activeDeneme} navigate={navigate} startInReport />;
   else if (view === "aipool") screen = <AIPool navigate={navigate} />;
   else if (view === "wrong") screen = <Wrong navigate={navigate} />;
   else if (view === "review") screen = <Review navigate={navigate} />;
@@ -77,7 +78,7 @@ export default function App() {
   else if (view === "dailywords") screen = <DailyWords navigate={navigate} />;
   else if (view === "settings") screen = <Settings navigate={navigate} />;
 
-  const activeNav = view === "solve" ? "home" : view;
+  const activeNav = view === "solve" || view === "denemeReport" ? "home" : view;
 
   return (
     <div className="app">

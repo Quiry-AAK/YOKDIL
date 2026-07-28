@@ -227,6 +227,12 @@ export default function Home({ navigate }) {
                   e.stopPropagation();
                   setAnalysisId(analysisId === d.id ? null : d.id);
                 }}>📊</button>
+                {answered > 0 && (
+                  <button className="icon-btn" title="Sonuç Raporu" onClick={(e) => {
+                    e.stopPropagation();
+                    navigate("denemeReport", d.id);
+                  }}>🧾</button>
+                )}
                 <button className="icon-btn" title="JSON güncelle" onClick={(e) => {
                   e.stopPropagation();
                   setUpdatingId(updatingId === d.id ? null : d.id);
