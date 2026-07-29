@@ -233,15 +233,21 @@ export const GRAMMAR_TOPICS = [
       "as...as (eşitlik), not as/so...as (eşit olmama)",
       "Çift comparative kullanılmaz (more bigger yanlış, bigger doğru)",
       "the + superlative + kıyaslanan grup (the most interesting book I've ever read)",
+      "the first / the last / the only + isim + to + V1 → \"...yapan ilk/son/tek...\" (superlative gibi davranan bu sıra/tekillik sıfatlarından sonra da to-infinitive gelir, aynı the + superlative + to + V1 kalıbı gibi)",
     ],
     examples: [
       { en: "The more you practice, the better you get.", tr: "Ne kadar çok pratik yaparsan o kadar iyi olursun." },
+      { en: "She was the first person to arrive at the office.", tr: "Ofise gelen ilk kişi oydu." },
+      { en: "He is the only student to have passed the exam.", tr: "Sınavı geçen tek öğrenci o." },
+      { en: "It was the best film I have ever seen.", tr: "Şimdiye kadar izlediğim en iyi filmdi." },
     ],
     pitfalls: [
       "❌ more bigger / more better → ✅ bigger / better (çift comparative kullanmak)",
       "❌ bigger from him → ✅ bigger than him (than yerine from/that kullanmak)",
       "the + comparative...the + comparative kalıbında \"the\"yı atlamak",
       "as...as kalıbı arasına sıfatın yanlış hâlini (comparative/superlative) koymak",
+      "❌ the first person who arrive / the first person arriving → ✅ the first person to arrive (the first/last/only + isimden sonra that/who + fiil yerine to + V1 kullanılmalı)",
+      "the only + isim + to + V1 yapısını fark edip \"tek ... yapan\" anlamını cümlede es geçmek",
     ],
   },
   {
