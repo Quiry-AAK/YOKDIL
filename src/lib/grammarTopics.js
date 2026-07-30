@@ -31,10 +31,12 @@ export const GRAMMAR_TOPICS = [
       "No sooner...than, Not only...but also, Only after/by/when, Under no circumstances de devrik yapı gerektirir",
       "Not only devrik olur, but also kısmı normal kalır",
       "Şart cümlelerinde de devrik kullanım olur: Had I known, Were it not for, Should you need help",
+      "By no stretch of the/one's imagination (\"hiçbir şekilde, akla hayale sığmaz biçimde\") cümle başına gelince de aynı olumsuz-zarf mantığıyla devrik yapar — \"imagination\"ı ne kadar zorlarsan zorla, o ihtimal yine de mümkün değil demektir",
     ],
     examples: [
       { en: "Never have I seen such a mess.", tr: "Hiç böyle bir dağınıklık görmedim." },
       { en: "Not only did she win, but she also broke the record.", tr: "Sadece kazanmakla kalmadı, rekoru da kırdı." },
+      { en: "By no stretch of the imagination can this be called a success.", tr: "Bu, hiçbir şekilde (akla hayale sığmayacak ölçüde) başarı olarak adlandırılamaz." },
     ],
     pitfalls: [
       "❌ No sooner had the plane landed when... → ✅ ...than... (No sooner...than sabit kalıptır, when/before ile kullanılmaz)",
@@ -42,6 +44,7 @@ export const GRAMMAR_TOPICS = [
       "Devrik yapının sadece ilk cümlecikte kaldığını unutup ikinci cümleciği de devrik kurmak (Not only...but also'da but also kısmı normal kalır)",
       "❌ Never I have seen... → ✅ Never have I seen... (zarfı fark edip yardımcı fiili özneden önce almayı unutmak)",
       "Only after / Only when / Only by ile başlayan cümlelerde devrikliği unutup düz cümle sırasına dönmek",
+      "❌ By no stretch of the imagination this can be... → ✅ ...can this be... (By no stretch of the imagination ile başlayan cümlede de yardımcı fiili özneden önce almayı unutmak)",
     ],
   },
   {
