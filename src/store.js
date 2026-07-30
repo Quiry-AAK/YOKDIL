@@ -100,6 +100,36 @@ export const useStore = create(
         return merged.length;
       },
 
+      retakeDeneme: (id) => {
+        const deneme = get().denemes.find((d) => d.id === id);
+        if (!deneme) return;
+        const total = deneme.questions.length;
+        const correct = deneme.questions.filter((q) => q.userAnswer === q.answer).length;
+        const answered = deneme.questions.filter((q) => q.userAnswer).length;
+        const wrong = answered - correct;
+        const attemptSnapshot = {
+          date: Date.now(),
+          total,
+          correct,
+          wrong,
+          unanswered: total - answered,
+          score: +(correct * 1.25).toFixed(2),
+          timeSpent: deneme.timeSpent || 0,
+        };
+        set((s) => ({
+          denemes: s.denemes.map((d) =>
+            d.id !== id
+              ? d
+              : {
+                  ...d,
+                  pastAttempts: answered > 0 ? [...(d.pastAttempts || []), attemptSnapshot] : d.pastAttempts || [],
+                  timeSpent: 0,
+                  questions: d.questions.map((q) => ({ ...q, userAnswer: null, timeSpent: 0 })),
+                }
+          ),
+        }));
+      },
+
       answerQuestion: (denemeId, questionId, letter) => {
         const deneme = get().denemes.find((d) => d.id === denemeId);
         if (!deneme) return false;

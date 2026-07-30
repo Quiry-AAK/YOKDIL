@@ -25,6 +25,7 @@ export default function Solve({ denemeId, navigate, startInReport }) {
   const answerQuestion = useStore((s) => s.answerQuestion);
   const addDenemeTime = useStore((s) => s.addDenemeTime);
   const addQuestionTime = useStore((s) => s.addQuestionTime);
+  const retakeDeneme = useStore((s) => s.retakeDeneme);
 
   const totalSeconds = deneme ? Math.round(FULL_EXAM_SECONDS * (deneme.questions.length / 80)) : 0;
   const persistedElapsed = deneme?.timeSpent || 0;
@@ -199,9 +200,41 @@ export default function Solve({ denemeId, navigate, startInReport }) {
           </div>
         )}
 
+        {fresh?.pastAttempts?.length > 0 && (
+          <div className="card">
+            <h3 style={{ marginBottom: 10 }}>Geçmiş Denemeler</h3>
+            {[...fresh.pastAttempts].reverse().map((a, i) => (
+              <div key={a.date} className="score-row">
+                <span className="score-label">
+                  {new Date(a.date).toLocaleDateString("tr-TR")}
+                </span>
+                <span className="score-val">
+                  {a.score} puan · <span style={{ color: "var(--good)" }}>✓{a.correct}</span> <span style={{ color: "var(--bad)" }}>✗{a.wrong}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="nav-row">
           <button className="btn" onClick={() => { setShowScore(false); setIdx(0); }}>Tekrar İncele</button>
           <button className="btn btn-primary" onClick={() => navigate("home")}>Ana Sayfa</button>
+        </div>
+        <div className="nav-row">
+          <button
+            className="btn btn-ghost"
+            onClick={() => {
+              if (confirm("Bu deneme yeniden çözülsün mü? Şu anki puan geçmişe kaydedilir, cevapların sıfırlanır.")) {
+                retakeDeneme(deneme.id);
+                setRemaining(totalSeconds);
+                setQElapsed(0);
+                setIdx(0);
+                setShowScore(false);
+              }
+            }}
+          >
+            🔁 Yeniden Çöz
+          </button>
         </div>
       </div>
     );

@@ -16,6 +16,7 @@ export default function Home({ navigate }) {
   const removeDeneme = useStore((s) => s.removeDeneme);
   const renameDeneme = useStore((s) => s.renameDeneme);
   const setDenemeType = useStore((s) => s.setDenemeType);
+  const retakeDeneme = useStore((s) => s.retakeDeneme);
   const updateDenemeQuestions = useStore((s) => s.updateDenemeQuestions);
   const [renamingId, setRenamingId] = useState(null);
   const [renamingName, setRenamingName] = useState("");
@@ -232,6 +233,15 @@ export default function Home({ navigate }) {
                     e.stopPropagation();
                     navigate("denemeReport", d.id);
                   }}>🧾</button>
+                )}
+                {answered > 0 && (
+                  <button className="icon-btn" title="Yeniden Çöz" onClick={(e) => {
+                    e.stopPropagation();
+                    if (confirm(`"${d.name}" yeniden çözülsün mü? Şu anki puanın (${score}) geçmişe kaydedilir, cevapların sıfırlanır.`)) {
+                      retakeDeneme(d.id);
+                      navigate("solve", d.id);
+                    }
+                  }}>🔁</button>
                 )}
                 <button className="icon-btn" title="JSON güncelle" onClick={(e) => {
                   e.stopPropagation();
