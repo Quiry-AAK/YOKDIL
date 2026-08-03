@@ -3,7 +3,6 @@ import { useStore } from "../store.js";
 
 const CAPACITIES = [10, 20, 30];
 const SOURCES = [
-  { key: "mix", label: "Tümü" },
   { key: "yokdil", label: "YÖKDİL" },
   { key: "yds", label: "YDS" },
   { key: "diger", label: "Diğer" },
@@ -17,11 +16,22 @@ export default function DailyWords() {
   const resetDailyWords = useStore((s) => s.resetDailyWords);
 
   const [capacity, setCapacity] = useState(10);
-  const [source, setSource] = useState("mix");
+  const [sources, setSources] = useState(["mix"]); // ["mix"] = tüm kategoriler, aksi halde seçilenlerin birleşimi
   const [tab, setTab] = useState("today"); // today | history
 
+  const toggleSource = (key) => {
+    setSources((prev) => {
+      const withoutMix = prev.filter((k) => k !== "mix");
+      const next = withoutMix.includes(key)
+        ? withoutMix.filter((k) => k !== key)
+        : [...withoutMix, key];
+      return next.length === 0 ? ["mix"] : next;
+    });
+  };
+
   const historySet = new Set(dailyWordsHistory);
-  const sourcePool = source === "mix" ? words : words.filter((w) => w.sourceType === source);
+  const isMix = sources.includes("mix");
+  const sourcePool = isMix ? words : words.filter((w) => sources.includes(w.sourceType));
   const availableCount = sourcePool.filter((w) => !historySet.has(w.word)).length;
 
   const dailySet = new Set(dailyWords);
@@ -30,7 +40,7 @@ export default function DailyWords() {
   const shown = tab === "today" ? currentWords : historyWords;
 
   const onPull = () => {
-    pullDailyWords(capacity, source);
+    pullDailyWords(capacity, sources);
     setTab("today");
   };
 
@@ -48,10 +58,11 @@ export default function DailyWords() {
       </header>
 
       <div className="card">
-        <p className="muted small" style={{ marginBottom: 8 }}>Hangi kategoriden çekilsin?</p>
+        <p className="muted small" style={{ marginBottom: 8 }}>Hangi kategoriden çekilsin? (birden fazla seçilebilir)</p>
         <div className="seg seg-wrap">
+          <button className={isMix ? "active" : ""} onClick={() => setSources(["mix"])}>Tümü</button>
           {SOURCES.map((s) => (
-            <button key={s.key} className={source === s.key ? "active" : ""} onClick={() => setSource(s.key)}>
+            <button key={s.key} className={!isMix && sources.includes(s.key) ? "active" : ""} onClick={() => toggleSource(s.key)}>
               {s.label}
             </button>
           ))}

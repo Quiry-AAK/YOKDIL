@@ -306,10 +306,11 @@ export const useStore = create(
       // --- Günün Kelimeleri ---
       dailyWords: [], // güncel çekilen kelimeler (word string listesi)
       dailyWordsHistory: [], // bugüne kadar çekilmiş tüm kelimeler — bir kez çekilen kelime tekrar çekilmez
-      pullDailyWords: (n, sourceType = "mix") => {
+      pullDailyWords: (n, sourceTypes = ["mix"]) => {
         const s = get();
         const usedSet = new Set(s.dailyWordsHistory);
-        const pool = sourceType === "mix" ? s.words : s.words.filter((w) => w.sourceType === sourceType);
+        const isMix = !sourceTypes || sourceTypes.length === 0 || sourceTypes.includes("mix");
+        const pool = isMix ? s.words : s.words.filter((w) => sourceTypes.includes(w.sourceType));
         const available = shuffle(pool.filter((w) => !usedSet.has(w.word)));
         const picked = available.slice(0, n).map((w) => w.word);
         set({
