@@ -47,6 +47,19 @@ export function useRound() {
     }
   };
 
+  // Mevcut öğeyi turdan tamamen çıkarır (ör. kelime listeden silindiğinde) —
+  // answer()'dan farklı olarak doğru/yanlış istatistiğine dahil etmez.
+  const remove = () => {
+    if (!current) return;
+    const key = keyOfRef.current(current);
+    attemptedRef.current.delete(key);
+    const nextCurrent = queue[0] ?? null;
+    setCurrent(nextCurrent);
+    setQueue(queue.slice(1));
+    setTotal((t) => Math.max(0, t - 1));
+    if (!nextCurrent) setFinished(true);
+  };
+
   return {
     current,
     total,
@@ -55,5 +68,6 @@ export function useRound() {
     remaining: queue.length + (current ? 1 : 0),
     start,
     answer,
+    remove,
   };
 }

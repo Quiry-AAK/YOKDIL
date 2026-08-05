@@ -11,6 +11,7 @@ export default function WordCards() {
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
   const addSynonym = useStore((s) => s.addSynonym);
   const removeSynonym = useStore((s) => s.removeSynonym);
+  const removeWord = useStore((s) => s.removeWord);
   const groups = useMemo(() => buildWordGroups(words, dailyWords, dailyWordsHistory), [words, dailyWords, dailyWordsHistory]);
 
   const [stage, setStage] = useState("group"); // group | size | play | score
@@ -77,6 +78,14 @@ export default function WordCards() {
     setSynonymInput("");
   };
 
+  const deleteCurrentWord = () => {
+    if (!round.current) return;
+    if (confirm(`"${round.current.word}" kelimeler listenden tamamen silinsin mi?`)) {
+      removeWord(round.current.word);
+      round.remove();
+    }
+  };
+
   return (
     <div className="screen">
       {stage === "group" && (
@@ -129,6 +138,7 @@ export default function WordCards() {
           <header className="screen-head solve-head">
             <button className="link" onClick={() => setStage("group")}>← Kelime Kartları</button>
             <span className="muted small">Kalan: {round.remaining} / {round.total}</span>
+            <button className="icon-btn" title="Kelimeyi listeden sil" onClick={deleteCurrentWord}>🗑</button>
           </header>
           <p className="muted small" style={{ marginBottom: 10 }}>
             Kartı çevir, kendi kendine tahmin et. Bildiysen sağa, bilemediysen sola sürükle (ya da alttaki butonları kullan).
