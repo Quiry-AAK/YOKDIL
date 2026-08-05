@@ -273,6 +273,25 @@ export const useStore = create(
         })),
       removeWord: (word) =>
         set((s) => ({ words: s.words.filter((w) => w.word !== word) })),
+      addSynonym: (word, synonym) => {
+        const s = synonym.trim();
+        if (!s) return;
+        set((st) => ({
+          words: st.words.map((w) =>
+            w.word !== word
+              ? w
+              : (w.synonyms || []).some((x) => x.toLowerCase() === s.toLowerCase())
+                ? w
+                : { ...w, synonyms: [...(w.synonyms || []), s] }
+          ),
+        }));
+      },
+      removeSynonym: (word, synonym) =>
+        set((s) => ({
+          words: s.words.map((w) =>
+            w.word !== word ? w : { ...w, synonyms: (w.synonyms || []).filter((x) => x !== synonym) }
+          ),
+        })),
       applyWordReformat: (fixed) => {
         const byWord = Object.fromEntries((fixed || []).map((f) => [f.word.toLowerCase(), f]));
         set((s) => ({

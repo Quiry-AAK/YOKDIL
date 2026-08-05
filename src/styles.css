@@ -269,6 +269,15 @@ button.opt-letter:disabled { opacity: 0.85; }
   font-size: 11px; padding: 2px 7px; border-radius: 6px; font-weight: 600;
 }
 .meaning { font-weight: 600; margin: 8px 0 4px; }
+.synonym-list { margin: 4px 0 8px; }
+.synonym-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.synonym-chip {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  padding: 3px 8px; font-size: 13px; color: var(--primary2);
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.synonym-add-row { margin: 6px 0; gap: 6px; }
+.input-sm { padding: 7px 10px; font-size: 13px; }
 .example { font-style: italic; margin: 4px 0; }
 .example-tr { margin: 2px 0 6px; font-size: 14px; }
 

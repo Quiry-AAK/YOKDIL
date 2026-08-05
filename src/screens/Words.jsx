@@ -26,6 +26,8 @@ export default function Words() {
   const importWords = useStore((s) => s.importWords);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
   const removeWord = useStore((s) => s.removeWord);
+  const addSynonym = useStore((s) => s.addSynonym);
+  const removeSynonym = useStore((s) => s.removeSynonym);
   const addPendingWord = useStore((s) => s.addPendingWord);
   const groups = useMemo(() => buildWordGroups(words, dailyWords, dailyWordsHistory), [words, dailyWords, dailyWordsHistory]);
 
@@ -43,6 +45,14 @@ export default function Words() {
   const [manualTag, setManualTag] = useState("yokdil");
   const [manualMsg, setManualMsg] = useState(null);
   const [listFilter, setListFilter] = useState("all"); // all | yokdil | yds | diger
+  const [synonymInputs, setSynonymInputs] = useState({}); // word -> girilen metin
+
+  const submitSynonym = (word) => {
+    const val = (synonymInputs[word] || "").trim();
+    if (!val) return;
+    addSynonym(word, val);
+    setSynonymInputs((prev) => ({ ...prev, [word]: "" }));
+  };
 
   useEffect(() => {
     if (!round.current) { setChoices([]); return; }
@@ -220,6 +230,30 @@ export default function Words() {
                   <button className="icon-btn" onClick={() => removeWord(w.word)}>🗑</button>
                 </div>
                 <p className="meaning">{w.meaning_tr}</p>
+                {w.synonyms?.length > 0 && (
+                  <div className="synonym-list">
+                    <span className="muted small">Kayıtlı synonymler:</span>
+                    <div className="synonym-chips">
+                      {w.synonyms.map((syn) => (
+                        <span key={syn} className="synonym-chip">
+                          {syn}
+                          <button className="pending-chip-x" onClick={() => removeSynonym(w.word, syn)}>✕</button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="row synonym-add-row">
+                  <input
+                    type="text"
+                    className="input input-sm"
+                    placeholder="synonym ekle…"
+                    value={synonymInputs[w.word] || ""}
+                    onChange={(e) => setSynonymInputs((prev) => ({ ...prev, [w.word]: e.target.value }))}
+                    onKeyDown={(e) => { if (e.key === "Enter") submitSynonym(w.word); }}
+                  />
+                  <button className="btn btn-sm" onClick={() => submitSynonym(w.word)}>Ekle</button>
+                </div>
                 <p className="example">"{w.example_en}"</p>
                 <p className="example-tr muted">{w.example_tr}</p>
                 <span className="muted small">görülme: {w.stats.seen} · doğru: {w.stats.correct}</span>
