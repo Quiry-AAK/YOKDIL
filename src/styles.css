@@ -435,6 +435,7 @@ button.opt-letter:disabled { opacity: 0.85; }
 .flip-card.swipe-left { border-color: var(--bad); }
 .flip-card-front .game-word { margin-bottom: 8px; }
 .flip-card-back { width: 100%; }
+.synonym-card-box { text-align: left; margin-top: 10px; cursor: default; }
 .flip-decide-row { display: flex; gap: 10px; margin-top: 16px; }
 .flip-decide-row .btn { flex: 1; padding: 14px; font-size: 15px; }
 .flip-btn-no { background: rgba(239,68,68,0.15); border-color: var(--bad); color: #fca5a5; }

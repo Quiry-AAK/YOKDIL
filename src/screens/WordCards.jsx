@@ -9,6 +9,8 @@ export default function WordCards() {
   const dailyWords = useStore((s) => s.dailyWords);
   const dailyWordsHistory = useStore((s) => s.dailyWordsHistory);
   const recordWordAnswer = useStore((s) => s.recordWordAnswer);
+  const addSynonym = useStore((s) => s.addSynonym);
+  const removeSynonym = useStore((s) => s.removeSynonym);
   const groups = useMemo(() => buildWordGroups(words, dailyWords, dailyWordsHistory), [words, dailyWords, dailyWordsHistory]);
 
   const [stage, setStage] = useState("group"); // group | size | play | score
@@ -18,10 +20,12 @@ export default function WordCards() {
   const [dragX, setDragX] = useState(0);
   const draggingRef = useRef(false);
   const startXRef = useRef(0);
+  const [synonymInput, setSynonymInput] = useState("");
 
   useEffect(() => {
     setFlipped(false);
     setDragX(0);
+    setSynonymInput("");
   }, [round.current]);
 
   useEffect(() => {
@@ -61,6 +65,16 @@ export default function WordCards() {
     if (dragX > 80) decide(true);
     else if (dragX < -80) decide(false);
     else setDragX(0);
+  };
+
+  const currentSynonyms = round.current
+    ? words.find((w) => w.word === round.current.word)?.synonyms || []
+    : [];
+  const submitSynonym = () => {
+    const val = synonymInput.trim();
+    if (!val || !round.current) return;
+    addSynonym(round.current.word, val);
+    setSynonymInput("");
   };
 
   return (
@@ -139,6 +153,38 @@ export default function WordCards() {
                 <p className="meaning">{round.current.word} = {round.current.meaning_tr}</p>
                 <p className="example">"{round.current.example_en}"</p>
                 <p className="example-tr muted">{round.current.example_tr}</p>
+                <div
+                  className="synonym-card-box"
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onPointerMove={(e) => e.stopPropagation()}
+                  onPointerUp={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {currentSynonyms.length > 0 && (
+                    <div className="synonym-list">
+                      <span className="muted small">Kayıtlı synonymler:</span>
+                      <div className="synonym-chips">
+                        {currentSynonyms.map((syn) => (
+                          <span key={syn} className="synonym-chip">
+                            {syn}
+                            <button className="pending-chip-x" onClick={() => removeSynonym(round.current.word, syn)}>✕</button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <div className="row synonym-add-row">
+                    <input
+                      type="text"
+                      className="input input-sm"
+                      placeholder="synonym ekle…"
+                      value={synonymInput}
+                      onChange={(e) => setSynonymInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") submitSynonym(); }}
+                    />
+                    <button className="btn btn-sm" onClick={submitSynonym}>Ekle</button>
+                  </div>
+                </div>
               </div>
             )}
           </div>
