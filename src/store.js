@@ -5,6 +5,8 @@ import { shuffle } from "./lib/round.js";
 
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 
+export const WRONG_EXAM_MIN = 10; // Yanlışlardan deneme oluşturmak için gereken en az soru sayısı
+
 const emptyStats = () => ({ seen: 0, correct: 0 });
 
 const makeDigerSeedWords = () =>
@@ -207,6 +209,36 @@ export const useStore = create(
             w.id === wrongId ? { ...w, note } : w
           ),
         })),
+      wrongTypeOf: (w) => {
+        const d = get().denemes.find((x) => x.id === w.denemeId);
+        return d?.type ?? "yokdil";
+      },
+      createDenemeFromWrongs: (type) => {
+        const s = get();
+        const eligible = s.wrongQuestions.filter((w) => s.wrongTypeOf(w) === type);
+        if (eligible.length < WRONG_EXAM_MIN) return null;
+        const questions = eligible.map((w) => ({
+          number: w.question.number,
+          text: w.question.text,
+          passage: w.question.passage,
+          options: w.question.options,
+          answer: w.question.answer,
+        }));
+        const id = uid();
+        const prepared = questions.map((q, i) => ({
+          ...q,
+          id: `q${q.number ?? i + 1}_${i}`,
+          userAnswer: null,
+        }));
+        const typeLabel = type === "yds" ? "YDS" : "YÖKDİL";
+        const name = `Yanlışlardan Deneme — ${typeLabel} (${new Date().toLocaleDateString("tr-TR")})`;
+        const eligibleIds = new Set(eligible.map((w) => w.id));
+        set((st) => ({
+          denemes: [...st.denemes, { id, name, type, createdAt: Date.now(), questions: prepared }],
+          wrongQuestions: st.wrongQuestions.filter((w) => !eligibleIds.has(w.id)),
+        }));
+        return id;
+      },
 
       // --- Kalıp Quiz istatistikleri (phrasal/prep/gerund/collocation) ---
       patternStats: {}, // { [key]: { seen, correct } }
