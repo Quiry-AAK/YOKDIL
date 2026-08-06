@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { DIGER_SEED_WORDS } from "./lib/digerSeedWords.js";
 import { shuffle } from "./lib/round.js";
+import { getCategory, CAT_ORDER } from "./lib/categories.js";
 
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 
@@ -217,7 +218,23 @@ export const useStore = create(
         const s = get();
         const eligible = s.wrongQuestions.filter((w) => s.wrongTypeOf(w) === type);
         if (eligible.length < WRONG_EXAM_MIN) return null;
-        const questions = eligible.map((w) => ({
+        // Random değil: önce denemeler listesinde daha yukarıda olan (daha
+        // önce eklenmiş) denemenin yanlışları, sonra kategori sırası, sonra
+        // soru numarasına göre sıralanır.
+        const denemeIndexOf = (denemeId) => {
+          const i = s.denemes.findIndex((d) => d.id === denemeId);
+          return i === -1 ? s.denemes.length : i;
+        };
+        const sorted = [...eligible].sort((a, b) => {
+          const denemeDiff = denemeIndexOf(a.denemeId) - denemeIndexOf(b.denemeId);
+          if (denemeDiff !== 0) return denemeDiff;
+          const catDiff =
+            CAT_ORDER.indexOf(getCategory(a.question.number, type)) -
+            CAT_ORDER.indexOf(getCategory(b.question.number, type));
+          if (catDiff !== 0) return catDiff;
+          return (a.question.number ?? 0) - (b.question.number ?? 0);
+        });
+        const questions = sorted.map((w) => ({
           number: w.question.number,
           text: w.question.text,
           passage: w.question.passage,
