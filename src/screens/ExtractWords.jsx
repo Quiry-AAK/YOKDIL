@@ -1,31 +1,23 @@
 import { useState, useMemo } from "react";
 import { useStore } from "../store.js";
 
-const STOPWORDS = new Set([
-  "the", "a", "an", "and", "or", "but", "if", "then", "than", "so", "because", "as", "of", "to", "in", "on",
-  "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after",
-  "above", "below", "from", "up", "down", "out", "off", "over", "under", "again", "further", "once", "is",
-  "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing",
-  "will", "would", "should", "could", "can", "may", "might", "must", "shall", "not", "no", "nor", "this",
-  "that", "these", "those", "you", "he", "she", "it", "we", "they", "them", "his", "her", "its", "our",
-  "their", "your", "which", "who", "whom", "what", "when", "where", "why", "how", "all", "each", "few",
-  "more", "most", "other", "some", "such", "only", "own", "same", "too", "very", "just", "also", "there",
-  "here",
-]);
-
-function extractWordsFromText(text) {
-  if (!text) return [];
-  const matches = text.match(/[A-Za-z']+/g) || [];
-  return matches
-    .map((w) => w.replace(/^'+|'+$/g, "").toLowerCase())
-    .filter((w) => w.length >= 3 && !STOPWORDS.has(w));
+function tokenSetFromDeneme(d) {
+  const set = new Set();
+  d.questions.forEach((q) => {
+    [q.passage, q.text, ...Object.values(q.options || {})].forEach((t) => {
+      if (!t) return;
+      (t.match(/[A-Za-z']+/g) || []).forEach((w) => {
+        set.add(w.replace(/^'+|'+$/g, "").toLowerCase());
+      });
+    });
+  });
+  return set;
 }
 
 export default function ExtractWords() {
   const denemes = useStore((s) => s.denemes);
   const words = useStore((s) => s.words);
-  const pendingWords = useStore((s) => s.pendingWords);
-  const addPendingWords = useStore((s) => s.addPendingWords);
+  const extractWordsFromDenemes = useStore((s) => s.extractWordsFromDenemes);
 
   const [selected, setSelected] = useState(new Set());
   const [msg, setMsg] = useState(null);
@@ -39,29 +31,24 @@ export default function ExtractWords() {
     });
   };
 
-  const knownKeys = useMemo(() => new Set(words.map((w) => w.word.toLowerCase())), [words]);
-  const pendingKeys = useMemo(() => new Set(pendingWords.map((w) => w.word)), [pendingWords]);
-
-  const preview = useMemo(() => {
-    const set = new Set();
+  const matchedWords = useMemo(() => {
+    if (selected.size === 0) return [];
+    const tokenSet = new Set();
     denemes
       .filter((d) => selected.has(d.id))
       .forEach((d) => {
-        d.questions.forEach((q) => {
-          [q.passage, q.text, ...Object.values(q.options || {})].forEach((t) => {
-            extractWordsFromText(t).forEach((w) => set.add(w));
-          });
-        });
+        tokenSetFromDeneme(d).forEach((w) => tokenSet.add(w));
       });
-    const newOnes = [...set].filter((w) => !knownKeys.has(w) && !pendingKeys.has(w));
-    return { total: set.size, newOnes };
-  }, [denemes, selected, knownKeys, pendingKeys]);
+    return words.filter((w) => tokenSet.has(w.word.toLowerCase()));
+  }, [denemes, selected, words]);
 
   const onExtract = () => {
-    const items = preview.newOnes.map((w) => ({ word: w, context: null, sourceType: "denemeler" }));
-    const n = addPendingWords(items);
-    setSelected(new Set());
-    setMsg(`${n} yeni kelime bekleme listesine eklendi. "Kelimeler" ekranından gönderip listeye ekleyebilirsin.`);
+    const n = extractWordsFromDenemes([...selected]);
+    setMsg(
+      n > 0
+        ? `${n} kelime "Denemelerden Çıkarılan Kelimeler" grubuna ayrıldı — kelime oyunlarından çalışabilirsin.`
+        : "Seçtiğin denemelerde, kelimelerim listende olan bir kelime bulunamadı."
+    );
     setTimeout(() => setMsg(null), 4000);
   };
 
@@ -70,9 +57,8 @@ export default function ExtractWords() {
       <header className="screen-head">
         <h1>Denemelerden Kelime Çıkar</h1>
         <p className="muted">
-          Seçtiğin denemelerdeki İngilizce metinlerden kelimeleri tarar, ayrı bir "Denemelerden Çıkarılan
-          Kelimeler" listesine eklenmek üzere bekleme listesine atar — tıpkı Günün Kelimeleri gibi, kelime
-          oyunlarında ayrı bir grup olarak seçilebilir.
+          Kelimelerim listendeki kelimelerden, seçtiğin denemelerde geçenleri bulur ve "Denemelerden Çıkarılan
+          Kelimeler" adında ayrı bir gruba ayırır — tıpkı Günün Kelimeleri gibi, kelime oyunlarında ayrı seçilebilir.
         </p>
       </header>
 
@@ -99,11 +85,10 @@ export default function ExtractWords() {
       {selected.size > 0 && (
         <div className="card">
           <p className="muted small" style={{ marginBottom: 8 }}>
-            Seçili {selected.size} denemede toplam {preview.total} benzersiz kelime var,
-            bunlardan <strong>{preview.newOnes.length}</strong> tanesi yeni (henüz eklenmemiş).
+            Seçili {selected.size} denemede, kelimelerim listemden <strong>{matchedWords.length}</strong> kelime geçiyor.
           </p>
-          <button className="btn btn-primary btn-big" onClick={onExtract} disabled={preview.newOnes.length === 0}>
-            Kelimeleri Çıkar ({preview.newOnes.length})
+          <button className="btn btn-primary btn-big" onClick={onExtract} disabled={matchedWords.length === 0}>
+            Bu Kelimeleri Ayır ({matchedWords.length})
           </button>
         </div>
       )}

@@ -19,6 +19,7 @@ export default function Words() {
   const words = useStore((s) => s.words);
   const dailyWords = useStore((s) => s.dailyWords);
   const dailyWordsHistory = useStore((s) => s.dailyWordsHistory);
+  const extractedWords = useStore((s) => s.extractedWords);
   const pendingWords = useStore((s) => s.pendingWords);
   const clearPendingWords = useStore((s) => s.clearPendingWords);
   const removePendingWord = useStore((s) => s.removePendingWord);
@@ -29,7 +30,7 @@ export default function Words() {
   const addSynonym = useStore((s) => s.addSynonym);
   const removeSynonym = useStore((s) => s.removeSynonym);
   const addPendingWord = useStore((s) => s.addPendingWord);
-  const groups = useMemo(() => buildWordGroups(words, dailyWords, dailyWordsHistory), [words, dailyWords, dailyWordsHistory]);
+  const groups = useMemo(() => buildWordGroups(words, dailyWords, dailyWordsHistory, extractedWords), [words, dailyWords, dailyWordsHistory, extractedWords]);
 
   const [mode, setMode] = useState("game");
   const [stage, setStage] = useState("group"); // group | size | play | score
@@ -210,7 +211,6 @@ export default function Words() {
               { key: "yokdil", label: `YÖKDİL (${words.filter((w) => w.sourceType === "yokdil").length})` },
               { key: "yds", label: `YDS (${words.filter((w) => w.sourceType === "yds").length})` },
               { key: "diger", label: `Diğer (${words.filter((w) => w.sourceType === "diger").length})` },
-              { key: "denemeler", label: `Denemelerden (${words.filter((w) => w.sourceType === "denemeler").length})` },
             ].map((f) => (
               <button key={f.key} className={listFilter === f.key ? "active" : ""} onClick={() => setListFilter(f.key)}>
                 {f.label}

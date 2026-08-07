@@ -423,20 +423,6 @@ export const useStore = create(
         set((s) => ({ pendingWords: [...s.pendingWords, { word: key, context, sourceType }] }));
         return true;
       },
-      addPendingWords: (items) => {
-        const s = get();
-        const knownKeys = new Set(s.words.map((w) => w.word.toLowerCase()));
-        const pendingKeys = new Set(s.pendingWords.map((w) => w.word));
-        const toAdd = [];
-        items.forEach(({ word, context, sourceType }) => {
-          const key = word.trim().toLowerCase();
-          if (knownKeys.has(key) || pendingKeys.has(key)) return;
-          pendingKeys.add(key);
-          toAdd.push({ word: key, context: context ?? null, sourceType: sourceType ?? null });
-        });
-        if (toAdd.length > 0) set((st) => ({ pendingWords: [...st.pendingWords, ...toAdd] }));
-        return toAdd.length;
-      },
       clearPendingWords: () => set({ pendingWords: [] }),
       removePendingWord: (word) =>
         set((s) => ({ pendingWords: s.pendingWords.filter((w) => w.word !== word) })),
@@ -532,6 +518,31 @@ export const useStore = create(
       },
       resetDailyWords: () =>
         set({ dailyWords: [], dailyWordsHistory: [] }),
+
+      // --- Denemelerden kelime çıkarma ---
+      // Seçilen denemelerin metninde geçen, zaten kelimelerim listesinde
+      // olan (bilinmeyen/kayıtlı) kelimelerin kesişimi — "denemeler" grubu.
+      extractedWords: [], // words store'undaki word string'leri
+      extractWordsFromDenemes: (denemeIds) => {
+        const s = get();
+        const idSet = new Set(denemeIds);
+        const tokenSet = new Set();
+        s.denemes
+          .filter((d) => idSet.has(d.id))
+          .forEach((d) => {
+            d.questions.forEach((q) => {
+              [q.passage, q.text, ...Object.values(q.options || {})].forEach((t) => {
+                if (!t) return;
+                (t.match(/[A-Za-z']+/g) || []).forEach((w) => {
+                  tokenSet.add(w.replace(/^'+|'+$/g, "").toLowerCase());
+                });
+              });
+            });
+          });
+        const matched = s.words.filter((w) => tokenSet.has(w.word.toLowerCase())).map((w) => w.word);
+        set({ extractedWords: matched });
+        return matched.length;
+      },
 
       // --- AI Soru Havuzu ---
       aiPool: [], // { id, type, category, passage, text, options, answer, createdAt }
