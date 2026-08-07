@@ -1,21 +1,17 @@
 import { useState, useMemo } from "react";
-import { useStore, WRONG_EXAM_MIN } from "../store.js";
+import { useStore } from "../store.js";
 
 export default function CreateExam({ navigate }) {
   const wrongQuestions = useStore((s) => s.wrongQuestions);
   const denemes = useStore((s) => s.denemes);
+  const previewWrongExam = useStore((s) => s.previewWrongExam);
   const createDenemeFromWrongs = useStore((s) => s.createDenemeFromWrongs);
 
   const [type, setType] = useState("yokdil");
 
-  const eligibleCount = useMemo(() => {
-    return wrongQuestions.filter((w) => {
-      const d = denemes.find((x) => x.id === w.denemeId);
-      return (d?.type ?? "yokdil") === type;
-    }).length;
-  }, [wrongQuestions, denemes, type]);
-
-  const canCreate = eligibleCount >= WRONG_EXAM_MIN;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const preview = useMemo(() => previewWrongExam(type), [type, wrongQuestions, denemes]);
+  const total = preview.rows.reduce((sum, r) => sum + r.quota, 0);
 
   const onCreate = () => {
     const id = createDenemeFromWrongs(type);
@@ -26,7 +22,11 @@ export default function CreateExam({ navigate }) {
     <div className="screen">
       <header className="screen-head">
         <h1>Deneme Oluştur</h1>
-        <p className="muted">Yanlışlarım havuzundaki sorulardan otomatik deneme oluştur. Kullanılan sorular Yanlışlarım'dan çıkar.</p>
+        <p className="muted">
+          Yanlışlarım havuzundan, gerçek {type === "yds" ? "YDS" : "YÖKDİL"} formatına uygun {total} soruluk bir
+          deneme oluşturur. Bir kategoride yeterli yanlış yoksa, kalan sorular denemelerinden rastgele tamamlanır.
+          Kullanılan yanlış sorular Yanlışlarım'dan çıkar; bu deneme silinirse geri döner.
+        </p>
       </header>
 
       <div className="card">
@@ -35,17 +35,36 @@ export default function CreateExam({ navigate }) {
           <button className={type === "yokdil" ? "active" : ""} onClick={() => setType("yokdil")}>YÖKDİL</button>
           <button className={type === "yds" ? "active" : ""} onClick={() => setType("yds")}>YDS</button>
         </div>
-
-        <p className="muted small" style={{ margin: "14px 0" }}>
-          {(type === "yds" ? "YDS" : "YÖKDİL")} formatında yanlışlarım havuzunda{" "}
-          <strong>{eligibleCount}</strong> soru var
-          {!canCreate && <> — en az <strong>{WRONG_EXAM_MIN}</strong> soru gerekiyor.</>}
-        </p>
-
-        <button className="btn btn-primary btn-big" onClick={onCreate} disabled={!canCreate}>
-          Deneme Oluştur
-        </button>
       </div>
+
+      <div className="card">
+        <h3 style={{ marginBottom: 10 }}>Kategori Dağılımı</h3>
+        {preview.rows.map((r) => (
+          <div key={r.label} className="score-row">
+            <span className="score-label">{r.label}</span>
+            {r.shortBy > 0 ? (
+              <span className="score-val bad">{r.poolAvailable}/{r.quota} — {r.shortBy} eksik</span>
+            ) : r.willRandomFill ? (
+              <span className="score-val" style={{ color: "#f59e0b" }}>
+                {r.wrongAvailable}/{r.quota} yanlış — kalanı rastgele
+              </span>
+            ) : (
+              <span className="score-val good">{r.quota}/{r.quota} yanlış</span>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {!preview.canCreate && (
+        <div className="alert">
+          Bazı kategorilerde yeterli soru yok (ne yanlışlarında ne de denemelerinde). {total} soruluk tam bir
+          deneme oluşturulamıyor — önce o kategorilerden deneme çözüp havuzu büyütmen gerekiyor.
+        </div>
+      )}
+
+      <button className="btn btn-primary btn-big" onClick={onCreate} disabled={!preview.canCreate}>
+        Deneme Oluştur
+      </button>
     </div>
   );
 }

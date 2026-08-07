@@ -2,13 +2,51 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { DIGER_SEED_WORDS } from "./lib/digerSeedWords.js";
 import { shuffle } from "./lib/round.js";
-import { getCategory, CAT_ORDER } from "./lib/categories.js";
+import { getCategory, YOKDIL_CATS, YDS_CATS } from "./lib/categories.js";
 
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 
-export const WRONG_EXAM_MIN = 10; // Yanlışlardan deneme oluşturmak için gereken en az soru sayısı
-
 const emptyStats = () => ({ seen: 0, correct: 0 });
+
+const catsFor = (type) => (type === "yds" ? YDS_CATS : YOKDIL_CATS);
+
+const denemeIndexOf = (denemes, denemeId) => {
+  const i = denemes.findIndex((d) => d.id === denemeId);
+  return i === -1 ? denemes.length : i;
+};
+
+// Bir kategoriye ait, tüm ilgili formattaki denemelerdeki (doğru/yanlış fark
+// etmeksizin) tüm sorular — rastgele doldurma için kullanılan tam havuz.
+const poolForCategory = (denemes, type, cat) => {
+  const seen = new Set();
+  const out = [];
+  denemes.filter((d) => d.type === type).forEach((d) => {
+    d.questions.forEach((q) => {
+      if (getCategory(q.number, type) !== cat.label) return;
+      const key = `${d.id}:${q.number}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      out.push({ denemeId: d.id, question: q });
+    });
+  });
+  return out;
+};
+
+// Bir kategoriye ait yanlış sorular — önce denemeler listesinde daha
+// yukarıda (daha önce eklenmiş) olan denemenin yanlışları, sonra soru
+// numarasına göre sıralı.
+const wrongEligibleForCategory = (wrongQuestions, denemes, type, cat) =>
+  wrongQuestions
+    .filter((w) => {
+      const d = denemes.find((x) => x.id === w.denemeId);
+      const t = d?.type ?? "yokdil";
+      return t === type && getCategory(w.question.number, type) === cat.label;
+    })
+    .sort((a, b) => {
+      const diff = denemeIndexOf(denemes, a.denemeId) - denemeIndexOf(denemes, b.denemeId);
+      if (diff !== 0) return diff;
+      return (a.question.number ?? 0) - (b.question.number ?? 0);
+    });
 
 const makeDigerSeedWords = () =>
   DIGER_SEED_WORDS.map((w) => ({ ...w, sourceType: "diger", stats: emptyStats(), addedAt: Date.now() }));
@@ -42,10 +80,17 @@ export const useStore = create(
         return id;
       },
       removeDeneme: (id) =>
-        set((s) => ({
-          denemes: s.denemes.filter((d) => d.id !== id),
-          wrongQuestions: s.wrongQuestions.filter((w) => w.denemeId !== id),
-        })),
+        set((s) => {
+          const deneme = s.denemes.find((d) => d.id === id);
+          const restored = deneme?.consumedWrongSnapshots || [];
+          return {
+            denemes: s.denemes.filter((d) => d.id !== id),
+            wrongQuestions: [
+              ...s.wrongQuestions.filter((w) => w.denemeId !== id),
+              ...restored,
+            ],
+          };
+        }),
       renameDeneme: (id, name) =>
         set((s) => ({
           denemes: s.denemes.map((d) => (d.id === id ? { ...d, name } : d)),
@@ -210,49 +255,82 @@ export const useStore = create(
             w.id === wrongId ? { ...w, note } : w
           ),
         })),
-      wrongTypeOf: (w) => {
-        const d = get().denemes.find((x) => x.id === w.denemeId);
-        return d?.type ?? "yokdil";
+      // Seçilen formatta (YÖKDİL/YDS) gerçek kategori dağılımına (80 soru)
+      // uygun bir deneme oluşturmadan önce kategori bazlı önizleme.
+      previewWrongExam: (type) => {
+        const s = get();
+        const rows = catsFor(type).map((cat) => {
+          const quota = cat.max - cat.min + 1;
+          const wrongAvailable = wrongEligibleForCategory(s.wrongQuestions, s.denemes, type, cat).length;
+          const poolAvailable = poolForCategory(s.denemes, type, cat).length;
+          return {
+            label: cat.label,
+            quota,
+            wrongAvailable,
+            poolAvailable,
+            shortBy: Math.max(0, quota - poolAvailable),
+            willRandomFill: wrongAvailable < quota && poolAvailable > wrongAvailable,
+          };
+        });
+        return { rows, canCreate: rows.every((r) => r.shortBy === 0) };
       },
       createDenemeFromWrongs: (type) => {
         const s = get();
-        const eligible = s.wrongQuestions.filter((w) => s.wrongTypeOf(w) === type);
-        if (eligible.length < WRONG_EXAM_MIN) return null;
-        // Random değil: önce denemeler listesinde daha yukarıda olan (daha
-        // önce eklenmiş) denemenin yanlışları, sonra kategori sırası, sonra
-        // soru numarasına göre sıralanır.
-        const denemeIndexOf = (denemeId) => {
-          const i = s.denemes.findIndex((d) => d.id === denemeId);
-          return i === -1 ? s.denemes.length : i;
-        };
-        const sorted = [...eligible].sort((a, b) => {
-          const denemeDiff = denemeIndexOf(a.denemeId) - denemeIndexOf(b.denemeId);
-          if (denemeDiff !== 0) return denemeDiff;
-          const catDiff =
-            CAT_ORDER.indexOf(getCategory(a.question.number, type)) -
-            CAT_ORDER.indexOf(getCategory(b.question.number, type));
-          if (catDiff !== 0) return catDiff;
-          return (a.question.number ?? 0) - (b.question.number ?? 0);
+        const preview = s.previewWrongExam(type);
+        if (!preview.canCreate) return null;
+
+        const consumedWrongSnapshots = [];
+        const finalQuestions = [];
+        const usedKeys = new Set();
+
+        catsFor(type).forEach((cat) => {
+          const quota = cat.max - cat.min + 1;
+          const wrongList = wrongEligibleForCategory(s.wrongQuestions, s.denemes, type, cat);
+          const chosenWrongs = wrongList.slice(0, quota);
+          chosenWrongs.forEach((w) => {
+            finalQuestions.push({
+              number: w.question.number,
+              text: w.question.text,
+              passage: w.question.passage,
+              options: w.question.options,
+              answer: w.question.answer,
+            });
+            consumedWrongSnapshots.push(w);
+            usedKeys.add(`${w.denemeId}:${w.question.number}`);
+          });
+          const remaining = quota - chosenWrongs.length;
+          if (remaining > 0) {
+            const pool = poolForCategory(s.denemes, type, cat).filter(
+              (p) => !usedKeys.has(`${p.denemeId}:${p.question.number}`)
+            );
+            shuffle(pool).slice(0, remaining).forEach((p) => {
+              finalQuestions.push({
+                number: p.question.number,
+                text: p.question.text,
+                passage: p.question.passage,
+                options: p.question.options,
+                answer: p.question.answer,
+              });
+              usedKeys.add(`${p.denemeId}:${p.question.number}`);
+            });
+          }
         });
-        const questions = sorted.map((w) => ({
-          number: w.question.number,
-          text: w.question.text,
-          passage: w.question.passage,
-          options: w.question.options,
-          answer: w.question.answer,
-        }));
+
         const id = uid();
-        const prepared = questions.map((q, i) => ({
+        const prepared = finalQuestions.map((q, i) => ({
           ...q,
           id: `q${q.number ?? i + 1}_${i}`,
           userAnswer: null,
         }));
         const typeLabel = type === "yds" ? "YDS" : "YÖKDİL";
         const name = `Yanlışlardan Deneme — ${typeLabel} (${new Date().toLocaleDateString("tr-TR")})`;
-        const eligibleIds = new Set(eligible.map((w) => w.id));
+        const consumedIds = new Set(consumedWrongSnapshots.map((w) => w.id));
         set((st) => ({
-          denemes: [...st.denemes, { id, name, type, createdAt: Date.now(), questions: prepared }],
-          wrongQuestions: st.wrongQuestions.filter((w) => !eligibleIds.has(w.id)),
+          denemes: [
+            ...st.denemes,
+            { id, name, type, createdAt: Date.now(), questions: prepared, consumedWrongSnapshots },
+          ],
+          wrongQuestions: st.wrongQuestions.filter((w) => !consumedIds.has(w.id)),
         }));
         return id;
       },
