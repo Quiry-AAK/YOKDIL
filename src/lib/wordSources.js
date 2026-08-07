@@ -8,6 +8,7 @@ export function buildWordGroups(words, dailyWords = [], dailyWordsHistory = []) 
     { key: "yokdil", label: "YÖKDİL Kelimeleri", pool: words.filter((w) => w.sourceType === "yokdil") },
     { key: "yds", label: "YDS Kelimeleri", pool: words.filter((w) => w.sourceType === "yds") },
     { key: "diger", label: "Diğer Kelimeler", pool: words.filter((w) => w.sourceType === "diger") },
+    { key: "denemeler", label: "Denemelerden Çıkarılan Kelimeler", pool: words.filter((w) => w.sourceType === "denemeler") },
     { key: "daily", label: "Günün Kelimeleri", pool: words.filter((w) => dailySet.has(w.word)) },
     { key: "daily-history", label: "Bugüne Kadarki Kelimeler", pool: words.filter((w) => historySet.has(w.word)) },
   ];

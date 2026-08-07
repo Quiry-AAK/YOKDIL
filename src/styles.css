@@ -420,6 +420,7 @@ button.opt-letter:disabled { opacity: 0.85; }
 /* Kategori seçici (Solve başlangıcı) */
 .cat-pick-card { cursor: pointer; transition: border-color 0.15s; }
 .cat-pick-card:active { border-color: var(--primary); }
+.cat-pick-card.active { border-color: var(--primary); background: rgba(99,102,241,0.12); }
 .cat-pick-card.disabled { opacity: 0.4; cursor: default; }
 .cat-pick-card.disabled:active { border-color: var(--border); }
 

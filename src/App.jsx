@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useStore } from "./store.js";
 import Home from "./screens/Home.jsx";
 import CreateExam from "./screens/CreateExam.jsx";
+import ExtractWords from "./screens/ExtractWords.jsx";
 import Solve from "./screens/Solve.jsx";
 import Wrong from "./screens/Wrong.jsx";
 import Review from "./screens/Review.jsx";
@@ -25,6 +26,7 @@ import { pickActiveDeneme } from "./lib/denemeHelpers.js";
 const NAV_ITEMS = [
   { key: "home", label: "Denemeler", icon: "📄" },
   { key: "createexam", label: "Deneme Oluştur", icon: "🆕" },
+  { key: "extractwords", label: "Denemelerden Kelime Çıkar", icon: "📥" },
   { key: "aipool", label: "AI Havuzu", icon: "🤖" },
   { key: "wrong", label: "Yanlışlarım", icon: "❌" },
   { key: "review", label: "Tekrar Çöz", icon: "🔁" },
@@ -61,6 +63,7 @@ export default function App() {
   let screen;
   if (view === "home") screen = <Home navigate={navigate} />;
   else if (view === "createexam") screen = <CreateExam navigate={navigate} />;
+  else if (view === "extractwords") screen = <ExtractWords navigate={navigate} />;
   else if (view === "solve") screen = <Solve denemeId={activeDeneme} navigate={navigate} />;
   else if (view === "denemeReport") screen = <Solve denemeId={activeDeneme} navigate={navigate} startInReport />;
   else if (view === "aipool") screen = <AIPool navigate={navigate} />;

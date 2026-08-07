@@ -423,6 +423,20 @@ export const useStore = create(
         set((s) => ({ pendingWords: [...s.pendingWords, { word: key, context, sourceType }] }));
         return true;
       },
+      addPendingWords: (items) => {
+        const s = get();
+        const knownKeys = new Set(s.words.map((w) => w.word.toLowerCase()));
+        const pendingKeys = new Set(s.pendingWords.map((w) => w.word));
+        const toAdd = [];
+        items.forEach(({ word, context, sourceType }) => {
+          const key = word.trim().toLowerCase();
+          if (knownKeys.has(key) || pendingKeys.has(key)) return;
+          pendingKeys.add(key);
+          toAdd.push({ word: key, context: context ?? null, sourceType: sourceType ?? null });
+        });
+        if (toAdd.length > 0) set((st) => ({ pendingWords: [...st.pendingWords, ...toAdd] }));
+        return toAdd.length;
+      },
       clearPendingWords: () => set({ pendingWords: [] }),
       removePendingWord: (word) =>
         set((s) => ({ pendingWords: s.pendingWords.filter((w) => w.word !== word) })),

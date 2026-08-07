@@ -210,6 +210,7 @@ export default function Words() {
               { key: "yokdil", label: `YÖKDİL (${words.filter((w) => w.sourceType === "yokdil").length})` },
               { key: "yds", label: `YDS (${words.filter((w) => w.sourceType === "yds").length})` },
               { key: "diger", label: `Diğer (${words.filter((w) => w.sourceType === "diger").length})` },
+              { key: "denemeler", label: `Denemelerden (${words.filter((w) => w.sourceType === "denemeler").length})` },
             ].map((f) => (
               <button key={f.key} className={listFilter === f.key ? "active" : ""} onClick={() => setListFilter(f.key)}>
                 {f.label}
