@@ -99,9 +99,17 @@ export default function Wrong() {
   const wrongQuestions = useStore((s) => s.wrongQuestions);
   const denemes = useStore((s) => s.denemes);
   const importWrongQuestions = useStore((s) => s.importWrongQuestions);
+  const syncWrongFromDenemes = useStore((s) => s.syncWrongFromDenemes);
   const importRef = useRef();
   const [importMsg, setImportMsg] = useState(null);
+  const [syncMsg, setSyncMsg] = useState(null);
   const [openCats, setOpenCats] = useState(new Set());
+
+  const onSync = () => {
+    const n = syncWrongFromDenemes();
+    setSyncMsg(n > 0 ? `${n} yanlış soru denemelerden çekildi.` : "Eksik yanlış bulunamadı, hepsi zaten listede.");
+    setTimeout(() => setSyncMsg(null), 3000);
+  };
 
   const toggleCat = (cat) =>
     setOpenCats((prev) => {
@@ -147,6 +155,11 @@ export default function Wrong() {
         <h1>Yanlışlarım</h1>
         <p className="muted">Yanlış yaptığın sorular burada.</p>
       </header>
+
+      <div className="io-row">
+        <button className="btn btn-sm" onClick={onSync}>🔄 Denemelerden Yanlışları Çek</button>
+      </div>
+      {syncMsg && <div className="alert alert-ok">{syncMsg}</div>}
 
       {wrongQuestions.length > 0 && (
         <div className="io-row">

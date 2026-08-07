@@ -255,6 +255,35 @@ export const useStore = create(
             w.id === wrongId ? { ...w, note } : w
           ),
         })),
+      // Denemelerdeki yanlış cevaplanmış ama Yanlışlarım'da olmayan soruları
+      // pool'a geri ekler (ör. Yanlışlarım kazayla eksilmişse kurtarma).
+      syncWrongFromDenemes: () => {
+        const s = get();
+        const existingKeys = new Set(s.wrongQuestions.map((w) => `${w.denemeId}:${w.questionId}`));
+        const toAdd = [];
+        s.denemes.forEach((d) => {
+          d.questions.forEach((q) => {
+            if (!q.userAnswer || q.userAnswer === q.answer) return;
+            const key = `${d.id}:${q.id}`;
+            if (existingKeys.has(key)) return;
+            existingKeys.add(key);
+            toAdd.push({
+              id: uid(),
+              denemeId: d.id,
+              questionId: q.id,
+              denemeName: d.name,
+              question: { ...q },
+              explanation: null,
+              stats: emptyStats(),
+              addedAt: Date.now(),
+            });
+          });
+        });
+        if (toAdd.length > 0) {
+          set((st) => ({ wrongQuestions: [...st.wrongQuestions, ...toAdd] }));
+        }
+        return toAdd.length;
+      },
       // Seçilen formatta (YÖKDİL/YDS) gerçek kategori dağılımına (80 soru)
       // uygun bir deneme oluşturmadan önce kategori bazlı önizleme.
       previewWrongExam: (type) => {
