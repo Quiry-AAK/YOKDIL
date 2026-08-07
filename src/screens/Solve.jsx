@@ -26,6 +26,7 @@ export default function Solve({ denemeId, navigate, startInReport }) {
   const addDenemeTime = useStore((s) => s.addDenemeTime);
   const addQuestionTime = useStore((s) => s.addQuestionTime);
   const retakeDeneme = useStore((s) => s.retakeDeneme);
+  const undoRetake = useStore((s) => s.undoRetake);
 
   const totalSeconds = deneme ? Math.round(FULL_EXAM_SECONDS * (deneme.questions.length / 80)) : 0;
   const persistedElapsed = deneme?.timeSpent || 0;
@@ -236,6 +237,20 @@ export default function Solve({ denemeId, navigate, startInReport }) {
             🔁 Yeniden Çöz
           </button>
         </div>
+        {fresh?.lastAttemptSnapshot && (
+          <div className="nav-row">
+            <button
+              className="btn btn-ghost"
+              onClick={() => {
+                if (confirm("Yeniden çözme iptal edilsin mi? Eski cevapların ve puanın geri gelir.")) {
+                  undoRetake(deneme.id);
+                }
+              }}
+            >
+              ↩️ Yeniden Çözmeyi İptal Et
+            </button>
+          </div>
+        )}
       </div>
     );
   }

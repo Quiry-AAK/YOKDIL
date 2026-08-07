@@ -17,6 +17,7 @@ export default function Home({ navigate }) {
   const renameDeneme = useStore((s) => s.renameDeneme);
   const setDenemeType = useStore((s) => s.setDenemeType);
   const retakeDeneme = useStore((s) => s.retakeDeneme);
+  const undoRetake = useStore((s) => s.undoRetake);
   const updateDenemeQuestions = useStore((s) => s.updateDenemeQuestions);
   const [renamingId, setRenamingId] = useState(null);
   const [renamingName, setRenamingName] = useState("");
@@ -242,6 +243,14 @@ export default function Home({ navigate }) {
                       navigate("solve", d.id);
                     }
                   }}>🔁</button>
+                )}
+                {d.lastAttemptSnapshot && (
+                  <button className="icon-btn" title="Yeniden Çözmeyi İptal Et" onClick={(e) => {
+                    e.stopPropagation();
+                    if (confirm(`"${d.name}" için yeniden çözme iptal edilsin mi? Eski cevapların ve puanın geri gelir.`)) {
+                      undoRetake(d.id);
+                    }
+                  }}>↩️</button>
                 )}
                 <button className="icon-btn" title="JSON güncelle" onClick={(e) => {
                   e.stopPropagation();

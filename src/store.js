@@ -164,6 +164,10 @@ export const useStore = create(
           score: +(correct * 1.25).toFixed(2),
           timeSpent: deneme.timeSpent || 0,
         };
+        const lastAttemptSnapshot = {
+          timeSpent: deneme.timeSpent || 0,
+          questions: deneme.questions.map((q) => ({ ...q })),
+        };
         set((s) => ({
           denemes: s.denemes.map((d) =>
             d.id !== id
@@ -171,8 +175,26 @@ export const useStore = create(
               : {
                   ...d,
                   pastAttempts: answered > 0 ? [...(d.pastAttempts || []), attemptSnapshot] : d.pastAttempts || [],
+                  lastAttemptSnapshot: answered > 0 ? lastAttemptSnapshot : d.lastAttemptSnapshot,
                   timeSpent: 0,
                   questions: d.questions.map((q) => ({ ...q, userAnswer: null, timeSpent: 0 })),
+                }
+          ),
+        }));
+      },
+      undoRetake: (id) => {
+        const deneme = get().denemes.find((d) => d.id === id);
+        if (!deneme?.lastAttemptSnapshot) return;
+        set((s) => ({
+          denemes: s.denemes.map((d) =>
+            d.id !== id
+              ? d
+              : {
+                  ...d,
+                  timeSpent: d.lastAttemptSnapshot.timeSpent,
+                  questions: d.lastAttemptSnapshot.questions,
+                  pastAttempts: (d.pastAttempts || []).slice(0, -1),
+                  lastAttemptSnapshot: null,
                 }
           ),
         }));
