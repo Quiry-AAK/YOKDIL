@@ -53,6 +53,7 @@ export default function App() {
   const wrongCount = useStore((s) => s.wrongQuestions.length);
   const wordCount = useStore((s) => s.words.length);
   const denemes = useStore((s) => s.denemes);
+  const textScale = useStore((s) => s.settings.textScale) || 1;
 
   const navigate = (v, payload) => {
     if (v === "solve" || v === "denemeReport") setActiveDeneme(payload);
@@ -95,7 +96,7 @@ export default function App() {
         <span className="topbar-title">YÖKDİL Asistan</span>
       </header>
 
-      <main className="content">{screen}</main>
+      <main className="content" style={{ zoom: textScale }}>{screen}</main>
 
       <nav className="bottombar">
         <button

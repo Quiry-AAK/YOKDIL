@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useStore } from "../store.js";
 
+const TEXT_SCALES = [
+  { value: 0.9, label: "Küçük" },
+  { value: 1, label: "Normal" },
+  { value: 1.15, label: "Büyük" },
+  { value: 1.3, label: "Çok Büyük" },
+];
+
 const MODELS = [
   { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash — önerilen", hint: "Ücretsiz, büyük denemeleri de okur" },
   { id: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash-Lite — en hızlı", hint: "Ücretsiz, daha hızlı/hafif" },
@@ -46,6 +53,22 @@ export default function Settings() {
         <span className={"status " + (settings.apiKey ? "ok" : "warn")}>
           {settings.apiKey ? "● Anahtar ayarlı" : "● Anahtar yok"}
         </span>
+      </div>
+
+      <div className="card">
+        <h3>Yazı Boyutu</h3>
+        <p className="muted">Uygulamadaki yazıları ve içeriği büyütür/küçültür.</p>
+        <div className="seg seg-wrap">
+          {TEXT_SCALES.map((t) => (
+            <button
+              key={t.value}
+              className={(settings.textScale || 1) === t.value ? "active" : ""}
+              onClick={() => setSettings({ textScale: t.value })}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="card">
